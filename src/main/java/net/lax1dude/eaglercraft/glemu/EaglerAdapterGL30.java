@@ -9,6 +9,7 @@ import java.util.HashMap;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2;
+import net.lax1dude.eaglercraft.glemu.StreamBuffer.StreamBufferInstance;
 import net.lax1dude.eaglercraft.glemu.vector.Matrix4f;
 import net.lax1dude.eaglercraft.glemu.vector.Vector3f;
 import net.lax1dude.eaglercraft.glemu.vector.Vector4f;
@@ -645,7 +646,17 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 
 	public static final void glBlendFunc(int p1, int p2) {
 		fogPremultiply = (p1 == GL_ONE && p2 == GL_ONE_MINUS_SRC_ALPHA);
-		_wglBlendFunc(p1, p2);
+		if(overlayFBOBlending) {
+			_wglBlendFuncSeparate(p1, p2, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		}else {
+			_wglBlendFunc(p1, p2);
+		}
+	}
+
+	private static boolean overlayFBOBlending = false;
+
+	public static final void enableOverlayFramebufferBlending(boolean en) {
+		overlayFBOBlending = en;
 	}
 
 	public static final void glDepthMask(boolean p1) {
@@ -1069,13 +1080,15 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 				System.err.println("only GL_QUADS supported in a display list");
 			}
 		} else {
-			bytesUploaded += _wArrayByteLength(buffer);
+			int bl =  _wArrayByteLength(buffer);
+			bytesUploaded += bl;
 			vertexDrawn += p3;
 
 			bindTheShader();
 
-			_wglBindVertexArray0(shader.genericArray);
-			_wglBindBuffer(_wGL_ARRAY_BUFFER, shader.genericBuffer);
+			StreamBufferInstance sb = shader.streamBuffer.getBuffer(bl);
+			_wglBindVertexArray0(sb.vertexArray);
+			_wglBindBuffer(_wGL_ARRAY_BUFFER, sb.vertexBuffer);
 			if (!shader.bufferIsInitialized) {
 				shader.bufferIsInitialized = true;
 				_wglBufferData(_wGL_ARRAY_BUFFER, blankUploadArray, _wGL_DYNAMIC_DRAW);
@@ -1455,6 +1468,10 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 		default:
 			return "Unknown Error";
 		}
+	}
+
+	public static final void optimize() {
+		FixedFunctionShader.optimize();
 	}
 
 	private static long lastBandwidthReset = 0l;

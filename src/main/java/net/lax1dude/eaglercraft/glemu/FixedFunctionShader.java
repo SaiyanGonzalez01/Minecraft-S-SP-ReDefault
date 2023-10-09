@@ -2,8 +2,9 @@ package net.lax1dude.eaglercraft.glemu;
 
 import static net.lax1dude.eaglercraft.EaglerAdapter.*;
 
-import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.BufferArrayGL;
-import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.BufferGL;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ProgramGL;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ShaderGL;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.UniformGL;
@@ -14,6 +15,7 @@ import net.lax1dude.eaglercraft.glemu.vector.Vector4f;
 public class FixedFunctionShader {
 	
 	private static final FixedFunctionShader[] instances = new FixedFunctionShader[4096]; //lol
+	private static final List<FixedFunctionShader> instanceList = new ArrayList();
 	
 	public static void refreshCoreGL() {
 		for(int i = 0; i < instances.length; ++i) {
@@ -22,6 +24,7 @@ public class FixedFunctionShader {
 				instances[i] = null;
 			}
 		}
+		instanceList.clear();
 		shaderSource = null;
 	}
 
@@ -92,6 +95,7 @@ public class FixedFunctionShader {
 			s = new FixedFunctionShader(i, CC_a_color, CC_a_normal, CC_a_texture0, CC_a_texture1, CC_TEX_GEN_STRQ, CC_lighting,
 					CC_fog, CC_alphatest, CC_unit0, CC_unit1, CC_anisotropic, CC_swap_rb);
 			instances[i] = s;
+			instanceList.add(s);
 		}
 		return s;
 	}
@@ -154,8 +158,7 @@ public class FixedFunctionShader {
 	
 	private final int attributeIndexesToEnable;
 
-	public final BufferArrayGL genericArray;
-	public final BufferGL genericBuffer;
+	public final StreamBuffer streamBuffer;
 	public boolean bufferIsInitialized = false;
 	
 	private FixedFunctionShader(int j, boolean CC_a_color, boolean CC_a_normal, boolean CC_a_texture0, boolean CC_a_texture1, boolean CC_TEX_GEN_STRQ, boolean CC_lighting, 
@@ -306,12 +309,12 @@ public class FixedFunctionShader {
 		
 		u_texCoordV0 = _wglGetUniformLocation(globject, "texCoordV0");
 		u_texCoordV1 = _wglGetUniformLocation(globject, "texCoordV1");
-		
-		genericArray = _wglCreateVertexArray();
-		genericBuffer = _wglCreateBuffer();
-		_wglBindVertexArray(genericArray);
-		_wglBindBuffer(_wGL_ARRAY_BUFFER, genericBuffer);
-		setupArrayForProgram();
+	
+		streamBuffer = new StreamBuffer(0x8000, 3, 8, (vertexArray, vertexBuffer) -> {
+			_wglBindVertexArray(vertexArray);
+			_wglBindBuffer(_wGL_ARRAY_BUFFER, vertexBuffer);
+			setupArrayForProgram();
+		});
 		
 	}
 	
@@ -342,6 +345,13 @@ public class FixedFunctionShader {
 	
 	public void unuseProgram() {
 		
+	}
+
+	public static void optimize() {
+		FixedFunctionShader pp;
+		for(int i = 0, l = instanceList.size(); i < l; ++i) {
+			instanceList.get(i).streamBuffer.optimize();
+		}
 	}
 
 	private float[] modelBuffer = new float[16];

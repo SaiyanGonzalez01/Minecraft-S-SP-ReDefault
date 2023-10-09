@@ -10,6 +10,7 @@ import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.lax1dude.eaglercraft.glemu.EffectPipeline;
 import net.lax1dude.eaglercraft.glemu.EffectPipelineFXAA;
+import net.lax1dude.eaglercraft.glemu.GameOverlayFramebuffer;
 import net.lax1dude.eaglercraft.glemu.vector.Matrix4f;
 import net.minecraft.client.Minecraft;
 
@@ -161,8 +162,11 @@ public class EntityRenderer {
 	public int startup = 0;
 	public int preStartup = 0;
 
+	private GameOverlayFramebuffer overlayFramebuffer;
+
 	public EntityRenderer(Minecraft par1Minecraft) {
 		this.mc = par1Minecraft;
+		this.overlayFramebuffer = new GameOverlayFramebuffer();
 		this.itemRenderer = new ItemRenderer(par1Minecraft);
 		this.lightmapTexture = par1Minecraft.renderEngine.allocateAndSetupTexture(new EaglerImage(16, 16, true));
 		this.lightmapColors = new int[256];
@@ -929,9 +933,46 @@ public class EntityRenderer {
 				this.mc.mcProfiler.endStartSection("gui");
 
 				if (!this.mc.gameSettings.hideGUI || this.mc.currentScreen != null) {
-					this.mc.ingameGUI.renderGameOverlay(par1, this.mc.currentScreen != null, var16, var17);
+					EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.1F);
+					long framebufferAge = this.overlayFramebuffer.getAge();
+					if(framebufferAge == -1l || framebufferAge > (Minecraft.debugFPS < 25 ? 125l : 75l)) {
+						this.overlayFramebuffer.beginRender(mc.displayWidth, mc.displayHeight);
+						EaglerAdapter.glColorMask(true, true, true, true);
+						EaglerAdapter.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+						EaglerAdapter.glClear(EaglerAdapter.GL_COLOR_BUFFER_BIT | EaglerAdapter.GL_DEPTH_BUFFER_BIT);
+						EaglerAdapter.enableOverlayFramebufferBlending(true);
+						this.mc.ingameGUI.renderGameOverlay(par1, this.mc.currentScreen != null, var16, var17);
+						EaglerAdapter.enableOverlayFramebufferBlending(false);
+						this.overlayFramebuffer.endRender();
+						EaglerAdapter.glClearColor(this.fogColorRed, this.fogColorGreen, this.fogColorBlue, 0.0F);
+					}
+					this.setupOverlayRendering();
+					EaglerAdapter.glDisable(EaglerAdapter.GL_LIGHTING);
+					EaglerAdapter.glEnable(EaglerAdapter.GL_BLEND);
+					if (Minecraft.isFancyGraphicsEnabled()) {
+						this.mc.ingameGUI.renderVignette(this.mc.thePlayer.getBrightness(par1), var14, var15);
+					}
+					this.mc.ingameGUI.renderCrosshairs(var14, var15);
+					this.overlayFramebuffer.bindTexture();
+					EaglerAdapter.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+					EaglerAdapter.glBlendFunc(EaglerAdapter.GL_SRC_ALPHA, EaglerAdapter.GL_ONE_MINUS_SRC_ALPHA);
+					EaglerAdapter.glDisable(EaglerAdapter.GL_ALPHA_TEST);
+					EaglerAdapter.glDisable(EaglerAdapter.GL_DEPTH_TEST);
+					EaglerAdapter.glDepthMask(false);
+					EaglerAdapter.glEnable(EaglerAdapter.EAG_SWAP_RB);
+					Tessellator tessellator = Tessellator.instance;
+					tessellator.startDrawingQuads();
+					tessellator.addVertexWithUV(0.0D, (double) var15, -90.0D, 0.0D, 0.0D);
+					tessellator.addVertexWithUV((double) var14, (double) var15, -90.0D, 1.0D, 0.0D);
+					tessellator.addVertexWithUV((double) var14, 0.0D, -90.0D, 1.0D, 1.0D);
+					tessellator.addVertexWithUV(0.0D, 0.0D, -90.0D, 0.0D, 1.0D);
+					tessellator.draw();
+					EaglerAdapter.glDepthMask(true);
+					EaglerAdapter.glEnable(EaglerAdapter.GL_ALPHA_TEST);
+					EaglerAdapter.glEnable(EaglerAdapter.GL_DEPTH_TEST);
+					EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
+					EaglerAdapter.glDisable(EaglerAdapter.EAG_SWAP_RB);
 				}
-
 				this.mc.mcProfiler.endSection();
 			} else {
 				EaglerAdapter.glViewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);

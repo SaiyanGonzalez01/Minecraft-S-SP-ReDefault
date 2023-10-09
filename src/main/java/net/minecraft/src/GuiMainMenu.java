@@ -86,7 +86,7 @@ public class GuiMainMenu extends GuiScreen {
 				this.splashText = "missingno";
 			}
 		}
-		this.field_92025_p = EaglerAdapter._wisWebGL() ? ("eaglercraft javascript runtime") : ("eaglercraft desktop runtime");
+		this.field_92025_p = "Eaglercraft 1.5.2 Service Pack #1";
 		this.start = System.currentTimeMillis();
 		this.start += this.start % 10000l;
 		this.ackLines = new ArrayList();
@@ -154,6 +154,7 @@ public class GuiMainMenu extends GuiScreen {
 			this.buttonList.add(new GuiButton(2, this.width / 2 - 100, var4, var2.translateKey("menu.multiplayer")));
 			this.buttonList.add(new GuiButton(3, this.width / 2 - 100, var4 + 24, var2.translateKey("menu.forkme")));
 		}
+		((GuiButton)this.buttonList.get(this.buttonList.size() - 1)).enabled = false;
 
 		this.buttonList.add(new GuiButton(0, this.width / 2 - 100, var4 + 72 + 12, 98, 20, var2.translateKey("menu.options")));
 		this.buttonList.add(new GuiButton(4, this.width / 2 + 2, var4 + 72 + 12, 98, 20, var2.translateKey("menu.editprofile")));
@@ -504,7 +505,7 @@ public class GuiMainMenu extends GuiScreen {
 		this.drawTexturedModalRect(var6 + 155, var7 + 0, 0, 45, 155, 44);
 
 		this.drawString(this.fontRenderer, "minecraft 1.5.2", 2, this.height - 20, 16777215);
-		this.drawString(this.fontRenderer, ConfigConstants.mainMenuString + EnumChatFormatting.GRAY + " (cracked)", 2, this.height - 10, 16777215);
+		this.drawString(this.fontRenderer, ConfigConstants.mainMenuString + " official", 2, this.height - 10, 16777215);
 
 		//String var10 = "Copyright " + Calendar.getInstance().get(Calendar.YEAR) + " Mojang AB.";
 		String var10 = "copyright 2013 Mojang AB";

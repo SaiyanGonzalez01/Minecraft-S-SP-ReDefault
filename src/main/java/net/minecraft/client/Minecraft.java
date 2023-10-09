@@ -536,6 +536,7 @@ public class Minecraft implements Runnable {
 		EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.1F);
 		EaglerAdapter.glFlush();
 		EaglerAdapter.updateDisplay();
+		EaglerAdapter.optimize();
 	}
 
 	/**
@@ -780,6 +781,7 @@ public class Minecraft implements Runnable {
 		}
 
 		this.checkGLError("Post render");
+		EaglerAdapter.optimize();
 		++this.fpsCounter;
 		//boolean var5 = this.isGamePaused;
 		//this.isGamePaused = false;

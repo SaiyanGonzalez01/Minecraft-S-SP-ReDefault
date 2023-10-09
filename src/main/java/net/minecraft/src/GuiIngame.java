@@ -59,12 +59,7 @@ public class GuiIngame extends Gui {
 		FontRenderer var8 = this.mc.fontRenderer;
 		this.mc.entityRenderer.setupOverlayRendering();
 		EaglerAdapter.glEnable(EaglerAdapter.GL_BLEND);
-
-		if (Minecraft.isFancyGraphicsEnabled()) {
-			this.renderVignette(this.mc.thePlayer.getBrightness(par1), var6, var7);
-		} else {
-			EaglerAdapter.glBlendFunc(EaglerAdapter.GL_SRC_ALPHA, EaglerAdapter.GL_ONE_MINUS_SRC_ALPHA);
-		}
+		EaglerAdapter.glBlendFunc(EaglerAdapter.GL_SRC_ALPHA, EaglerAdapter.GL_ONE_MINUS_SRC_ALPHA);
 
 		ItemStack var9 = this.mc.thePlayer.inventory.armorItemInSlot(3);
 
@@ -102,29 +97,9 @@ public class GuiIngame extends Gui {
 			this.zLevel = -90.0F;
 			this.drawTexturedModalRect(var6 / 2 - 91, var7 - 22, 0, 0, 182, 22);
 			this.drawTexturedModalRect(var6 / 2 - 91 - 1 + var31.currentItem * 20, var7 - 22 - 1, 0, 22, 24, 22);
+
 			tex_icons.bindTexture();
 			EaglerAdapter.glEnable(EaglerAdapter.GL_BLEND);
-			EaglerAdapter.glBlendFunc(EaglerAdapter.GL_ONE_MINUS_DST_COLOR, EaglerAdapter.GL_ONE_MINUS_SRC_COLOR);
-
-			float i = mc.entityRenderer.startup / 900.0f - 0.5f;
-			if(i > 1.0f) i = 1.0f;
-			if(i < 0.0f) i = 0.0f;
-			float i2 = i * i;
-			if(i2 > 0.0f) {
-				float f = (float)((System.currentTimeMillis() % 1000000l) * 0.0002);
-				f += MathHelper.sin(f * 5.0f) * 0.2f;
-				i2 *= MathHelper.sin(f) + MathHelper.sin(f * 1.5f + 0.6f) + MathHelper.sin(f * 0.7f + 1.7f) +
-						MathHelper.sin(f * 3.0f + 3.0f);
-				EaglerAdapter.glPushMatrix();
-				EaglerAdapter.glTranslatef(var6 / 2, var7 / 2, 0.0f);
-				EaglerAdapter.glRotatef(i2 * 5.0f, 0.0f, 0.0f, 1.0f);
-				this.drawTexturedModalRect(-7, -7, 0, 0, 16, 16);
-				EaglerAdapter.glPopMatrix();
-			}else {
-				this.drawTexturedModalRect(var6 / 2 - 7, var7 / 2 - 7, 0, 0, 16, 16);
-			}
-			
-			EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
 			var11 = this.mc.thePlayer.hurtResistantTime / 3 % 2 == 1;
 
 			if (this.mc.thePlayer.hurtResistantTime < 10) {
@@ -669,14 +644,14 @@ public class GuiIngame extends Gui {
 				int var19 = var23 - var12 * par4FontRenderer.FONT_HEIGHT;
 				int var20 = par3 - var24 + 2;
 				drawRect(var25 - 2, var19, var20, var19 + par4FontRenderer.FONT_HEIGHT, 1342177280);
-				par4FontRenderer.drawString(var16, var25, var19, 553648127);
-				par4FontRenderer.drawString(var17, var20 - par4FontRenderer.getStringWidth(var17), var19, 553648127);
+				par4FontRenderer.drawString(var16, var25, var19, 0xFFFFFFFF);
+				par4FontRenderer.drawString(var17, var20 - par4FontRenderer.getStringWidth(var17), var19, 0xFFFFFFFF);
 
 				if (var12 == var6.size()) {
 					String var21 = par1ScoreObjective.getDisplayName();
 					drawRect(var25 - 2, var19 - par4FontRenderer.FONT_HEIGHT - 1, var20, var19 - 1, 1610612736);
 					drawRect(var25 - 2, var19 - 1, var20, var19, 1342177280);
-					par4FontRenderer.drawString(var21, var25 + var7 / 2 - par4FontRenderer.getStringWidth(var21) / 2, var19 - par4FontRenderer.FONT_HEIGHT, 553648127);
+					par4FontRenderer.drawString(var21, var25 + var7 / 2 - par4FontRenderer.getStringWidth(var21) / 2, var19 - par4FontRenderer.FONT_HEIGHT, 0xFFFFFFFF);
 				}
 			}
 		}
@@ -732,7 +707,7 @@ public class GuiIngame extends Gui {
 	/**
 	 * Renders the vignette. Args: vignetteBrightness, width, height
 	 */
-	private void renderVignette(float par1, int par2, int par3) {
+	public void renderVignette(float par1, int par2, int par3) {
 		par1 = 1.0F - par1 * 0.5f;
 
 		if (par1 < 0.0F) {
@@ -760,6 +735,31 @@ public class GuiIngame extends Gui {
 		EaglerAdapter.glEnable(EaglerAdapter.GL_DEPTH_TEST);
 		EaglerAdapter.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		EaglerAdapter.glBlendFunc(EaglerAdapter.GL_SRC_ALPHA, EaglerAdapter.GL_ONE_MINUS_SRC_ALPHA);
+	}
+
+	public void renderCrosshairs(int w, int h) {
+		tex_icons.bindTexture();
+		EaglerAdapter.glEnable(EaglerAdapter.GL_BLEND);
+		EaglerAdapter.glBlendFunc(EaglerAdapter.GL_ONE_MINUS_DST_COLOR, EaglerAdapter.GL_ONE_MINUS_SRC_COLOR);
+
+		float i = mc.entityRenderer.startup / 900.0f - 0.5f;
+		if(i > 1.0f) i = 1.0f;
+		if(i < 0.0f) i = 0.0f;
+		float i2 = i * i;
+		if(i2 > 0.0f) {
+			float f = (float)((System.currentTimeMillis() % 1000000l) * 0.0002);
+			f += MathHelper.sin(f * 5.0f) * 0.2f;
+			i2 *= MathHelper.sin(f) + MathHelper.sin(f * 1.5f + 0.6f) + MathHelper.sin(f * 0.7f + 1.7f) +
+					MathHelper.sin(f * 3.0f + 3.0f);
+			EaglerAdapter.glPushMatrix();
+			EaglerAdapter.glTranslatef(w / 2, h / 2, 0.0f);
+			EaglerAdapter.glRotatef(i2 * 5.0f, 0.0f, 0.0f, 1.0f);
+			this.drawTexturedModalRect(-7, -7, 0, 0, 16, 16);
+			EaglerAdapter.glPopMatrix();
+		}else {
+			this.drawTexturedModalRect(w / 2 - 7, h / 2 - 7, 0, 0, 16, 16);
+		}
+		
 	}
 
 	/**

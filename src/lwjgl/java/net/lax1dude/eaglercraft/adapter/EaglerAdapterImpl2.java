@@ -228,6 +228,7 @@ public class EaglerAdapterImpl2 {
 	public static final int _wGL_ELEMENT_ARRAY_BUFFER = GL15.GL_ELEMENT_ARRAY_BUFFER;
 	public static final int _wGL_STATIC_DRAW = GL15.GL_STATIC_DRAW;
 	public static final int _wGL_DYNAMIC_DRAW = GL15.GL_DYNAMIC_DRAW;
+	public static final int _wGL_STREAM_DRAW = GL15.GL_STREAM_DRAW;
 	public static final int _wGL_INVALID_ENUM = GL11.GL_INVALID_ENUM;
 	public static final int _wGL_INVALID_VALUE= GL11.GL_INVALID_VALUE;
 	public static final int _wGL_INVALID_OPERATION = GL11.GL_INVALID_OPERATION;
@@ -356,9 +357,11 @@ public class EaglerAdapterImpl2 {
 	public static final void _wglTexImage2D(int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, ByteBuffer p9) {
 		GL11.glTexImage2D(p1, p2, p3, p4, p5, p6, p7, p8, p9);
 	}
-
 	public static final void _wglBlendFunc(int p1, int p2) {
 		GL11.glBlendFunc(p1, p2);
+	}
+	public static final void _wglBlendFuncSeparate(int p1, int p2, int p3, int p4) {
+		GL14.glBlendFuncSeparate(p1, p2, p3, p4);
 	}
 	public static final void _wglBlendColor(float r, float g, float b, float a) {
 		GL14.glBlendColor(r, g, b, a);
@@ -479,6 +482,9 @@ public class EaglerAdapterImpl2 {
 	}
 	public static final void _wglBufferData0(int p1, IntBuffer p2, int p3) {
 		GL15.glBufferData(p1, p2, p3);
+	}
+	public static final void _wglBufferData00(int p1, long len, int p3) {
+		GL15.glBufferData(p1, len, p3);
 	}
 	public static final void _wglBufferSubData0(int p1, int p2, IntBuffer p3) {
 		GL15.glBufferSubData(p1, p2, p3);
