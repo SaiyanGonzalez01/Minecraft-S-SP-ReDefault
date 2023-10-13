@@ -86,21 +86,22 @@ uniform vec3 normalUniform;
 #endif
 #ifdef CC_fog
 uniform vec4 fogColor;
-uniform int fogMode;
-uniform float fogStart;
-uniform float fogEnd;
-uniform float fogDensity;
-uniform float fogPremultiply;
+//X = uniform float fogMode;
+//Y = uniform float fogStart;
+//Z = uniform float fogEnd - fogStart;
+//W = uniform float fogDensity;
+uniform vec4 fogParam;
 #endif
 uniform vec4 colorUniform;
 #ifdef CC_alphatest
 uniform float alphaTestF;
 #endif
 #ifdef CC_TEX_GEN_STRQ
-uniform int textureGenS_M;
-uniform int textureGenT_M;
-uniform int textureGenR_M;
-uniform int textureGenQ_M;
+//uniform int textureGenS_M;
+//uniform int textureGenT_M;
+//uniform int textureGenR_M;
+//uniform int textureGenQ_M;
+uniform ivec4 textureGen_M;
 uniform vec4 textureGenS_V;
 uniform vec4 textureGenT_V;
 uniform vec4 textureGenR_V;
@@ -144,10 +145,10 @@ void main(){
 	texSrc[1] = v_position;
 	
 	vec4 texPos;
-	texPos.x = dot(texSrc[textureGenS_M], textureGenS_V);
-	texPos.y = dot(texSrc[textureGenT_M], textureGenT_V);
-	texPos.z = dot(texSrc[textureGenR_M], textureGenR_V);
-	texPos.w = dot(texSrc[textureGenQ_M], textureGenQ_V);
+	texPos.x = dot(texSrc[textureGen_M.x], textureGenS_V);
+	texPos.y = dot(texSrc[textureGen_M.y], textureGenT_V);
+	texPos.z = dot(texSrc[textureGen_M.z], textureGenR_V);
+	texPos.w = dot(texSrc[textureGen_M.w], textureGenQ_V);
 	texPos = matrix_t * texPos;
 	color *= texture(tex0, texPos.xy / texPos.w).bgra;
 #ifdef CC_alphatest
@@ -210,7 +211,7 @@ void main(){
 	
 #ifdef CC_fog
 	float dist = sqrt(dot(v_position, v_position));
-	float i = fogMode == 1 ? (dist - fogStart) / (fogEnd - fogStart) : 1.0 - exp(-fogDensity * dist);
+	float i = fogParam.x == 1.0 ? (dist - fogParam.y) / fogParam.z : 1.0 - exp(-fogParam.w * dist);
 	color.rgb = mix(color.rgb, fogColor.xyz, clamp(i, 0.0, 1.0) * fogColor.a);
 #endif
 	
