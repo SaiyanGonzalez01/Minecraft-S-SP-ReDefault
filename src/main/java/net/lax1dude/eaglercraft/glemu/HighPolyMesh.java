@@ -1,6 +1,6 @@
 package net.lax1dude.eaglercraft.glemu;
 
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.*;
+import static net.lax1dude.eaglercraft.EaglerAdapter.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -88,7 +88,7 @@ public class HighPolyMesh {
 		}
 		
 		BufferArrayGL vertexArray = _wglCreateVertexArray();
-		_wglBindVertexArray(vertexArray);
+		_wglBindVertexArray0(vertexArray);
 
 		up1.position(0).limit(intsOfVertex);
 		

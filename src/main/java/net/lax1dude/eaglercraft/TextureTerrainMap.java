@@ -169,7 +169,7 @@ public class TextureTerrainMap implements IconRegister {
 						
 						EaglerAdapter.glBindTexture(EaglerAdapter.GL_TEXTURE_2D, -1);
 						frames = EaglerAdapter._wglGenTextures();
-						EaglerAdapter._wglBindTexture(EaglerAdapter.GL_TEXTURE_2D, frames);
+						EaglerAdapter.glBindTexture(EaglerAdapter.GL_TEXTURE_2D, frames);
 
 						EaglerImage mipLvl = populateAlpha(img);
 						uploadBuffer.clear();
@@ -499,7 +499,7 @@ public class TextureTerrainMap implements IconRegister {
 		EaglerAdapter._wglBindFramebuffer(EaglerAdapter._wGL_FRAMEBUFFER, copyFramebuffer);
 		EaglerAdapter._wglReadBuffer(EaglerAdapter._wGL_COLOR_ATTACHMENT0);
 		for(int i = 0; i < 5; i++) {
-			EaglerAdapter._wglBindTexture(EaglerAdapter.GL_TEXTURE_2D, icon.frames);
+			EaglerAdapter.glBindTexture(EaglerAdapter.GL_TEXTURE_2D, icon.frames);
 			EaglerAdapter._wglFramebufferTexture2D(EaglerAdapter._wGL_COLOR_ATTACHMENT0, icon.frames, i);
 			EaglerAdapter.glBindTexture(EaglerAdapter.GL_TEXTURE_2D, texture);
 			

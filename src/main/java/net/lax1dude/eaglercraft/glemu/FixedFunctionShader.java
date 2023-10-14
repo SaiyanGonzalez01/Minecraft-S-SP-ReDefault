@@ -313,7 +313,7 @@ public class FixedFunctionShader {
 		u_texCoordV1 = _wglGetUniformLocation(globject, "texCoordV1");
 	
 		streamBuffer = new StreamBuffer(0x8000, 3, 8, (vertexArray, vertexBuffer) -> {
-			_wglBindVertexArray(vertexArray);
+			_wglBindVertexArray0(vertexArray);
 			_wglBindBuffer(_wGL_ARRAY_BUFFER, vertexBuffer);
 			setupArrayForProgram();
 		});

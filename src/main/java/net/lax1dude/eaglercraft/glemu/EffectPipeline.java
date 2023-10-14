@@ -86,7 +86,7 @@ public class EffectPipeline {
 				noiseCounter = _wglGetUniformLocation(noiseProgram, "counter");
 				
 				noiseSourceTexture = _wglGenTextures();
-				_wglBindTexture(_wGL_TEXTURE_2D, noiseSourceTexture);
+				glBindTexture(_wGL_TEXTURE_2D, noiseSourceTexture);
 				_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_MAG_FILTER, _wGL_NEAREST);
 				_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_MIN_FILTER, _wGL_NEAREST);
 				_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_S, _wGL_REPEAT);
@@ -106,7 +106,7 @@ public class EffectPipeline {
 				noiseGenFramebuffer = _wglCreateFramebuffer();
 				noiseGenTexture = _wglGenTextures();
 
-				_wglBindTexture(_wGL_TEXTURE_2D, noiseGenTexture);
+				glBindTexture(_wGL_TEXTURE_2D, noiseGenTexture);
 				_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_MAG_FILTER, _wGL_LINEAR);
 				_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_MIN_FILTER, _wGL_LINEAR);
 				_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_S, _wGL_REPEAT);
@@ -137,7 +137,7 @@ public class EffectPipeline {
 			
 			_wglBindVertexArray0(renderQuadArray);
 			glActiveTexture(_wGL_TEXTURE0);
-			_wglBindTexture(_wGL_TEXTURE_2D, noiseSourceTexture);
+			glBindTexture(_wGL_TEXTURE_2D, noiseSourceTexture);
 			glDisable(GL_DEPTH_TEST);
 			glDisable(GL_CULL_FACE);
 			glDisable(GL_BLEND);
@@ -162,10 +162,8 @@ public class EffectPipeline {
 			return;
 		}
 		
-		// three guesses to figure out what this does
-		
 		glActiveTexture(_wGL_TEXTURE0);
-		_wglBindTexture(_wGL_TEXTURE_2D, noiseGenTexture);
+		glBindTexture(_wGL_TEXTURE_2D, noiseGenTexture);
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
 		glDisable(GL_ALPHA_TEST);

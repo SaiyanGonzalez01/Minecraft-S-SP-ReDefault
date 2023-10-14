@@ -180,7 +180,8 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 
 	static int selectedTex = 0;
 	static int selectedClientTex = 0;
-	static int[] boundTex = new int[2];
+	static int[] boundTexI = new int[2];
+	static TextureGL[] boundTex = new TextureGL[2];
 	static int tex0Serial = 0;
 	static float tex0X = 0;
 	static float tex0Y = 0;
@@ -772,11 +773,26 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 	}
 
 	public static final void glBindTexture(int p1, int p2) {
-		if(boundTex[selectedTex] != p2) {
+		if(boundTexI[selectedTex] != p2) {
 			TextureGL t = texObjects.get(p2);
-			_wglBindTexture(_wGL_TEXTURE_2D, t);
+			if(boundTex[selectedTex] != t) {
+				_wglBindTexture(_wGL_TEXTURE_2D, t);
+				if (selectedTex == 0) {
+					boundTexture0 = t;
+					updateAnisotropicPatch();
+				}
+				boundTex[selectedTex] = t;
+			}
+			boundTexI[selectedTex] = p2;
+		}
+	}
+
+	public static final void glBindTexture(int p1, TextureGL p2) {
+		boundTexI[selectedTex] = -1;
+		if(boundTex[selectedTex] != p2) {
+			_wglBindTexture(_wGL_TEXTURE_2D, p2);
 			if (selectedTex == 0) {
-				boundTexture0 = t;
+				boundTexture0 = p2;
 				updateAnisotropicPatch();
 			}
 			boundTex[selectedTex] = p2;
@@ -1443,12 +1459,16 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 	public static final void glActiveTexture(int p1) {
 		switch (p1) {
 		case GL_TEXTURE0:
-			selectedTex = 0;
-			_wglActiveTexture(_wGL_TEXTURE0);
+			if(selectedTex != 0) {
+				selectedTex = 0;
+				_wglActiveTexture(_wGL_TEXTURE0);
+			}
 			break;
 		case GL_TEXTURE1:
-			selectedTex = 1;
-			_wglActiveTexture(_wGL_TEXTURE1);
+			if(selectedTex != 1) {
+				selectedTex = 1;
+				_wglActiveTexture(_wGL_TEXTURE1);
+			}
 			break;
 		default:
 			System.err.println("only two texture units implemented");

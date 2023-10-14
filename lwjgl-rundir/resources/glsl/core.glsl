@@ -1,6 +1,5 @@
 
 // copyright (c) 2020-2023 lax1dude
-// creative commons BY-NC 4.0
 
 #line 7
 

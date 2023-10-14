@@ -21,7 +21,7 @@ public class GameOverlayFramebuffer {
 			depthBuffer = _wglCreateRenderBuffer();
 			framebufferColor = _wglGenTextures();
 			_wglBindFramebuffer(_wGL_FRAMEBUFFER, framebuffer);
-			_wglBindTexture(_wGL_TEXTURE_2D, framebufferColor);
+			glBindTexture(_wGL_TEXTURE_2D, framebufferColor);
 			_wglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			_wglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			_wglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -34,7 +34,7 @@ public class GameOverlayFramebuffer {
 		if(currentWidth != width || currentHeight != height) {
 			currentWidth = width;
 			currentHeight = height;
-			_wglBindTexture(_wGL_TEXTURE_2D, framebufferColor);
+			glBindTexture(_wGL_TEXTURE_2D, framebufferColor);
 			_wglTexImage2D(_wGL_TEXTURE_2D, 0, _wGL_RGBA8, width, height, 0, _wGL_RGBA, _wGL_UNSIGNED_BYTE, (ByteBuffer)null);
 			_wglBindRenderbuffer(depthBuffer);
 			_wglRenderbufferStorage(0x81A5, width, height);
@@ -53,7 +53,7 @@ public class GameOverlayFramebuffer {
 	}
 
 	public void bindTexture() {
-		_wglBindTexture(_wGL_TEXTURE_2D, framebufferColor);
+		glBindTexture(_wGL_TEXTURE_2D, framebufferColor);
 	}
 
 	public void destroy() {
