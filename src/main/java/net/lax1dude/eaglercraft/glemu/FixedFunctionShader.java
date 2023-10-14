@@ -8,7 +8,6 @@ import java.util.List;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ProgramGL;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ShaderGL;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.UniformGL;
-import net.lax1dude.eaglercraft.glemu.vector.Matrix4f;
 import net.lax1dude.eaglercraft.glemu.vector.Vector2f;
 import net.lax1dude.eaglercraft.glemu.vector.Vector4f;
 
@@ -409,29 +408,29 @@ public class FixedFunctionShader {
 	private int lightPos0Serial = -1;
 	private int lightPos1Serial = -1;
 
-	static int texS_plane = -1;
-	static float texS_X = -999.0f;
-	static float texS_Y = -999.0f;
-	static float texS_Z = -999.0f;
-	static float texS_W = -999.0f;
+	private int texS_plane = -1;
+	private float texS_X = -999.0f;
+	private float texS_Y = -999.0f;
+	private float texS_Z = -999.0f;
+	private float texS_W = -999.0f;
 
-	static int texT_plane = -1;
-	static float texT_X = -999.0f;
-	static float texT_Y = -999.0f;
-	static float texT_Z = -999.0f;
-	static float texT_W = -999.0f;
+	private int texT_plane = -1;
+	private float texT_X = -999.0f;
+	private float texT_Y = -999.0f;
+	private float texT_Z = -999.0f;
+	private float texT_W = -999.0f;
 
-	static int texR_plane = -1;
-	static float texR_X = -999.0f;
-	static float texR_Y = -999.0f;
-	static float texR_Z = -999.0f;
-	static float texR_W = -999.0f;
+	private int texR_plane = -1;
+	private float texR_X = -999.0f;
+	private float texR_Y = -999.0f;
+	private float texR_Z = -999.0f;
+	private float texR_W = -999.0f;
 
-	static int texQ_plane = -1;
-	static float texQ_X = -999.0f;
-	static float texQ_Y = -999.0f;
-	static float texQ_Z = -999.0f;
-	static float texQ_W = -999.0f;
+	private int texQ_plane = -1;
+	private float texQ_X = -999.0f;
+	private float texQ_Y = -999.0f;
+	private float texQ_Z = -999.0f;
+	private float texQ_W = -999.0f;
 
 	public void update() {
 		if(anisotropicFixSerial != EaglerAdapterGL30.anisotropicFixSerial) {
