@@ -91,7 +91,7 @@ public class GuiMainMenu extends GuiScreen {
 		this.start += this.start % 10000l;
 		this.ackLines = new ArrayList();
 		
-		if(!LocalStorageManager.gameSettingsStorage.getBoolean("seenAcknowledgements")) {
+		if(!LocalStorageManager.gameSettingsStorage.getBoolean("seenAcknowledgementsSP1")) {
 			this.showAck = true;
 		}
 	}
@@ -128,8 +128,8 @@ public class GuiMainMenu extends GuiScreen {
 	}
 	
 	private void hideAck() {
-		if(!LocalStorageManager.gameSettingsStorage.getBoolean("seenAcknowledgements")) {
-			LocalStorageManager.gameSettingsStorage.setBoolean("seenAcknowledgements", true);
+		if(!LocalStorageManager.gameSettingsStorage.getBoolean("seenAcknowledgementsSP1")) {
+			LocalStorageManager.gameSettingsStorage.setBoolean("seenAcknowledgementsSP1", true);
 			LocalStorageManager.saveStorageG();
 		}
 		showAck = false;

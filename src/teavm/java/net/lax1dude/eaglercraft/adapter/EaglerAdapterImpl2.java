@@ -588,6 +588,7 @@ public class EaglerAdapterImpl2 {
 	public static final int _wGL_ELEMENT_ARRAY_BUFFER = ELEMENT_ARRAY_BUFFER;
 	public static final int _wGL_STATIC_DRAW = STATIC_DRAW;
 	public static final int _wGL_DYNAMIC_DRAW = DYNAMIC_DRAW;
+	public static final int _wGL_STREAM_DRAW = STREAM_DRAW;
 	public static final int _wGL_INVALID_ENUM = INVALID_ENUM;
 	public static final int _wGL_INVALID_VALUE= INVALID_VALUE;
 	public static final int _wGL_INVALID_OPERATION = INVALID_OPERATION;
@@ -737,6 +738,9 @@ public class EaglerAdapterImpl2 {
 	public static final void _wglBlendFunc(int p1, int p2) {
 		webgl.blendFunc(p1, p2);
 	}
+	public static final void _wglBlendFuncSeparate(int p1, int p2, int p3, int p4) {
+		webgl.blendFuncSeparate(p1, p2, p3, p4);
+	}
 	public static final void _wglBlendColor(float r, float g, float b, float a) {
 		webgl.blendColor(r, g, b, a);
 	}
@@ -868,6 +872,9 @@ public class EaglerAdapterImpl2 {
 	}
 	public static final void _wglBufferData(int p1, Object p2, int p3) {
 		webgl.bufferData(p1, (Int32Array)p2, p3);
+	}
+	public static final void _wglBufferData00(int p1, long len, int p3) {
+		webgl.bufferData(p1, (int)len, p3);
 	}
 	public static final void _wglBufferSubData(int p1, int p2, Object p3) {
 		webgl.bufferSubData(p1, p2, (Int32Array)p3);

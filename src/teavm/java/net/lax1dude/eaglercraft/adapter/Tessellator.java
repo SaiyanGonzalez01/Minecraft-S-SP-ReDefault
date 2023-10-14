@@ -319,8 +319,8 @@ public class Tessellator {
 	 * integer).
 	 */
 	public void setColorOpaque_I(int par1) {
-		int var2 = par1 >> 16 & 255;
-		int var3 = par1 >> 8 & 255;
+		int var2 = par1 >>> 16 & 255;
+		int var3 = par1 >>> 8 & 255;
 		int var4 = par1 & 255;
 		this.setColorOpaque(var2, var3, var4);
 	}
@@ -330,8 +330,8 @@ public class Tessellator {
 	 * values.
 	 */
 	public void setColorRGBA_I(int par1, int par2) {
-		int var3 = par1 >> 16 & 255;
-		int var4 = par1 >> 8 & 255;
+		int var3 = par1 >>> 16 & 255;
+		int var4 = par1 >>> 8 & 255;
 		int var5 = par1 & 255;
 		this.setColorRGBA(var3, var4, var5, par2);
 	}
