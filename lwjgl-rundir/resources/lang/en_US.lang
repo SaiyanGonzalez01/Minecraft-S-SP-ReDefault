@@ -291,6 +291,7 @@ networkSettings.loadDefaults=Load Defaults
 networkSettings.relayTimeout=Connection Timeout:
 networkSettings.relayTimeoutChange=change
 networkSettings.relayTimeoutTitle=Change Connection Timeout
+networkSettings.downloadRelay=Download JAR
 
 addRelay.title=Add New Relay
 addRelay.name=Relay Comment
