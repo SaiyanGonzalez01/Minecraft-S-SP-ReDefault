@@ -1,6 +1,10 @@
 package net.minecraft.src;
 
+import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.adapter.SimpleStorage;
 import net.minecraft.client.Minecraft;
+
+import java.util.List;
 
 public class GuiTexturePacks extends GuiScreen {
 	protected GuiScreen guiScreen;
@@ -8,6 +12,8 @@ public class GuiTexturePacks extends GuiScreen {
 
 	/** the absolute location of this texture pack */
 	private String fileLocation = "";
+
+	private boolean isSelectingPack = false;
 
 	/**
 	 * the GuiTexturePackSlot that contains all the texture packs and their
@@ -26,9 +32,7 @@ public class GuiTexturePacks extends GuiScreen {
 	 */
 	public void initGui() {
 		StringTranslate var1 = StringTranslate.getInstance();
-		GuiSmallButton b;
-		this.buttonList.add(b = new GuiSmallButton(5, this.width / 2 - 154, this.height - 48, var1.translateKey("texturePack.openFolder")));
-		b.enabled = false;
+		this.buttonList.add(new GuiSmallButton(5, this.width / 2 - 154, this.height - 48, var1.translateKey("texturePack.openFolder")));
 		this.buttonList.add(new GuiSmallButton(6, this.width / 2 + 4, this.height - 48, var1.translateKey("gui.done")));
 		this.mc.texturePackList.updateAvaliableTexturePacks();
 		//this.fileLocation = (new File("texturepacks")).getAbsolutePath();
@@ -42,7 +46,15 @@ public class GuiTexturePacks extends GuiScreen {
 	 */
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (par1GuiButton.enabled) {
-			
+			if (par1GuiButton.id == 5) {
+				isSelectingPack = true;
+				EaglerAdapter.openFileChooser("epk,.zip", null);
+			} else if (par1GuiButton.id == 6) {
+				// this.mc.renderEngine.refreshTextures();
+				this.mc.displayGuiScreen(guiScreen);
+			} else {
+				this.guiTexturePackSlot.actionPerformed(par1GuiButton);
+			}
 		}
 	}
 
@@ -85,69 +97,35 @@ public class GuiTexturePacks extends GuiScreen {
 	public void updateScreen() {
 		super.updateScreen();
 		--this.refreshTimer;
+		if (isSelectingPack && EaglerAdapter.getFileChooserResultAvailable()) {
+			isSelectingPack = false;
+			String name = EaglerAdapter.getFileChooserResultName();
+			SimpleStorage.set(name.replaceAll("[^A-Za-z0-9_]", "_"), name.toLowerCase().endsWith(".zip") ? TexturePackList.zipToEpk(EaglerAdapter.getFileChooserResult()) : EaglerAdapter.getFileChooserResult());
+			EaglerAdapter.clearFileChooserResult();
+			this.mc.displayGuiScreen(this);
+		}
 	}
 
-	static Minecraft func_73950_a(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.mc;
-	}
+	@Override
+	public void confirmClicked(boolean par1, int par2) {
+		this.mc.displayGuiScreen(this);
 
-	static Minecraft func_73955_b(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.mc;
-	}
+		List var3 = this.mc.texturePackList.availableTexturePacks();
 
-	static Minecraft func_73958_c(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.mc;
-	}
-
-	static Minecraft func_73951_d(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.mc;
-	}
-
-	static Minecraft func_73952_e(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.mc;
-	}
-
-	static Minecraft func_73962_f(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.mc;
-	}
-
-	static Minecraft func_73959_g(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.mc;
-	}
-
-	static Minecraft func_73957_h(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.mc;
-	}
-
-	static Minecraft func_73956_i(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.mc;
-	}
-
-	static Minecraft func_73953_j(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.mc;
-	}
-
-	static Minecraft func_73961_k(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.mc;
-	}
-
-	static Minecraft func_96143_l(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.mc;
-	}
-
-	static Minecraft func_96142_m(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.mc;
-	}
-
-	static FontRenderer func_73954_n(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.fontRenderer;
-	}
-
-	static FontRenderer func_96145_o(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.fontRenderer;
-	}
-
-	static FontRenderer func_96144_p(GuiTexturePacks par0GuiTexturePacks) {
-		return par0GuiTexturePacks.fontRenderer;
+		if (par1) {
+			SimpleStorage.set(((ITexturePack) var3.get(par2)).getTexturePackFileName(), null);
+		} else {
+			try {
+				this.mc.texturePackList.setTexturePack((ITexturePack) var3.get(par2));
+				this.mc.renderEngine.refreshTextures();
+				this.mc.renderGlobal.loadRenderers();
+			} catch (Exception var5) {
+				var5.printStackTrace();
+				this.mc.texturePackList.setTexturePack((ITexturePack) var3.get(0));
+				this.mc.renderEngine.refreshTextures();
+				this.mc.renderGlobal.loadRenderers();
+				SimpleStorage.set(((ITexturePack) var3.get(par2)).getTexturePackFileName(), null);
+			}
+		}
 	}
 }

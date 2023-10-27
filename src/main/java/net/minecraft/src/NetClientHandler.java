@@ -1187,7 +1187,42 @@ public class NetClientHandler extends NetHandler {
 	}
 
 	public void handleCustomPayload(Packet250CustomPayload par1Packet250CustomPayload) {
-		if ("MC|TrList".equals(par1Packet250CustomPayload.channel)) {
+		if ("MC|TPack".equals(par1Packet250CustomPayload.channel)) {
+			String[] var2 = (new String(par1Packet250CustomPayload.data))
+					.split("\u0000");
+			String var3 = var2[0];
+
+			if (var2[1].equals("16"))
+			{
+				if (this.mc.texturePackList.getAcceptsTextures())
+				{
+					this.mc.texturePackList.requestDownloadOfTexture(var3);
+				}
+				else if (this.mc.texturePackList.func_77300_f())
+				{
+					this.mc.displayGuiScreen(new GuiYesNo(
+							new GuiScreen() {
+								public void confirmClicked(boolean par1, int par2) {
+									mc = Minecraft.getMinecraft();
+
+									if (mc.getServerData() != null) {
+										mc.getServerData().setAcceptsTextures(par1);
+									}
+
+									if (par1) {
+										mc.texturePackList.requestDownloadOfTexture(var3);
+									}
+
+									mc.displayGuiScreen(null);
+								}
+							},
+							StringTranslate.getInstance().translateKey(
+									"multiplayer.texturePrompt.line1"),
+							StringTranslate.getInstance().translateKey(
+									"multiplayer.texturePrompt.line2"), 0));
+				}
+			}
+		} else if ("MC|TrList".equals(par1Packet250CustomPayload.channel)) {
 			DataInputStream var8 = new DataInputStream(new ByteArrayInputStream(par1Packet250CustomPayload.data));
 
 			try {

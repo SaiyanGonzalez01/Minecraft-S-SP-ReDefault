@@ -16,6 +16,7 @@ import org.json.JSONObject;
 public class AssetRepository {
 	
 	private static final HashMap<String,byte[]> filePool = new HashMap();
+	private static final HashMap<String,byte[]> filePoolTemp = new HashMap();
 	public static final HashMap<String, String> fileNameOverrides = new HashMap();
 
 	public static final void loadOverrides(JSONObject json) {
@@ -33,8 +34,34 @@ public class AssetRepository {
 			}
 		}
 	}
+
+	private static byte[] def = null;
+
+	public static final void reset() throws IOException {
+		if (def != null) {
+			filePool.clear();
+			install(def);
+		}
+	}
+
+	public static final void installTemp(byte[] pkg) throws IOException {
+		filePoolTemp.clear();
+		filePoolTemp.putAll(filePool);
+		reset();
+		install(pkg);
+	}
+
+	public static final void resetTemp() throws IOException {
+		filePool.clear();
+		filePool.putAll(filePoolTemp);
+		filePoolTemp.clear();
+	}
 	
 	public static final void install(byte[] pkg) throws IOException {
+		if (def == null) {
+			def = pkg;
+		}
+
 		ByteArrayInputStream in = new ByteArrayInputStream(pkg);
 		
 		byte[] header = new byte[8];

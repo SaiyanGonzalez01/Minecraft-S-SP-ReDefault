@@ -1225,16 +1225,22 @@ public class EaglerAdapterImpl2 {
 						yee.setDialogTitle("select a file");
 						yee.setFileSelectionMode(JFileChooser.FILES_ONLY);
 						yee.setMultiSelectionEnabled(false);
+
+						String[] exts = ext.split(",.");
 						yee.setFileFilter(new FileFilter() {
 							
 							@Override
 							public String getDescription() {
-								return ext+" files";
+								return String.join("/", exts)+" files";
 							}
 							
 							@Override
 							public boolean accept(File f) {
-								return f.isDirectory() || f.getName().endsWith("."+ext);
+								if (f.isDirectory()) return true;
+								for (String e : exts) {
+									if (f.getName().endsWith("."+e)) return true;
+								}
+								return false;
 							}
 						});
 						if(yee.showOpenDialog(eagler) == JFileChooser.APPROVE_OPTION) {

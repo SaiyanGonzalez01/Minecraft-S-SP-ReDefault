@@ -545,6 +545,7 @@ public class GameSettings {
 			if(yee.hasKey("hideJoinCode")) hideJoinCode = yee.getBoolean("hideJoinCode");
 			if(yee.hasKey("relayTimeout")) relayTimeout = yee.getByte("relayTimeout");
 			if(yee.hasKey("adderall")) adderall = yee.getBoolean("adderall");
+			if(yee.hasKey("skin")) skin = yee.getString("skin");
 			
 			if(voiceListenRadius < 5) voiceListenRadius = 5;
 			else if(voiceListenRadius > 22) voiceListenRadius = 22;
@@ -626,6 +627,7 @@ public class GameSettings {
 		yee.setBoolean("hideJoinCode", hideJoinCode);
 		yee.setByte("relayTimeout", (byte)relayTimeout);
 		yee.setBoolean("adderall", adderall);
+		yee.setString("skin", skin);
 		
 		for (int var4 = 0; var4 < this.keyBindings.length; ++var4) {
 			yee.setInteger(keyBindings[var4].keyDescription, keyBindings[var4].keyCode);

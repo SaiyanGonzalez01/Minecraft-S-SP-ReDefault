@@ -10,9 +10,7 @@
   - backported 1.8's double buffering
   - backported 1.8's FXAA shader
 
-Release date: §9MM/DD/YYYY§r
-
-Time spent: §9~5 days§r
+Release date: §910/27/2023§r
 
 §0Made §0by §4lax1dude§r 
 

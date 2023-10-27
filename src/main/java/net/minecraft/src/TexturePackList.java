@@ -1,11 +1,16 @@
 package net.minecraft.src;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
+import net.lax1dude.eaglercraft.AssetRepository;
+import net.lax1dude.eaglercraft.EPK2Compiler;
+import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.adapter.SimpleStorage;
 import net.minecraft.client.Minecraft;
 
 public class TexturePackList {
@@ -13,7 +18,7 @@ public class TexturePackList {
 	 * An instance of TexturePackDefault for the always available builtin texture
 	 * pack.
 	 */
-	private static final ITexturePack defaultTexturePack = new TexturePackDefault();
+	public static final ITexturePack defaultTexturePack = new TexturePackDefault();
 
 	/** The Minecraft instance. */
 	private final Minecraft mc;
@@ -35,7 +40,7 @@ public class TexturePackList {
 	private Map texturePackCache = new HashMap();
 
 	/** The TexturePack that will be used. */
-	private ITexturePack selectedTexturePack;
+	public ITexturePack selectedTexturePack;
 
 	/** True if a texture pack is downloading in the background. */
 	private boolean isDownloading;
@@ -57,6 +62,10 @@ public class TexturePackList {
 		} else {
 			this.isDownloading = false;
 			this.selectedTexturePack = par1ITexturePack;
+			try {
+				AssetRepository.reset();
+				AssetRepository.install(SimpleStorage.get(this.selectedTexturePack.getTexturePackFileName()));
+			} catch (IOException ignored) {}
 			this.mc.gameSettings.skin = par1ITexturePack.getTexturePackFileName();
 			this.mc.gameSettings.saveOptions();
 			return true;
@@ -64,9 +73,8 @@ public class TexturePackList {
 	}
 
 	/**
-	 * filename must end in .zip
+	 * filename must end in .zip or .epk
 	 */
-	/*
 	public void requestDownloadOfTexture(String par1Str) {
 		String var2 = par1Str.substring(par1Str.lastIndexOf("/") + 1);
 
@@ -74,24 +82,17 @@ public class TexturePackList {
 			var2 = var2.substring(0, var2.indexOf("?"));
 		}
 
-		if (var2.endsWith(".zip")) {
-			File var3 = new File(this.mpTexturePackFolder, var2);
-			this.downloadTexture(par1Str, var3);
+		if (var2.toLowerCase().endsWith(".zip") || var2.toLowerCase().endsWith(".epk")) {
+			this.downloadTexture(par1Str, var2);
 		}
 	}
-	*/
-/*
-	private void downloadTexture(String par1Str, File par2File) {
-		HashMap var3 = new HashMap();
-		GuiProgress var4 = new GuiProgress();
-		var3.put("X-Minecraft-Username", this.mc.session.username);
-		var3.put("X-Minecraft-Version", "1.5.2");
-		var3.put("X-Minecraft-Supported-Resolutions", "16");
+
+	private void downloadTexture(String par1Str, String par2File) {
 		this.isDownloading = true;
-		this.mc.displayGuiScreen(var4);
-		HttpUtil.downloadTexturePack(par2File, par1Str, new TexturePackDownloadSuccess(this), var3, 10000000, var4);
+		SimpleStorage.set(par2File.replaceAll("[^A-Za-z0-9_]", "_"), par2File.toLowerCase().endsWith(".zip") ? zipToEpk(EaglerAdapter.downloadURL(par1Str)) : EaglerAdapter.downloadURL(par1Str));
+		this.onDownloadFinished();
 	}
-*/
+
 	/**
 	 * Return true if a texture pack is downloading in the background.
 	 */
@@ -114,29 +115,32 @@ public class TexturePackList {
 	 */
 	public void updateAvaliableTexturePacks() {
 		ArrayList var1 = new ArrayList();
-		this.selectedTexturePack = defaultTexturePack;
 		var1.add(defaultTexturePack);
-		/*
 		Iterator var2 = this.getTexturePackDirContents().iterator();
 
 		while (var2.hasNext()) {
-			File var3 = (File) var2.next();
-			String var4 = this.generateTexturePackID(var3);
+			String var3 = (String) var2.next();
 
-			if (var4 != null) {
-				Object var5 = (ITexturePack) this.texturePackCache.get(var4);
+			Object var5 = (ITexturePack) this.texturePackCache.get(var3);
 
-				if (var5 == null) {
-					var5 = var3.isDirectory() ? new TexturePackFolder(var4, var3, defaultTexturePack) : new TexturePackCustom(var4, var3, defaultTexturePack);
-					this.texturePackCache.put(var4, var5);
+			if (var5 == null) {
+				try {
+					var5 = new TexturePackCustom(var3, defaultTexturePack);
+					this.texturePackCache.put(var3, var5);
+				} catch (RuntimeException e) {
+					e.printStackTrace(); // bad texture pack
 				}
-
-				if (((ITexturePack) var5).getTexturePackFileName().equals(this.mc.gameSettings.skin)) {
-					this.selectedTexturePack = (ITexturePack) var5;
-				}
-
-				var1.add(var5);
 			}
+
+			if (((ITexturePack) var5).getTexturePackFileName().equals(this.mc.gameSettings.skin)) {
+				this.selectedTexturePack = (ITexturePack) var5;
+				try {
+					AssetRepository.reset();
+					AssetRepository.install(SimpleStorage.get(this.selectedTexturePack.getTexturePackFileName()));
+				} catch (IOException ignored) {}
+			}
+
+			var1.add(var5);
 		}
 
 		this.availableTexturePacks.removeAll(var1);
@@ -147,7 +151,6 @@ public class TexturePackList {
 			var6.deleteTexturePack(this.mc.renderEngine);
 			this.texturePackCache.remove(var6.getTexturePackID());
 		}
-		*/
 
 		this.availableTexturePacks = var1;
 	}
@@ -163,11 +166,11 @@ public class TexturePackList {
 //	}
 
 	/**
-	 * Return a List<File> of file/directories in the texture pack directory.
+	 * Return a List<String> of file/directories in the texture pack directory.
 	 */
-//	private List getTexturePackDirContents() {
-//		return this.texturePackDir.exists() && this.texturePackDir.isDirectory() ? Arrays.asList(this.texturePackDir.listFiles()) : Collections.emptyList();
-//	}
+	private List getTexturePackDirContents() {
+		return SimpleStorage.isAvailable() ? Arrays.asList(SimpleStorage.list()) : Collections.emptyList();
+	}
 
 	/**
 	 * Returns a list of the available texture packs.
@@ -177,6 +180,9 @@ public class TexturePackList {
 	}
 
 	public ITexturePack getSelectedTexturePack() {
+		if (this.selectedTexturePack == null) {
+			this.selectedTexturePack = defaultTexturePack;
+		}
 		return this.selectedTexturePack;
 	}
 
@@ -224,5 +230,29 @@ public class TexturePackList {
 
 	static Minecraft getMinecraft(TexturePackList par0TexturePackList) {
 		return par0TexturePackList.mc;
+	}
+
+	public static final byte[] zipToEpk(byte[] in) {
+		try {
+			EPK2Compiler epk2Compiler = new EPK2Compiler();
+			try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(in))) {
+				ZipEntry zipEntry;
+				byte[] bb = new byte[16000];
+				while ((zipEntry = zis.getNextEntry()) != null) {
+					if (zipEntry.isDirectory()) continue;
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					int len;
+					while ((len = zis.read(bb)) != -1) {
+						baos.write(bb, 0, len);
+					}
+					baos.close();
+					epk2Compiler.append(zipEntry.getName(), baos.toByteArray());
+				}
+			}
+			return epk2Compiler.complete();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return in;
+		}
 	}
 }

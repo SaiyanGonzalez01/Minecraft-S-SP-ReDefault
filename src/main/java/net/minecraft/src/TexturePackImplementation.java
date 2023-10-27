@@ -61,7 +61,7 @@ public abstract class TexturePackImplementation implements ITexturePack {
 	/**
 	 * Load and initialize thumbnailImage from the the /pack.png file.
 	 */
-	private void loadThumbnailImage() {
+	protected void loadThumbnailImage() {
 		//this.thumbnailImage = EaglerImage.loadImage(EaglerAdapter.loadResourceBytes("/pack.png"));
 		this.thumbnailImage = EaglerAdapter.loadPNG(EaglerAdapter.loadResourceBytes("/pack.png"));
 	}
@@ -145,8 +145,12 @@ public abstract class TexturePackImplementation implements ITexturePack {
 	}
 
 	public boolean func_98138_b(String par1Str, boolean par2) {
-		boolean var3 = this.func_98140_c(par1Str);
-		return !var3 && par2 && this.field_98141_g != null ? this.field_98141_g.func_98138_b(par1Str, par2) : var3;
+		try {
+			boolean var3 = this.func_98140_c(par1Str);
+			return !var3 && par2 && this.field_98141_g != null ? this.field_98141_g.func_98138_b(par1Str, par2) : var3;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	public abstract boolean func_98140_c(String var1);
