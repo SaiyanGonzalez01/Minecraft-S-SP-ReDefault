@@ -739,6 +739,8 @@ public class GuiIngame extends Gui {
 
 	public void renderCrosshairs(int w, int h) {
 		tex_icons.bindTexture();
+		EaglerAdapter.glEnable(EaglerAdapter.GL_TEXTURE_2D);
+		EaglerAdapter.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		EaglerAdapter.glEnable(EaglerAdapter.GL_BLEND);
 		EaglerAdapter.glBlendFunc(EaglerAdapter.GL_ONE_MINUS_DST_COLOR, EaglerAdapter.GL_ONE_MINUS_SRC_COLOR);
 
