@@ -1,38 +1,25 @@
-# This repository will be deleted imminently
 
-### Create a fresh fork ASAP to preserve it, you MUST fork a 100% fresh copy in order for the repository to be considered genuine
+# Eaglercraft 1.5.2 - Service Pack 1
 
-### Please read `LAX1DUDE_SIGNATURE.txt` for instructions to verify this is an original copy, if the file is not present then do not use this copy of the project
-
-### LAX1DUDE's PGP key is here: [https://deev.is/certs/LAX1DUDE_eagler_public.asc](https://deev.is/certs/LAX1DUDE_eagler_public.asc)
-
-### Do not edit this README, modifying any file will invalidate the repository's checksum
-
-### Download your worlds off of [https://g.deev.is/eaglercraft/](https://g.deev.is/eaglercraft/) and alts in case of a URL change for the demo client
-
-### MY LAN WORLD RELAYS (relay.deev.is, relay.lax1dude.net) WILL REMAIN ONLINE FOR CONVENIENCE
-
-# Eaglercraft
+### Released: October 27th, 2023 - "23w43a"
+### 
 
 ![eaglercraft](https://g.deev.is/eaglercraft/cover.png)
 :-:
 Eaglercraft is real Minecraft 1.5.2 that you can play in any regular web browser. That includes school chromebooks, it works on all chromebooks. It supports both singleplayer and multiplayer.
 
-**Currently maintained by [ayunami2000](https://github.com/ayunami2000)**
+# New in Service Pack 1:
+**Huge FPS boosts, lessons learned during the development of 1.8 have been applied to 1.5, and [ayunami2000](https://github.com/ayunami2000/) added basic support for resource packs. Update your unblocked game websites ASAP for the best user experience on slow hardware.**
+  - fixed sunrise/sunset fog color
+  - better optimized pipeline shader
+  - backported 1.8's state management
+  - backported 1.8's buffer streaming
+  - backported 1.8's hotbar FPS fix
+  - backported 1.8's double buffering
+  - backported 1.8's FXAA shader
 
-**For any questions you can join the discord server and hit us up there [https://discord.gg/Ekzcgs3DKZ](https://discord.gg/Ekzcgs3DKZ)**
+**The LAN world relay server is now bundled with the client, you can download it using a button in the "Network Settings" menu where LAN relays are configured. Hopefully this will prevent LAN worlds from ever becoming defunct once our default relay servers no longer exist.**
 
-# Quick Start
-
-### Client: [https://g.deev.is/eaglercraft/](https://g.deev.is/eaglercraft/) [^1]
-
-### Offline Client Download: [Offline_Download_Version.html](https://github.com/lax1dude/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
-
-**(right click the link and press 'Save link as...' to download the file)**
-
-### Play Minecraft Beta Singleplayer: [https://g.deev.is/eaglercraft/beta/](https://g.deev.is/eaglercraft/beta/)
-
-[^1]: A list of public servers are already added into the official client
 
 # Table Of Contents:
 | [Singleplayer](#Singleplayer)                                 | [Multiplayer](#Multiplayer)                                                     | [Others](#Others)                                     |
