@@ -1,21 +1,35 @@
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-Hello, this is lax1dude, I regret to inform you that the official repository
-for Eaglercraft 1.5.2 has been deleted
+Eaglercraft 1.5.2 - Service Pack 1
 
-This folder contains a copy of the repo from the day it was deleted, and a tool
-to verify it's authenticity
+Released: October 27th, 2023 - "23w43a"
+
+New in Service Pack 1:
+
+Huge FPS boosts, lessons learned during the development of 1.8 have been applied
+to 1.5, and ayunami2000 added basic support for resource packs. Update your
+unblocked game websites ASAP for the best user experience on slow hardware.
+
+  - fixed sunrise/sunset fog color
+  - better optimized pipeline shader
+  - backported 1.8's state management
+  - backported 1.8's buffer streaming
+  - backported 1.8's hotbar FPS fix
+  - backported 1.8's double buffering
+  - backported 1.8's FXAA shader
+
+Made by lax1dude
 
 Run "GetRepositorySignature.bat", and verify that this is the result:
 
 
 ~~~ Repository SHA-256: ~~~
 
-     ba2015db643a0dd6
-     e78bbf92f27f76ae
-     0797feb78874edb4
-     19d14a8b54373269
+     71a8ef1c208d98f2
+     324d169ab580042f
+     aae707451c858c0c
+     599083505b32e0d7
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -27,8 +41,7 @@ GetRepositorySignature.bat: 4B995076348E03A5322F3EB6AF72948E4C27CEB6
 GetRepositorySignature.sh: 8B269BA0D54C2B4BD7E9199B10C9769D39F00DC6
 
 
-If this is all correct, then you are truly using the official final release of
-Eaglercraft 1.5.2, made by the real LAX1DUDE ;>
+If this is all correct, then this is the official Eaglercraft 1.5.2 Service Pack 1
 
 
 You can download a clean copy of "GetRepositorySignature.jar" here: [https://deev.is/eagler/GetRepositorySignature.jar]
@@ -42,35 +55,19 @@ which allows you to select the repository to check using a file chooser
 
 To verify the PGP signature on this message, my public key is here: [https://deev.is/certs/LAX1DUDE_eagler_public.asc]
 
-The original copy of this message is available here too: [https://deev.is/eagler/LAX1DUDE_SIGNATURE.txt]
-
-
-Thank you all for the stars and support for this project but I simply want closure
-that I will never wake up one busy day in the future and have to drop everything
-and come back to this project and fight a DMCA when I'm not even working on it
-anymore. When a repository on github gets DMCA'd, all of it's forks also get DMCA'd
-which would eradicate it off github, but if we all fork it and then delete the
-original then Microsoft would have to DMCA individual forks instead of just my
-original repository which they obviously don't have time to do. This is for the
-best, trust me, we'll always have this checksum here of the files of the official
-final release so we can always find a repo and come back to this commit and check
-if it's mine and if it is then play it the way it was meant to be played with all
-of my original code and it'll be like I never deleted it
-
-
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEcBgAq2s4AHU8tLsdcu68cJImpGoFAmNmFz4ACgkQcu68cJIm
-pGrjlBAAjxaXHOI6DNoAORhsJUi+B9z84/3i+XJ7U7RXYnbI1Gtg6A6s2hozoXI3
-Dp3lrmS6VpaZiutlyzl6maraAtMKR/edQPl1N2p8ugqr6g+nwfCuBCjl32MOI56a
-DDti9Vzd8SUVKh4KCxQ4MJy8v0lg42z/1DBEWDWb/Ri7dWeGcxQARjNHnql999Jo
-f+ECDvOQgOtgQrIQkkFXfxqSvJi5uAT3MXQvEF7hBhMf9XbwNy8gfE8s1+o7rn55
-D78jmk0w3utzCzzj7QmAha+fLt9K97Xyd4L3vtMvnoEraW87Z3H8UCBQde+gXmm6
-Qwvul+pX/AmZaYF7cLs74oTctu6njCswXiKmobQpi0eIu1F4Q7fefByMFUUeF3kB
-8fNLUb7FYsYr97LWEtufDPdJ3eM/o5qn4SGlzjQlYUG/BGSfKd2dioNAKxwQZ4yb
-rLegHuQOjm3aAk0qlYaDM1PFpK5wiz3xjGIxt8uxxVrZ023Nk6fPF3ONyWlswYyv
-cnIIO9dSmcvvyIanhHF+tGYaPOct61YLH1vDoWE/OUrCG/B7vGGDnKW3X2dcI7NQ
-Pe+hgpcKc0qEkX8qr3SxHNJQgcWkVXnWLx8e3zZBqTYdSN8n4KgxJg0enHN9ylMu
-VOAaCkMYZfwK7wQgh0rgynmRyOYO2eQaet4HRsbxJlZLQ01sI5c=
-=Jgpm
+iQIzBAEBCAAdFiEEcBgAq2s4AHU8tLsdcu68cJImpGoFAmU8lcwACgkQcu68cJIm
+pGofzg/+JROwhvzaxf53TTDLGW6/5cAYro5L07nrtvVcj29FVRBg/KQRaONau5oW
+B7fSgap+p7QuCESqfNqzErQKhpowBOAs985F7xNYoudgrvgAi66FKvgLsw57B0G4
+vh0P4fHqq+xaVOpwxz/0xCm1Ac6oak16Jx2itmPMRXgmmSDujpgxFSBTe+RzQPOP
+zCEW7GCSyjhOQWKeTNvTqqOJjBl8j/B3sD31DAG5D7yiE1tf7/a2TXv2/9CLaDb7
+Zc+VoAi6hfy7S5AJ0AcfWInogLzhb40u0SmFnnMmJSiGj27RoLJtNTNmZ9LD2bGC
+41qfuBk6d1SD7vGgA0rsLvHrrbABTydUwTy+6hj6Mtr4uM8OfGevlgDQV5TvJORr
+0bCGrHUz2g6l5MCuqjMgG+5iYgnj/7THEe6wC2O82U9BNz/MJoGc3fFQvVrQ2Zue
+WKA12ZQyZfF9Dya31IoYljMrOMvxvTuZO1C0dvP4Ts19yiAr+efY8G3oOnnMeyQb
+evTr+ysUHbZh0r+lPXzM1JfIZJqEMbHOKNzEL92btnd6Ft5EgVC2zFZj5kWYe3Uv
+SD5zO56PGIoGXZ6zrUQNUWL26MvvhdfJlZ4dMBBShMYzm8ueVMzrnhUUGQ7CxqMA
+P90Z/xfYFETNC9wVSlmiekhJdOaFrKc7ZMoO4zqlxrMVw1qG/fc=
+=VwBl
 -----END PGP SIGNATURE-----
