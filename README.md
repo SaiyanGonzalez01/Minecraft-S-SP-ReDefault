@@ -9,14 +9,14 @@
 Eaglercraft is real Minecraft 1.5.2 that you can play in any regular web browser. That includes school chromebooks, it works on all chromebooks. It supports both singleplayer and multiplayer.
 
 # New in Service Pack 1:
-**Huge FPS boosts, lessons learned during the development of 1.8 have been applied to 1.5, and [ayunami2000](https://github.com/ayunami2000/) added basic support for resource packs. Update your unblocked game websites ASAP for the best user experience on slow hardware.**
+**Huge FPS boosts, lessons learned during the development of EaglercraftX 1.8 have been applied to 1.5, and [ayunami2000](https://github.com/ayunami2000/) added basic support for resource packs. Update your unblocked game websites ASAP for the best user experience on slow hardware.**
   - fixed sunrise/sunset fog color
   - better optimized pipeline shader
-  - backported 1.8's state management
-  - backported 1.8's buffer streaming
-  - backported 1.8's hotbar FPS fix
-  - backported 1.8's double buffering
-  - backported 1.8's FXAA shader
+  - backported X's state management
+  - backported X's buffer streaming
+  - backported X's hotbar FPS fix
+  - backported X's double buffering
+  - backported X's FXAA shader
 
 **The LAN world relay server is now bundled with the client, you can download it using a button in the "Network Settings" menu where LAN relays are configured. Hopefully this will prevent LAN worlds from ever becoming defunct once our default relay servers no longer exist.**
 

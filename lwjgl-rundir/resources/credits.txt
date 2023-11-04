@@ -4,11 +4,11 @@
   - resource packs §4(by §4ayunami2000)§r
   - fixed sunrise/sunset fog color
   - better optimized pipeline shader
-  - backported 1.8's state management
-  - backported 1.8's buffer streaming
-  - backported 1.8's hotbar FPS fix
-  - backported 1.8's double buffering
-  - backported 1.8's FXAA shader
+  - backported X's state management
+  - backported X's buffer streaming
+  - backported X's hotbar FPS fix
+  - backported X's double buffering
+  - backported X's FXAA shader
 
 Release date: §910/27/2023§r
 

@@ -1,7 +1,7 @@
 
 // copyright (c) 2020-2023 lax1dude
 
-#line 7
+#line 4
 
 precision highp int;
 precision highp sampler2D;
@@ -129,7 +129,8 @@ in vec2 v_texture1;
 
 out vec4 fragColor;
 
-#define TEX_MAT3(mat4In) mat3(mat4In[0].xyw,mat4In[1].xyw,mat4In[3].xyw)
+#define TEX_MAT3x2(mat4In) mat3x2(mat4In[0].xy,mat4In[1].xy,mat4In[3].xy)
+#define TEX_MAT4x3(mat4In) mat4x3(mat4In[0].xyw,mat4In[1].xyw,mat4In[2].xyw,mat4In[3].xyw)
 
 void main(){
 #ifdef CC_a_color
@@ -148,8 +149,8 @@ void main(){
 	texPos.y = dot(texSrc[textureGen_M.y], textureGenT_V);
 	texPos.z = dot(texSrc[textureGen_M.z], textureGenR_V);
 	texPos.w = dot(texSrc[textureGen_M.w], textureGenQ_V);
-	texPos = matrix_t * texPos;
-	color *= texture(tex0, texPos.xy / texPos.w).bgra;
+	texPos.xyz = TEX_MAT4x3(matrix_t) * texPos;
+	color *= texture(tex0, texPos.xy / texPos.z).bgra;
 #ifdef CC_alphatest
 	if(color.a < alphaTestF){
 		discard;
@@ -160,18 +161,18 @@ void main(){
 #ifdef CC_a_texture0
 
 #ifdef CC_patch_anisotropic
-	vec2 uv = (TEX_MAT3(matrix_t) * vec3(v_texture0, 1.0)).xy;
+	vec2 uv = TEX_MAT3x2(matrix_t) * vec3(v_texture0, 1.0);
 	
 	/* https://bugs.chromium.org/p/angleproject/issues/detail?id=4994 */
 	uv = ((uv * anisotropic_fix) - fract(uv * anisotropic_fix) + 0.5) / anisotropic_fix;
 	
 	vec4 texColor = texture(tex0, uv);
 #else
-	vec4 texColor = texture(tex0, (TEX_MAT3(matrix_t) * vec3(v_texture0, 1.0)).xy);
+	vec4 texColor = texture(tex0, TEX_MAT3x2(matrix_t) * vec3(v_texture0, 1.0));
 #endif
 
 #else
-	vec4 texColor = texture(tex0, (TEX_MAT3(matrix_t) * vec3(texCoordV0, 1.0)).xy);
+	vec4 texColor = texture(tex0, TEX_MAT3x2(matrix_t) * vec3(texCoordV0, 1.0));
 #endif
 
 #ifdef CC_swap_rb
