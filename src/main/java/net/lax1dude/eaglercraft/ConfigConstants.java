@@ -6,7 +6,7 @@ public class ConfigConstants {
 	
 	public static boolean profanity = false;
 
-	public static final String version = "1.5.2-sp1";
+	public static final String version = "1.5.2-sp1.01";
 	public static final String mainMenuString = "eaglercraft " + version;
 	
 	public static final String forkMe = null;

@@ -102,7 +102,7 @@ public class EffectPipelineFXAA {
 		_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_MIN_FILTER, _wGL_NEAREST);
 		_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_S, _wGL_CLAMP);
 		_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_T, _wGL_CLAMP);
-		_wglTexImage2D(_wGL_TEXTURE_2D, 0, _wGL_RGB8, width, height, 0, _wGL_RGB, _wGL_UNSIGNED_BYTE, (ByteBuffer)null);
+		_wglTexImage2D(_wGL_TEXTURE_2D, 0, _wGL_RGBA8, width, height, 0, _wGL_RGBA, _wGL_UNSIGNED_BYTE, (ByteBuffer)null);
 		
 		
 		framebuffer_depth = _wglCreateRenderBuffer();
@@ -122,7 +122,7 @@ public class EffectPipelineFXAA {
 		framebuffer_depth = _wglCreateRenderBuffer();
 		_wglBindFramebuffer(_wGL_FRAMEBUFFER, framebuffer);
 		_wglBindRenderbuffer(framebuffer_color);
-		_wglRenderbufferStorageMultisample(state == 2 ? 4 : 8, _wGL_RGB8, width, height);
+		_wglRenderbufferStorageMultisample(state == 2 ? 4 : 8, _wGL_RGBA8, width, height);
 		_wglBindRenderbuffer(framebuffer_depth);
 		_wglRenderbufferStorageMultisample(state == 2 ? 4 : 8, _wGL_DEPTH_COMPONENT32F, width, height);
 		_wglFramebufferRenderbuffer(_wGL_COLOR_ATTACHMENT0, framebuffer_color);
@@ -174,7 +174,7 @@ public class EffectPipelineFXAA {
 					initFXAA();
 				}else {
 					glBindTexture(_wGL_TEXTURE_2D, fxaaSourceTexture);
-					_wglTexImage2D(_wGL_TEXTURE_2D, 0, _wGL_RGB8, width, height, 0, _wGL_RGB, _wGL_UNSIGNED_BYTE, (ByteBuffer)null);
+					_wglTexImage2D(_wGL_TEXTURE_2D, 0, _wGL_RGBA8, width, height, 0, _wGL_RGBA, _wGL_UNSIGNED_BYTE, (ByteBuffer)null);
 					_wglBindRenderbuffer(framebuffer_depth);
 					_wglRenderbufferStorage(_wGL_DEPTH_COMPONENT32F, width, height);
 				}
@@ -183,7 +183,7 @@ public class EffectPipelineFXAA {
 					initMSAA();
 				}else {
 					_wglBindRenderbuffer(framebuffer_color);
-					_wglRenderbufferStorageMultisample(state == 2 ? 4 : 8, _wGL_RGB8, width, height);
+					_wglRenderbufferStorageMultisample(state == 2 ? 4 : 8, _wGL_RGBA8, width, height);
 					_wglBindRenderbuffer(framebuffer_depth);
 					_wglRenderbufferStorageMultisample(state == 2 ? 4 : 8, _wGL_DEPTH_COMPONENT32F, width, height);
 				}
@@ -224,7 +224,7 @@ public class EffectPipelineFXAA {
 			_wglViewport(originalViewport[0], originalViewport[1], originalViewport[2], originalViewport[3]);
 			_wglBindFramebuffer(_wGL_READ_FRAMEBUFFER, framebuffer);
 			_wglBindFramebuffer(_wGL_DRAW_FRAMEBUFFER, null);
-			_wglDrawBuffer(_wGL_BACK);
+			_wglDrawBuffer(_wGL_COLOR_ATTACHMENT0);
 			_wglBlitFramebuffer(0, 0, width, height, 0, 0, width, height, _wGL_COLOR_BUFFER_BIT, _wGL_NEAREST);
 			_wglBindFramebuffer(_wGL_READ_FRAMEBUFFER, null);
 		}

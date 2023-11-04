@@ -11,13 +11,11 @@ import net.lax1dude.eaglercraft.DefaultSkinRenderer;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerProfile;
 import net.lax1dude.eaglercraft.GuiScreenEditProfile;
-import net.lax1dude.eaglercraft.GuiScreenLicense;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerConnecting;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
 import net.lax1dude.eaglercraft.GuiVoiceOverlay;
 import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.IntegratedServerLAN;
-import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.WorkerNetworkManager;
 import net.lax1dude.eaglercraft.adapter.SimpleStorage;
@@ -352,10 +350,6 @@ public class Minecraft implements Runnable {
 			scr = new GuiScreenEditProfile(new GuiConnecting(new GuiMainMenu(), this, new ServerData("Eaglercraft Server", s, false)));
 		}else {
 			scr = new GuiScreenEditProfile(new GuiMainMenu());
-		}
-		
-		if(!LocalStorageManager.profileSettingsStorage.getBoolean("acceptLicense")) {
-			scr = new GuiScreenLicense(scr);
 		}
 		
 		displayGuiScreen(scr);
