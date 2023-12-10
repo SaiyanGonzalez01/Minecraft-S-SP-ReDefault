@@ -27,10 +27,10 @@ Run "GetRepositorySignature.bat", and verify that this is the result:
 
 ~~~ Repository SHA-256: ~~~
 
-     5239fb2c2cba1a93
-     e7ce93cce1f7571e
-     9fe989a98e650b03
-     af10eb24f3d5c222
+     d9fe1b0ffbc2c7fb
+     516448a68b1d3b9f
+     9b844ae78af0d3df
+     86d9ea582c8a281c
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -58,17 +58,17 @@ To verify the PGP signature on this message, my public key is here: [https://dee
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEcBgAq2s4AHU8tLsdcu68cJImpGoFAmVGEFcACgkQcu68cJIm
-pGo+2hAAmC0mPbQzfSR/GCb3ilOynH4GwLHhhRjsKjtucOBkmCRd+oPr0jXrI8xj
-GfdXJ+gqXgKTfzC9Mhh1mZbdJo6m75HNJD1Y4eWInkaNEwMZ+win3efhiqx7iXGr
-nDRl8F39IwHp/Y9OCO1+H7GJXsawvB45LWaMYrHQgiYdtaOIYvlYFdJLFXTwJY4X
-HRXb+C7YnHBP1xzCpWhjpgkFwZbTa6c+NYr3z6lnHighai2Ix26BhpZKVjhURNJU
-YMu1MqeTHDuDwCyqMKgZHj2qMFh50iu7IlxyJlE7sC2uB22GnPO8thKuYpKT9abU
-zcBu0N/r68+y8CBS61gNBdDf4GeigF2c6N5A9B00W9SqJ3U6hzPHPuUj+JrSMe/t
-Wq0CN36PmRHdJo3zP8tFtngBBjWlA/3IZWzVCmBcvxpTdkd6YaqHVSE2sxD6hGOB
-QOuAojqr+dOxuinxcmmjlVab+kyurgbWKUtqmvrnpE/e4fQp6gloeoOPaGlqsjOs
-QLaALHHhbZb/w+j1YjkkcwSYA8cF7q5Ndl/t8/BhHsSO/JLZ9SxsuDlkxlpoLogq
-jT8ns8kaDa2xZliibIEYu8ldqDLecpu76P8LBwe8OtRAdz338OG/63qvqRg9U9Jc
-igIanqpf7TjOa5Nt9wqCaOrqvzTtldkulKAeF1IE9uSejiTkJX4=
-=l8Sa
+iQIzBAEBCAAdFiEEcBgAq2s4AHU8tLsdcu68cJImpGoFAmV1aUoACgkQcu68cJIm
+pGo5fxAAg1Gkq3IWRS0AMdO1AYDdjRPGsPHMHiI8S3IfHrPPzegNFyg1PlcWzlKA
+dLgJnROOKT+qo2wY4tXKs+ZkIS/W6XZxDpUbp9v6gOQtf4IlDqgbbgfI8jmbd8B5
+pX1imcvhNICeSST0nqFwYCt2vesrkLRWiTdDrF/e8gxWtacjsQA1fRX90T4s5v/b
+OSWVmFLo/jaecdtN53NOrEiJGslKDhByaf4Gr5z+UU38bSr7wNlFDR6KxQjN1aAO
+l1z5r4g5fzN7e7nWifzL8MszHatGRLgtr7oKlEeew8KgIgh06w15f7ZUG7SkmwJU
+XMBZbGoptEufrTI1Qo1rV3jHDIpSxS5SSXMelpHJctv7AytSVJVOtfbM4k7REYv+
+GV76G+/iHi12Nqo9Rm8QVfWXN4p/PPfrW0t84CBYjQ0Z0PZfSaHLQCPg9BCE4rMk
+DXll15v+pNABjGOfFF6Dm2cDlT+pCNyuJqHWrPeWk/Wyx3wp189c7ZO41XLTHyq5
+oN/lS69svSunZi0sdR3BPk72OJ0EJvBhha8RLdf8AE60o8mb5LtX7jaW6a9BiApM
+hs2Z1K1AP8poPnWtwaMgnDE6cofLB/4Sud0OH3ZS+oKWC07fi6QB5OgWgmbLfMAz
+sm2Wj14ikgoJ85iwHnmMJlmwApbAX+JOLv7TdRYDKqSrFl5umas=
+=IsXi
 -----END PGP SIGNATURE-----
