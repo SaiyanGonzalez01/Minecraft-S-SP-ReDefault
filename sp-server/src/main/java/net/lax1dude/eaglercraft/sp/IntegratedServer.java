@@ -749,6 +749,8 @@ public class IntegratedServer {
 				sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket01StopServer.ID));
 				currentProcess = null;
 			}
+		}else {
+			SysUtil.sleep(50);
 		}
 	}
 	
@@ -767,7 +769,7 @@ public class IntegratedServer {
 			
 			mainLoop();
 			
-			SysUtil.sleep(1); // allow some async to occur
+			SysUtil.immediateContinue();
 		}
 		
 		// yee

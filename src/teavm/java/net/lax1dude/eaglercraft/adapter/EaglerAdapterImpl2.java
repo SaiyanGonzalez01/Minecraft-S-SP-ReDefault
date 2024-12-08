@@ -32,6 +32,7 @@ import org.teavm.interop.AsyncCallback;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
+import org.teavm.jso.JSProperty;
 import org.teavm.jso.ajax.ReadyStateChangeHandler;
 import org.teavm.jso.ajax.XMLHttpRequest;
 import org.teavm.jso.browser.Storage;
@@ -39,6 +40,7 @@ import org.teavm.jso.browser.TimerHandler;
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.canvas.CanvasRenderingContext2D;
 import org.teavm.jso.canvas.ImageData;
+import org.teavm.jso.core.JSString;
 import org.teavm.jso.dom.css.CSSStyleDeclaration;
 import org.teavm.jso.dom.events.ErrorEvent;
 import org.teavm.jso.dom.events.Event;
@@ -108,10 +110,12 @@ import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftLANClient;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftLANServer;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftVoiceClient;
+import net.lax1dude.eaglercraft.adapter.teavm.MessageChannel;
 import net.lax1dude.eaglercraft.adapter.teavm.SelfDefence;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLQuery;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLVertexArray;
+import net.lax1dude.eaglercraft.glemu.EaglerAdapterGL30;
 import net.lax1dude.eaglercraft.sp.relay.pkt.IPacket;
 import net.lax1dude.eaglercraft.sp.relay.pkt.IPacket00Handshake;
 import net.lax1dude.eaglercraft.sp.relay.pkt.IPacket07LocalWorlds;
@@ -243,6 +247,13 @@ public class EaglerAdapterImpl2 {
 	private static String[] identifier = new String[0];
 	private static String integratedServerScript = "worker_bootstrap.js";
 	private static boolean anisotropicFilteringSupported = false;
+	private static boolean vsyncSupport = false;
+	private static int vsyncTimeout = -1;
+	private static boolean useDelayOnSwap = false;
+	private static MessageChannel immediateContinueChannel = null;
+	private static Runnable currentMsgChannelContinueHack = null;
+	
+	private static final EagsFileChooser fileChooser = initFileChooser();
 	
 	public static final String[] getIdentifier() {
 		return identifier;
@@ -395,6 +406,18 @@ public class EaglerAdapterImpl2 {
 		});
 		onBeforeCloseRegister();
 		
+		checkImmediateContinueSupport();
+		
+		vsyncTimeout = -1;
+		vsyncSupport = false;
+
+		try {
+			asyncRequestAnimationFrame();
+			vsyncSupport = true;
+		}catch(Throwable t) {
+			System.err.println("VSync is not supported on this browser!");
+		}
+		
 		initFileChooser();
 		
 		EarlyLoadScreen.paintScreen();
@@ -452,37 +475,58 @@ public class EaglerAdapterImpl2 {
 			}
 		}, 5000);
 	}
-	
+
 	@JSBody(params = { }, script = "return window.startVoiceClient();")
 	private static native EaglercraftVoiceClient startVoiceClient();
-	
+
+	private static interface EagsFileChooser extends JSObject {
+
+		@JSProperty
+		HTMLElement getInputElement();
+
+		void openFileChooser(String ext, String mime);
+
+		@JSProperty
+		ArrayBuffer getGetFileChooserResult();
+
+		@JSProperty
+		void setGetFileChooserResult(ArrayBuffer val);
+
+		@JSProperty
+		String getGetFileChooserResultName();
+
+		@JSProperty
+		void setGetFileChooserResultName(String str);
+
+	}
+
 	@JSBody(params = { }, script = 
-			"window.eagsFileChooser = {\r\n" + 
+			"var ret = {\r\n" + 
 			"inputElement: null,\r\n" + 
 			"openFileChooser: function(ext, mime){\r\n" + 
-			"var el = window.eagsFileChooser.inputElement = document.createElement(\"input\");\r\n" + 
+			"var el = ret.inputElement = document.createElement(\"input\");\r\n" + 
 			"el.type = \"file\";\r\n" + 
 			"el.multiple = false;\r\n" + 
 			"el.addEventListener(\"change\", function(evt){\r\n" + 
-			"var f = window.eagsFileChooser.inputElement.files;\r\n" + 
+			"var f = ret.inputElement.files;\r\n" + 
 			"if(f.length == 0){\r\n" + 
-			"window.eagsFileChooser.getFileChooserResult = null;\r\n" + 
+			"ret.getFileChooserResult = null;\r\n" + 
 			"}else{\r\n" + 
-			"(async function(){\r\n" + 
-			"window.eagsFileChooser.getFileChooserResult = await f[0].arrayBuffer();\r\n" + 
-			"window.eagsFileChooser.getFileChooserResultName = f[0].name;\r\n" + 
-			"})();\r\n" + 
+			"f[0].arrayBuffer().then(function(res) {\r\n" + 
+			"ret.getFileChooserResult = res;\r\n" + 
+			"ret.getFileChooserResultName = f[0].name;\r\n" + 
+			"});\r\n" + 
 			"}\r\n" + 
 			"});\r\n" + 
-			"window.eagsFileChooser.getFileChooserResult = null;\r\n" + 
-			"window.eagsFileChooser.getFileChooserResultName = null;\r\n" + 
+			"ret.getFileChooserResult = null;\r\n" + 
+			"ret.getFileChooserResultName = null;\r\n" + 
 			"el.accept = \".\" + ext;\r\n" +
 			"el.click();\r\n" + 
 			"},\r\n" + 
 			"getFileChooserResult: null,\r\n" + 
 			"getFileChooserResultName: null\r\n" + 
-			"};")
-	private static native void initFileChooser();
+			"}; return ret;")
+	private static native EagsFileChooser initFileChooser();
 	
 	public static final void destroyContext() {
 		
@@ -1695,7 +1739,13 @@ public class EaglerAdapterImpl2 {
 	public static final boolean shouldShutdown() {
 		return false;
 	}
-	public static final void updateDisplay() {
+	public static final boolean isVSyncSupported() {
+		return vsyncSupport;
+	}
+	@JSBody(params = { "doc" }, script = "return (typeof doc.visibilityState !== \"string\") || (doc.visibilityState === \"visible\");")
+	private static native boolean getVisibilityState(JSObject doc);
+	private static final long[] syncTimer = new long[1];
+	public static final void updateDisplay(int fpsLimit, boolean vsync) {
 		double r = win.getDevicePixelRatio();
 		int w = parent.getClientWidth();
 		int h = parent.getClientHeight();
@@ -1713,7 +1763,172 @@ public class EaglerAdapterImpl2 {
 		webgl.blitFramebuffer(0, 0, backBufferWidth, backBufferHeight, 0, 0, w2, h2, COLOR_BUFFER_BIT, NEAREST);
 		webgl.bindFramebuffer(FRAMEBUFFER, backBuffer.obj);
 		resizeBackBuffer(w2, h2);
-		sleep(1);
+
+		if(getVisibilityState(win.getDocument())) {
+			if(vsyncSupport && vsync) {
+				syncTimer[0] = 0l;
+				asyncRequestAnimationFrame();
+			}else {
+				if(fpsLimit <= 0) {
+					syncTimer[0] = 0l;
+					swapDelayTeaVM();
+				}else {
+					if(!EaglerAdapterGL30.sync(fpsLimit, syncTimer)) {
+						swapDelayTeaVM();
+					}
+				}
+			}
+		}else {
+			syncTimer[0] = 0l;
+			sleep(50);
+		}
+	}
+	@Async
+	private static native void asyncRequestAnimationFrame();
+	private static void asyncRequestAnimationFrame(AsyncCallback<Void> cb) {
+		if(vsyncTimeout != -1) {
+			cb.error(new IllegalStateException("Already waiting for vsync!"));
+			return;
+		}
+		final boolean[] hasTimedOut = new boolean[] { false };
+		final int[] timeout = new int[] { -1 };
+		Window.requestAnimationFrame((d) -> {
+			if(!hasTimedOut[0]) {
+				hasTimedOut[0] = true;
+				if(vsyncTimeout != -1) {
+					if(vsyncTimeout == timeout[0]) {
+						try {
+							Window.clearTimeout(vsyncTimeout);
+						}catch(Throwable t) {
+						}
+						vsyncTimeout = -1;
+					}
+					cb.complete(null);
+				}
+			}
+		});
+		vsyncTimeout = timeout[0] = Window.setTimeout(() -> {
+			if(!hasTimedOut[0]) {
+				hasTimedOut[0] = true;
+				if(vsyncTimeout != -1) {
+					vsyncTimeout = -1;
+					cb.complete(null);
+				}
+			}
+		}, 50);
+	}
+	private static final void swapDelayTeaVM() {
+		if(!useDelayOnSwap && immediateContinueChannel != null) {
+			immediateContinueTeaVM0();
+		}else {
+			sleep(0);
+		}
+	}
+	public static final void immediateContinue() {
+		if(immediateContinueChannel != null) {
+			immediateContinueTeaVM0();
+		}else {
+			sleep(0);
+		}
+	}
+	private static final JSString emptyJSString = JSString.valueOf("");
+	@Async
+	private static native void immediateContinueTeaVM0();
+	private static void immediateContinueTeaVM0(final AsyncCallback<Void> cb) {
+		if(currentMsgChannelContinueHack != null) {
+			cb.error(new IllegalStateException("Main thread is already waiting for an immediate continue callback!"));
+			return;
+		}
+		currentMsgChannelContinueHack = () -> {
+			cb.complete(null);
+		};
+		try {
+			immediateContinueChannel.getPort2().postMessage(emptyJSString);
+		}catch(Throwable t) {
+			currentMsgChannelContinueHack = null;
+			System.err.println("Caught error posting immediate continue, using setTimeout instead");
+			Window.setTimeout(() -> cb.complete(null), 0);
+		}
+	}
+	private static final int IMMEDIATE_CONT_SUPPORTED = 0;
+	private static final int IMMEDIATE_CONT_FAILED_NOT_ASYNC = 1;
+	private static final int IMMEDIATE_CONT_FAILED_NOT_CONT = 2;
+	private static final int IMMEDIATE_CONT_FAILED_EXCEPTIONS = 3;
+	private static void checkImmediateContinueSupport() {
+		immediateContinueChannel = null;
+		int stat = checkImmediateContinueSupport0();
+		if(stat == IMMEDIATE_CONT_SUPPORTED) {
+			return;
+		}else if(stat == IMMEDIATE_CONT_FAILED_NOT_ASYNC) {
+			System.err.println("MessageChannel fast immediate continue hack is incompatible with this browser due to actually continuing immediately!");
+		}else if(stat == IMMEDIATE_CONT_FAILED_NOT_CONT) {
+			System.err.println("MessageChannel fast immediate continue hack is incompatible with this browser due to startup check failing!");
+		}else if(stat == IMMEDIATE_CONT_FAILED_EXCEPTIONS) {
+			System.err.println("MessageChannel fast immediate continue hack is incompatible with this browser due to exceptions!");
+		}
+		immediateContinueChannel = null;
+	}
+	private static int checkImmediateContinueSupport0() {
+		try {
+			if(!MessageChannel.supported()) {
+				return IMMEDIATE_CONT_SUPPORTED;
+			}
+			immediateContinueChannel = new MessageChannel();
+			immediateContinueChannel.getPort1().addEventListener("message", new EventListener<MessageEvent>() {
+				@Override
+				public void handleEvent(MessageEvent evt) {
+					Runnable toRun = currentMsgChannelContinueHack;
+					currentMsgChannelContinueHack = null;
+					if(toRun != null) {
+						toRun.run();
+					}
+				}
+			});
+			immediateContinueChannel.getPort1().start();
+			immediateContinueChannel.getPort2().start();
+			final boolean[] checkMe = new boolean[1];
+			checkMe[0] = false;
+			currentMsgChannelContinueHack = () -> {
+				checkMe[0] = true;
+			};
+			immediateContinueChannel.getPort2().postMessage(emptyJSString);
+			if(checkMe[0]) {
+				currentMsgChannelContinueHack = null;
+				if(immediateContinueChannel != null) {
+					safeShutdownChannel(immediateContinueChannel);
+				}
+				immediateContinueChannel = null;
+				return IMMEDIATE_CONT_FAILED_NOT_ASYNC;
+			}
+			sleep(10);
+			currentMsgChannelContinueHack = null;
+			if(!checkMe[0]) {
+				if(immediateContinueChannel != null) {
+					safeShutdownChannel(immediateContinueChannel);
+				}
+				immediateContinueChannel = null;
+				return IMMEDIATE_CONT_FAILED_NOT_CONT;
+			}else {
+				return IMMEDIATE_CONT_SUPPORTED;
+			}
+		}catch(Throwable t) {
+			currentMsgChannelContinueHack = null;
+			if(immediateContinueChannel != null) {
+				safeShutdownChannel(immediateContinueChannel);
+			}
+			immediateContinueChannel = null;
+			return IMMEDIATE_CONT_FAILED_EXCEPTIONS;
+		}
+	}
+	private static void safeShutdownChannel(MessageChannel chan) {
+		try {
+			chan.getPort1().close();
+		}catch(Throwable tt) {
+		}
+		try {
+			chan.getPort2().close();
+		}catch(Throwable tt) {
+		}
 	}
 	public static final void setupBackBuffer() {
 		backBuffer = _wglCreateFramebuffer();
@@ -1740,9 +1955,6 @@ public class EaglerAdapterImpl2 {
 	public static final float getContentScaling() {
 		 return (float)win.getDevicePixelRatio();
 	}
-	public static final void setVSyncEnabled(boolean p1) {
-		
-	} 
 	public static final void enableRepeatEvents(boolean b) {
 		enableRepeatEvents = b;
 	}
@@ -1775,9 +1987,6 @@ public class EaglerAdapterImpl2 {
 		return canvas.getHeight();
 	}
 	public static final void setDisplaySize(int x, int y) {
-		
-	}
-	public static final void syncDisplay(int performanceToFps) {
 		
 	}
 	
@@ -2001,11 +2210,13 @@ public class EaglerAdapterImpl2 {
 	@JSBody(params = { }, script = "window.onbeforeunload = function(){javaMethods.get('net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.onWindowUnload()V').invoke();return false;};")
 	private static native void onBeforeCloseRegister();
 
-	@JSBody(params = { "ext", "mime" }, script = "window.eagsFileChooser.openFileChooser(ext, mime);")
-	public static native void openFileChooser(String ext, String mime);
+	public static final void openFileChooser(String ext, String mime) {
+		fileChooser.openFileChooser(ext, mime);
+	}
 	
-	@JSBody(params = { }, script = "return window.eagsFileChooser.getFileChooserResult != null;")
-	public static final native boolean getFileChooserResultAvailable();
+	public static final boolean getFileChooserResultAvailable() {
+		return fileChooser.getGetFileChooserResult() != null;
+	}
 	
 	public static final byte[] getFileChooserResult() {
 		ArrayBuffer b = getFileChooserResult0();
@@ -2022,12 +2233,16 @@ public class EaglerAdapterImpl2 {
 		getFileChooserResult0();
 	}
 
-	@JSBody(params = {  }, script = "var ret = window.eagsFileChooser.getFileChooserResult; window.eagsFileChooser.getFileChooserResult = null; return ret;")
-	private static native ArrayBuffer getFileChooserResult0();
+	private static final ArrayBuffer getFileChooserResult0() {
+		ArrayBuffer ret = fileChooser.getGetFileChooserResult();
+		fileChooser.setGetFileChooserResultName(null);
+		return ret;
+	}
 
-	@JSBody(params = { }, script = "var ret = window.eagsFileChooser.getFileChooserResultName; window.eagsFileChooser.getFileChooserResultName = null; return ret;")
-	public static native String getFileChooserResultName();
-	
+	public static final String getFileChooserResultName() {
+		return fileChooser.getGetFileChooserResultName();
+	}
+
 	public static final void setListenerPos(float x, float y, float z, float vx, float vy, float vz, float pitch, float yaw) {
 		float var2 = MathHelper.cos(-yaw * 0.017453292F);
 		float var3 = MathHelper.sin(-yaw * 0.017453292F);

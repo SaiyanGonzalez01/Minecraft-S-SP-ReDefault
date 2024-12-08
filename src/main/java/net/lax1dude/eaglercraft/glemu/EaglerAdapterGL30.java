@@ -1613,4 +1613,33 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 		return ret;
 	}
 
+	public static boolean sync(int limitFramerate, long[] timerPtr) {
+		boolean limitFPS = limitFramerate > 0 && limitFramerate < 1000;
+		boolean blocked = false;
+		
+		if(limitFPS) {
+			if(timerPtr[0] == 0l) {
+				timerPtr[0] = steadyTimeMillis();
+			}else {
+				long millis = steadyTimeMillis();
+				long frameMillis = (1000l / limitFramerate);
+				long frameTime = millis - timerPtr[0];
+				if(frameTime > 2000l || frameTime < 0l) {
+					frameTime = frameMillis;
+					timerPtr[0] = millis;
+				}else {
+					timerPtr[0] += frameMillis;
+				}
+				if(frameTime >= 0l && frameTime < frameMillis) {
+					sleep((int)(frameMillis - frameTime));
+					blocked = true;
+				}
+			}
+		}else {
+			timerPtr[0] = 0l;
+		}
+		
+		return blocked;
+	}
+
 }

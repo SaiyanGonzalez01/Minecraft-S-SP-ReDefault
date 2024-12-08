@@ -243,6 +243,7 @@ public class Minecraft implements Runnable {
 	
 	public boolean lanState = false;
 	public boolean yeeState = false;
+	public boolean checkGLErrors = false;
 	
 	public Minecraft() {
 		this.tempDisplayHeight = 480;
@@ -404,7 +405,7 @@ public class Minecraft implements Runnable {
 			EaglerAdapter.glPopMatrix();
 
 			EaglerAdapter.glFlush();
-			EaglerAdapter.updateDisplay();
+			updateDisplay();
 			
 			long t = t1 + 17 + 17*i - EaglerAdapter.steadyTimeMillis();
 			if(t > 0) {
@@ -437,7 +438,7 @@ public class Minecraft implements Runnable {
 			EaglerAdapter.glPopMatrix();
 
 			EaglerAdapter.glFlush();
-			EaglerAdapter.updateDisplay();
+			updateDisplay();
 			
 			long t = t1 + 17 + 17*i - EaglerAdapter.steadyTimeMillis();
 			if(t > 0) {
@@ -468,7 +469,7 @@ public class Minecraft implements Runnable {
 			EaglerAdapter.glPopMatrix();
 
 			EaglerAdapter.glFlush();
-			EaglerAdapter.updateDisplay();
+			updateDisplay();
 			
 			long t = t1 + 17 + 17*i - EaglerAdapter.steadyTimeMillis();
 			if(t > 0) {
@@ -478,7 +479,7 @@ public class Minecraft implements Runnable {
 		
 		EaglerAdapter.glClear(EaglerAdapter.GL_COLOR_BUFFER_BIT | EaglerAdapter.GL_DEPTH_BUFFER_BIT);
 		EaglerAdapter.glFlush();
-		EaglerAdapter.updateDisplay();
+		updateDisplay();
 		
 		EaglerAdapter.sleep(100);
 		
@@ -521,7 +522,7 @@ public class Minecraft implements Runnable {
 		EaglerAdapter.glEnable(EaglerAdapter.GL_ALPHA_TEST);
 		EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.1F);
 		EaglerAdapter.glFlush();
-		EaglerAdapter.updateDisplay();
+		updateDisplay();
 		EaglerAdapter.optimize();
 	}
 
@@ -603,6 +604,7 @@ public class Minecraft implements Runnable {
 	 * string.
 	 */
 	public void checkGLError(String par1Str) {
+		if(!checkGLErrors) return;
 		int var2;
 		
 
@@ -712,7 +714,7 @@ public class Minecraft implements Runnable {
 		EaglerAdapter.glEnable(EaglerAdapter.GL_TEXTURE_2D);
 
 		if (!EaglerAdapter.isKeyDown(65)) {
-			EaglerAdapter.updateDisplay();
+			updateDisplay();
 		}
 
 		if (this.thePlayer != null && this.thePlayer.isEntityInsideOpaqueBlock()) {
@@ -780,11 +782,6 @@ public class Minecraft implements Runnable {
 			debugChunkGeometryUpdates = chunkGeometryUpdates;
 			chunkGeometryUpdates = 0;
 			secondTimer = EaglerAdapter.steadyTimeMillis();
-		}
-		this.mcProfiler.startSection("syncDisplay");
-
-		if (this.func_90020_K() > 0) {
-			EaglerAdapter.syncDisplay(EntityRenderer.performanceToFps(this.func_90020_K()));
 		}
 		
 		if(isGonnaTakeDatScreenShot) {
@@ -1102,6 +1099,11 @@ public class Minecraft implements Runnable {
 		}
 		
 		this.voiceOverlay.setResolution(var4, var5);
+	}
+	
+	public void updateDisplay() {
+		int i = this.func_90020_K();
+		EaglerAdapter.updateDisplay(i > 0 ? EntityRenderer.performanceToFps(i) : 0, false);
 	}
 	
 	private boolean wasPaused = false;

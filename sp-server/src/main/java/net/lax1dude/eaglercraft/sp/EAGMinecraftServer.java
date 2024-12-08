@@ -59,15 +59,10 @@ public class EAGMinecraftServer extends MinecraftServer {
 			this.tick();
 			lastTick = SysUtil.steadyTimeMillis();
 		} else {
-			boolean mustYield = false;
-			while (delta >= 50L) {
-				if(mustYield) {
-					SysUtil.sleep(1); // allow some async
-				}
+			if (delta >= 50l) {
 				delta -= 50L;
-				lastTick = SysUtil.steadyTimeMillis();
+				lastTick += 50l;
 				this.tick();
-				mustYield = true;
 			}
 		}
 		

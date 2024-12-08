@@ -99,7 +99,8 @@ public class EarlyLoadScreen {
 		_wglDrawArrays(_wGL_TRIANGLES, 0, 6);
 		_wglDisableVertexAttribArray(0);
 		_wglFlush();
-		updateDisplay();
+		updateDisplay(0, false);
+		sleep(20);
 
 		_wglUseProgram(null);
 		_wglBindBuffer(_wGL_ARRAY_BUFFER, null);
@@ -156,7 +157,8 @@ public class EarlyLoadScreen {
 		_wglDrawArrays(_wGL_TRIANGLES, 0, 6);
 		_wglDisableVertexAttribArray(0);
 		_wglFlush();
-		updateDisplay();
+		updateDisplay(0, false);
+		sleep(20);
 
 		_wglUseProgram(null);
 		_wglBindBuffer(_wGL_ARRAY_BUFFER, null);

@@ -81,8 +81,6 @@ import net.lax1dude.eaglercraft.RelayQuery.VersionMismatch;
 import net.lax1dude.eaglercraft.RelayWorldsQuery;
 import net.lax1dude.eaglercraft.ServerQuery;
 import net.lax1dude.eaglercraft.Voice;
-import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ProgramGL;
-import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.lax1dude.eaglercraft.adapter.lwjgl.GameWindowListener;
 import net.lax1dude.eaglercraft.sp.relay.pkt.IPacket;
 import net.lax1dude.eaglercraft.sp.relay.pkt.IPacket07LocalWorlds.LocalWorld;
@@ -971,12 +969,16 @@ public class EaglerAdapterImpl2 {
 	public static final boolean shouldShutdown() {
 		return Display.isCloseRequested();
 	}
-	public static final void updateDisplay() {
-		Display.update();
+	public static final void updateDisplay(int fpsLimit, boolean vsync) {
+		if(vsync) {
+			Display.setVSyncEnabled(true);
+			Display.update();
+		}else {
+			Display.setVSyncEnabled(false);
+			Display.sync(fpsLimit);
+			Display.update();
+		}
 	}
-	public static final void setVSyncEnabled(boolean p1) {
-		Display.setVSyncEnabled(p1);
-	} 
 	public static final void enableRepeatEvents(boolean b) {
 		Keyboard.enableRepeatEvents(b);
 	}
@@ -1005,17 +1007,14 @@ public class EaglerAdapterImpl2 {
 			e.printStackTrace();
 		}
 	}
-	public static final void syncDisplay(int performanceToFps) {
-		Display.sync(performanceToFps);
-	}
 
-	private static final Set<String> rateLimitedAddresses = new HashSet();
-	private static final Set<String> blockedAddresses = new HashSet();
+	private static final Set<String> rateLimitedAddresses = new HashSet<>();
+	private static final Set<String> blockedAddresses = new HashSet<>();
 	
 	private static WebSocketClient clientSocket = null;
 	private static final Object socketSync = new Object();
 	
-	private static LinkedList<byte[]> readPackets = new LinkedList();
+	private static LinkedList<byte[]> readPackets = new LinkedList<>();
 	
 	private static class EaglerSocketClient extends WebSocketClient {
 		
@@ -1465,7 +1464,7 @@ public class EaglerAdapterImpl2 {
 	public static final float getVoiceSpeakVolume() {
 		return volumeSpeak;
 	}
-	private static final Set<String> emptySet = new HashSet();
+	private static final Set<String> emptySet = new HashSet<>();
 	public static final Set<String> getVoiceListening() {
 		return emptySet;
 	}
@@ -1478,7 +1477,7 @@ public class EaglerAdapterImpl2 {
 	public static final Set<String> getVoiceMuted() {
 		return emptySet;
 	}
-	private static final List<String> emptyList = new ArrayList();
+	private static final List<String> emptyList = new ArrayList<>();
 	public static final List<String> getVoiceRecent() {
 		return emptyList;
 	}
@@ -1546,8 +1545,8 @@ public class EaglerAdapterImpl2 {
 	
 	private static class ServerQueryImpl extends WebSocketClient implements ServerQuery {
 		
-		private final LinkedList<QueryResponse> queryResponses = new LinkedList();
-		private final LinkedList<byte[]> queryResponsesBytes = new LinkedList();
+		private final LinkedList<QueryResponse> queryResponses = new LinkedList<>();
+		private final LinkedList<byte[]> queryResponsesBytes = new LinkedList<>();
 		private final String type;
 		private boolean open;
 		private boolean alive;

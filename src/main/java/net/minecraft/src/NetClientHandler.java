@@ -119,20 +119,20 @@ public class NetClientHandler extends NetHandler {
 				RateLimit r = EaglerAdapter.getRateLimitStatus();
 				if(r != null) {
 					if(r == RateLimit.NOW_LOCKED) {
-						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.ipNowLocked", "disconnect.endOfStream", null));
+						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.ipNowLocked", "disconnect.endOfStream"));
 					}else if(r == RateLimit.LOCKED) {
-						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.ipLocked", "disconnect.endOfStream", null));
+						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.ipLocked", "disconnect.endOfStream"));
 					}else if(r == RateLimit.BLOCKED) {
-						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.ipBlocked", "disconnect.endOfStream", null));
+						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.ipBlocked", "disconnect.endOfStream"));
 					}else if(r == RateLimit.FAILED_POSSIBLY_LOCKED) {
-						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.ipFailedPossiblyLocked", "disconnect.endOfStream", null));
+						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.ipFailedPossiblyLocked", "disconnect.endOfStream"));
 					}else {
-						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.disconnected", "RateLimit." + r.name(), null));
+						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.disconnected", "RateLimit." + r.name()));
 					}
 				}else {
 					if(!(this.mc.currentScreen instanceof GuiDisconnected) && !(this.mc.currentScreen instanceof GuiScreenSingleplayerException) &&
 							!(this.mc.currentScreen instanceof GuiScreenSingleplayerLoading)) {
-						this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.disconnected", "disconnect.endOfStream", null));
+						this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.disconnected", "disconnect.endOfStream"));
 					}
 				}
 				this.disconnected = true;
