@@ -1375,7 +1375,7 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 
 	public static final boolean glGetQueryResultAvailable(int obj) {
 		QueryGL q = queryObjs.get(obj);
-		return _wglGetQueryObjecti(q, _wGL_QUERY_RESULT_AVAILABLE) >= 0;
+		return _wglGetQueryObjecti(q, _wGL_QUERY_RESULT_AVAILABLE) > 0;
 	}
 
 	public static final int glGenTextures() {

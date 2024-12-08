@@ -64,8 +64,7 @@ public class WorldRenderer {
 	public int chunkIndex;
 
 	/** Is this renderer visible according to the occlusion query */
-	public int isVisible = 0;
-	public boolean isNowVisible = true;
+	public boolean isVisible = true;
 
 	/** Is this renderer waiting on the result of the occlusion query */
 	public boolean isWaitingOnOcclusionQuery;
@@ -73,7 +72,6 @@ public class WorldRenderer {
 	/** Is the chunk lit */
 	public boolean isChunkLit;
 	private boolean isInitialized = false;
-	public int hasOcclusionData = 0;
 
 	/** All the tile entities that have special rendering code for this chunk */
 	public List tileEntityRenderers = new ArrayList();
@@ -98,7 +96,6 @@ public class WorldRenderer {
 	public void setPosition(int par1, int par2, int par3) {
 		if (par1 != this.posX || par2 != this.posY || par3 != this.posZ) {
 			this.setDontDraw();
-			this.hasOcclusionData = 0;
 			this.posX = par1;
 			this.posY = par2;
 			this.posZ = par3;
