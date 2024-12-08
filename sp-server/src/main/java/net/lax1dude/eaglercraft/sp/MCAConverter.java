@@ -84,7 +84,7 @@ public class MCAConverter {
 		byte[] readBuffer = new byte[16000];
 
 		try {
-			int timestamp = (int) System.currentTimeMillis();
+			int timestamp = (int) (System.currentTimeMillis() / 1000);
 
 			int maxX = Integer.MIN_VALUE;
 			int maxZ = Integer.MIN_VALUE;

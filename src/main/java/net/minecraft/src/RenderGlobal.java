@@ -572,7 +572,7 @@ public class RenderGlobal implements IWorldAccess {
 		long stallRate = 500l;
 		int cooldownRate = 13;
 
-		long ct = System.currentTimeMillis();
+		long ct = EaglerAdapter.steadyTimeMillis();
 		if(par2 == 0) {
 			this.theWorld.theProfiler.endStartSection("getoccl");
 			for (int i = 0; i < this.sortedWorldRenderers.length; ++i) {
@@ -620,7 +620,7 @@ public class RenderGlobal implements IWorldAccess {
 		
 		var7 -= par1EntityLiving.getEyeHeight();
 		
-		ct = System.currentTimeMillis();
+		ct = EaglerAdapter.steadyTimeMillis();
 		if(par2 == 0 && ct - lastOcclusionQuery > queryRate) {
 			
 			int totalRenderers = this.sortedWorldRenderers.length;

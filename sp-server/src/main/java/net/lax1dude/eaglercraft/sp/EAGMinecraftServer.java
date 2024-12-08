@@ -37,11 +37,11 @@ public class EAGMinecraftServer extends MinecraftServer {
 	
 	public void mainLoop() {
 		if(paused && this.playersOnline.size() <= 1) {
-			lastTick = System.currentTimeMillis();
+			lastTick = SysUtil.steadyTimeMillis();
 			return;
 		}
 		
-		long ctm = System.currentTimeMillis();
+		long ctm = SysUtil.steadyTimeMillis();
 		long delta = ctm - lastTick;
 		
 		if (delta > 2000L && ctm - this.timeOfLastWarning >= 15000L) {
@@ -57,19 +57,15 @@ public class EAGMinecraftServer extends MinecraftServer {
 		
 		if (this.worldServers[0].areAllPlayersAsleep()) {
 			this.tick();
-			lastTick = System.currentTimeMillis();
+			lastTick = SysUtil.steadyTimeMillis();
 		} else {
 			boolean mustYield = false;
 			while (delta >= 50L) {
 				if(mustYield) {
-					try {
-						Thread.sleep(1l); // allow some async
-					}catch(InterruptedException e) {
-						System.err.println("you eagler");
-					}
+					SysUtil.sleep(1); // allow some async
 				}
 				delta -= 50L;
-				lastTick = System.currentTimeMillis();
+				lastTick = SysUtil.steadyTimeMillis();
 				this.tick();
 				mustYield = true;
 			}
@@ -80,7 +76,7 @@ public class EAGMinecraftServer extends MinecraftServer {
 	public void setPaused(boolean p) {
 		paused = p;
 		if(!p) {
-			lastTick = System.currentTimeMillis();
+			lastTick = SysUtil.steadyTimeMillis();
 		}
 	}
 	
@@ -93,7 +89,7 @@ public class EAGMinecraftServer extends MinecraftServer {
 		SkinsPlugin.reset();
 		VoiceChatPlugin.reset();
 		this.loadAllWorlds(folderName, 0l, newWorldSettings);
-		this.lastTick = System.currentTimeMillis();
+		this.lastTick = SysUtil.steadyTimeMillis();
 		return true;
 	}
 

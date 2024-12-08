@@ -45,11 +45,11 @@ public class GameOverlayFramebuffer {
 
 	public void endRender() {
 		_wglBindFramebuffer(_wGL_FRAMEBUFFER, null);
-		age = System.currentTimeMillis();
+		age = steadyTimeMillis();
 	}
 
 	public long getAge() {
-		return age == -1l ? -1l : (System.currentTimeMillis() - age);
+		return age == -1l ? -1l : (steadyTimeMillis() - age);
 	}
 
 	public void bindTexture() {

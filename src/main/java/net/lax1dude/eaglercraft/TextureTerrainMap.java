@@ -263,7 +263,7 @@ public class TextureTerrainMap implements IconRegister {
 		this.height = size;
 		this.basePath = par3Str;
 		this.missingImage = new TerrainIconV2(nextSlot[1]++, 1, this, null);
-		this.iconList = new ArrayList();
+		this.iconList = new ArrayList<>();
 		this.texture = EaglerAdapter.glGenTextures();
 		this.copyFramebuffer = EaglerAdapter._wglCreateFramebuffer();
 		EaglerAdapter.glBindTexture(EaglerAdapter.GL_TEXTURE_2D, texture);

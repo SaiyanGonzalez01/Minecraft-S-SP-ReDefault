@@ -2,8 +2,6 @@ package net.minecraft.src;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.adapter.SimpleStorage;
-import net.minecraft.client.Minecraft;
-
 import java.util.List;
 
 public class GuiTexturePacks extends GuiScreen {

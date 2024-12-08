@@ -502,7 +502,7 @@ public class EntityRenderer {
 		if(i < 0.0f) i = 0.0f;
 		float i2 = i * i;
 		if(i2 > 0.0f) {
-			float f = (float)((System.currentTimeMillis() % 10000000l) * 0.0002);
+			float f = (float)((EaglerAdapter.steadyTimeMillis() % 10000000l) * 0.0002);
 			f += MathHelper.sin(f * 5.0f) * 0.2f;
 			i2 *= MathHelper.sin(f) + MathHelper.sin(f * 1.5f + 0.6f) + MathHelper.sin(f * 0.7f + 1.7f) +
 					MathHelper.sin(f * 3.0f + 3.0f) + MathHelper.sin(f * 5.25f + 1.2f);
@@ -531,7 +531,7 @@ public class EntityRenderer {
 		i2 = i * i;
 		if(i > 0.0f) {
 			
-			float f = (float)((System.currentTimeMillis() % 10000000l) * 0.00012);
+			float f = (float)((EaglerAdapter.steadyTimeMillis() % 10000000l) * 0.00012);
 			f += MathHelper.sin(f * 3.0f) * 0.2f;
 			i2 *= MathHelper.sin(f * 1.2f + 1.0f) + MathHelper.sin(f * 1.5f + 0.8f) * 3.0f + MathHelper.sin(f * 0.6f + 3.0f) +
 					MathHelper.sin(f * 4.3f) + MathHelper.sin(f * 5.25f + 0.5f);
@@ -609,7 +609,7 @@ public class EntityRenderer {
 			if(i < 0.0f) i = 0.0f;
 			float i2 = i * i;
 			if(i2 > 0.0f) {
-				float f = (float)((System.currentTimeMillis() % 10000000l) * 0.0003);
+				float f = (float)((EaglerAdapter.steadyTimeMillis() % 10000000l) * 0.0003);
 				f += MathHelper.sin(f * 3.0f) * 0.2f;
 				i2 *= MathHelper.sin(f * 1.2f + 1.0f) + MathHelper.sin(f * 1.5f + 0.8f) * 3.0f + MathHelper.sin(f * 0.6f + 3.0f) +
 						MathHelper.sin(f * 4.3f) + MathHelper.sin(f * 5.25f + 0.5f);
@@ -1236,7 +1236,7 @@ public class EntityRenderer {
 	}
 
 	private int updateCounter = 0;
-	private int randomOffset = (int)(System.currentTimeMillis() % 100000l);
+	private int randomOffset = (int)(EaglerAdapter.steadyTimeMillis() % 100000l);
 
 	public boolean asdfghjkl = false;
 

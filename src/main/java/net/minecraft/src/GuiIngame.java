@@ -10,7 +10,6 @@ import net.lax1dude.eaglercraft.EnumBrowser;
 import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
-import net.lax1dude.eaglercraft.glemu.EffectPipeline;
 import net.minecraft.client.Minecraft;
 
 public class GuiIngame extends Gui {
@@ -749,7 +748,7 @@ public class GuiIngame extends Gui {
 		if(i < 0.0f) i = 0.0f;
 		float i2 = i * i;
 		if(i2 > 0.0f) {
-			float f = (float)((System.currentTimeMillis() % 1000000l) * 0.0002);
+			float f = (float)((EaglerAdapter.steadyTimeMillis() % 1000000l) * 0.0002);
 			f += MathHelper.sin(f * 5.0f) * 0.2f;
 			i2 *= MathHelper.sin(f) + MathHelper.sin(f * 1.5f + 0.6f) + MathHelper.sin(f * 0.7f + 1.7f) +
 					MathHelper.sin(f * 3.0f + 3.0f);

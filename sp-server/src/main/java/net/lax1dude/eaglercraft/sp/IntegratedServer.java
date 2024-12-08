@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSFunctor;
@@ -32,7 +33,7 @@ import net.minecraft.src.WorldType;
 
 public class IntegratedServer {
 	
-	private static final LinkedList<PKT> messageQueue = new LinkedList();
+	private static final LinkedList<PKT> messageQueue = new LinkedList<>();
 	
 	protected static class PKT {
 		protected final String channel;
@@ -70,7 +71,7 @@ public class IntegratedServer {
 				return;
 			}
 			
-			Uint8Array a = Uint8Array.create(buf);
+			Uint8Array a = new Uint8Array(buf);
 			byte[] pkt = new byte[a.getLength()];
 			for(int i = 0; i < pkt.length; ++i) {
 				pkt[i] = (byte) a.get(i);
@@ -107,7 +108,7 @@ public class IntegratedServer {
 		String str = t.toString();
 		System.err.println("Exception was raised to client: " + str);
 		t.printStackTrace();
-		List<String> arr = new LinkedList();
+		List<String> arr = new LinkedList<>();
 		for(StackTraceElement e : t.getStackTrace()) {
 			String st = e.toString();
 			arr.add(st);
@@ -220,7 +221,7 @@ public class IntegratedServer {
 							}
 							String[] worldsTxt = SYS.VFS.getFile("worlds.txt").getAllLines();
 							if(worldsTxt != null) {
-								LinkedList<String> newWorlds = new LinkedList();
+								LinkedList<String> newWorlds = new LinkedList<>();
 								for(String str : worldsTxt) {
 									if(!str.equalsIgnoreCase(pkt.worldName)) {
 										newWorlds.add(str);
@@ -240,7 +241,7 @@ public class IntegratedServer {
 								break;
 							}else {
 								String[] worldsTxt = SYS.VFS.getFile("worlds.txt").getAllLines();
-								LinkedList<String> newWorlds = new LinkedList();
+								LinkedList<String> newWorlds = new LinkedList<>();
 								if(worldsTxt != null) {
 									for(String str : worldsTxt) {
 										if(pkt.copy || !str.equalsIgnoreCase(pkt.worldOldName)) {
@@ -586,7 +587,6 @@ public class IntegratedServer {
 						}
 						break;
 					case IPCPacket0EListWorlds.ID: {
-							IPCPacket0EListWorlds pkt = (IPCPacket0EListWorlds)packet;
 							if(isServerStopped()) {
 								String[] worlds = SYS.VFS.getFile("worlds.txt").getAllLines();
 								if(worlds == null || (worlds.length == 1 && worlds[0].trim().length() <= 0)) {
@@ -596,8 +596,8 @@ public class IntegratedServer {
 									sendIPCPacket(new IPCPacket16NBTList(IPCPacket16NBTList.WORLD_LIST, new LinkedList<NBTTagCompound>()));
 									break;
 								}
-								LinkedList<String> updatedList = new LinkedList();
-								LinkedList<NBTTagCompound> sendListNBT = new LinkedList();
+								LinkedList<String> updatedList = new LinkedList<>();
+								LinkedList<NBTTagCompound> sendListNBT = new LinkedList<>();
 								boolean rewrite = false;
 								for(String w : worlds) {
 									byte[] dat = (new VFile("worlds", w, "level.dat")).getAllBytes();
@@ -683,13 +683,13 @@ public class IntegratedServer {
 				continue;
 			}
 		}
-		long watchDog = System.currentTimeMillis();
+		long watchDog = SysUtil.steadyTimeMillis();
 		itr = cur.iterator();
 		int overflow = 0;
 		while(itr.hasNext()) {
 			PKT msg = itr.next();
 			if(!msg.channel.equals("IPC")) {
-				if(System.currentTimeMillis() - watchDog > 500l) {
+				if(SysUtil.steadyTimeMillis() - watchDog > 500l) {
 					++overflow;
 					continue;
 				}
@@ -720,16 +720,16 @@ public class IntegratedServer {
 			return;
 		}
 		
-		ArrayBuffer arb = ArrayBuffer.create(serialized.length);
-		Uint8Array ar = Uint8Array.create(arb);
+		ArrayBuffer arb = new ArrayBuffer(serialized.length);
+		Uint8Array ar = new Uint8Array(arb);
 		ar.set(serialized);
 		sendWorkerPacket("IPC", arb);
 	}
 	
 	public static void sendPlayerPacket(String channel, byte[] buf) {
 		//System.out.println("[Server][SEND][" + channel + "]: " + buf.length);
-		ArrayBuffer arb = ArrayBuffer.create(buf.length);
-		Uint8Array ar = Uint8Array.create(arb);
+		ArrayBuffer arb = new ArrayBuffer(buf.length);
+		Uint8Array ar = new Uint8Array(arb);
 		ar.set(buf);
 		sendWorkerPacket("NET|" + channel, arb);
 	}
@@ -767,11 +767,7 @@ public class IntegratedServer {
 			
 			mainLoop();
 			
-			try {
-				Thread.sleep(1l); // allow some async to occur
-			}catch(InterruptedException e) {
-				System.err.println("you eagler");
-			}
+			SysUtil.sleep(1); // allow some async to occur
 		}
 		
 		// yee

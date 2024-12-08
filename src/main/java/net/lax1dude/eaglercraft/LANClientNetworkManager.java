@@ -67,7 +67,7 @@ public class LANClientNetworkManager implements INetworkManager {
 						
 						// print servers
 						System.out.println("Relay [" + displayRelay + "|" + displayCode + "] provided ICE servers:");
-						List<String> servers = new ArrayList();
+						List<String> servers = new ArrayList<>();
 						for(net.lax1dude.eaglercraft.sp.relay.pkt.ICEServerSet.RelayServer srv : ipkt.servers) {
 							System.out.println("Relay [" + displayRelay + "|" + displayCode + "]     " + srv.type.name()
 									+ ": " + srv.address);
@@ -78,7 +78,7 @@ public class LANClientNetworkManager implements INetworkManager {
 						EaglerAdapter.clientLANSetICEServersAndConnect(servers.toArray(new String[servers.size()]));
 
 						// await result
-						long lm = System.currentTimeMillis();
+						long lm = EaglerAdapter.steadyTimeMillis();
 						do {
 							String c = EaglerAdapter.clientLANAwaitDescription();
 							if(c != null) {
@@ -90,11 +90,8 @@ public class LANClientNetworkManager implements INetworkManager {
 								connectState = SENT_DESCRIPTION;
 								continue mainLoop;
 							}
-							try {
-								Thread.sleep(20l);
-							} catch (InterruptedException e) {
-							}
-						}while(System.currentTimeMillis() - lm < 5000l);
+							EaglerAdapter.sleep(20);
+						}while(EaglerAdapter.steadyTimeMillis() - lm < 5000l);
 
 						// no description was sent
 						sock.close();
@@ -119,7 +116,7 @@ public class LANClientNetworkManager implements INetworkManager {
 						EaglerAdapter.clientLANSetICECandidate(ipkt.candidate);
 
 						// await result
-						long lm = System.currentTimeMillis();
+						long lm = EaglerAdapter.steadyTimeMillis();
 						do {
 							if(EaglerAdapter.clientLANAwaitChannel()) {
 								System.out.println("Relay [" + displayRelay + "|" + displayCode + "] client opened data channel");
@@ -130,11 +127,8 @@ public class LANClientNetworkManager implements INetworkManager {
 								return new LANClientNetworkManager(displayCode, displayRelay);
 
 							}
-							try {
-								Thread.sleep(20l);
-							} catch (InterruptedException e) {
-							}
-						}while(System.currentTimeMillis() - lm < 5000l);
+							EaglerAdapter.sleep(20);
+						}while(EaglerAdapter.steadyTimeMillis() - lm < 5000l);
 
 						// no channel was opened
 						sock.writePacket(new IPacket06ClientFailure(ipkt.peerId));
@@ -160,7 +154,7 @@ public class LANClientNetworkManager implements INetworkManager {
 						EaglerAdapter.clientLANSetDescription(ipkt.description);
 
 						// await result
-						long lm = System.currentTimeMillis();
+						long lm = EaglerAdapter.steadyTimeMillis();
 						do {
 							String c = EaglerAdapter.clientLANAwaitICECandidate();
 							if(c != null) {
@@ -172,11 +166,8 @@ public class LANClientNetworkManager implements INetworkManager {
 								connectState = SENT_ICE_CANDIDATE;
 								continue mainLoop;
 							}
-							try {
-								Thread.sleep(20l);
-							} catch (InterruptedException e) {
-							}
-						}while(System.currentTimeMillis() - lm < 5000l);
+							EaglerAdapter.sleep(20);
+						}while(EaglerAdapter.steadyTimeMillis() - lm < 5000l);
 
 						// no ice candidates were sent
 						sock.close();
@@ -212,10 +203,7 @@ public class LANClientNetworkManager implements INetworkManager {
 					return null;
 				}
 			}
-			try {
-				Thread.sleep(20l);
-			} catch (InterruptedException e) {
-			}
+			EaglerAdapter.sleep(20);
 		}
 		return null;
 	}

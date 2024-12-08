@@ -1622,7 +1622,7 @@ public class EaglerAdapterImpl2 {
 			this.alive = true;
 			synchronized(queryResponses) {
 				if(pingTimer == -1) {
-					pingTimer = System.currentTimeMillis() - pingStart;
+					pingTimer = steadyTimeMillis() - pingStart;
 				}
 				if(arg0.equalsIgnoreCase("BLOCKED")) {
 					synchronized(socketSync) {
@@ -1672,7 +1672,7 @@ public class EaglerAdapterImpl2 {
 		@Override
 		public void onOpen(ServerHandshake arg0) {
 			send("Accept: " + type);
-			pingStart = System.currentTimeMillis();
+			pingStart = steadyTimeMillis();
 		}
 
 		@Override
@@ -1995,5 +1995,20 @@ public class EaglerAdapterImpl2 {
 	public static final byte[] downloadURL(String url) {
 		return null;
 	}
-	
+
+	public static final long steadyTimeMillis() {
+		return System.nanoTime() / 1000000l;
+	}
+
+	public static final long nanoTime() {
+		return System.nanoTime();
+	}
+
+	public static final void sleep(int millis) {
+		try {
+			Thread.sleep(millis);
+		}catch(InterruptedException ex) {
+		}
+	}
+
 }

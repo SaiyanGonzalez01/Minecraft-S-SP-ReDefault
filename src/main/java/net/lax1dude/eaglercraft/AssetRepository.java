@@ -10,14 +10,13 @@ import java.util.HashMap;
 import com.jcraft.jzlib.CRC32;
 import com.jcraft.jzlib.GZIPInputStream;
 import com.jcraft.jzlib.InflaterInputStream;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class AssetRepository {
 	
-	private static final HashMap<String,byte[]> filePool = new HashMap();
-	private static final HashMap<String,byte[]> filePoolTemp = new HashMap();
-	public static final HashMap<String, String> fileNameOverrides = new HashMap();
+	private static final HashMap<String,byte[]> filePool = new HashMap<>();
+	private static final HashMap<String,byte[]> filePoolTemp = new HashMap<>();
+	public static final HashMap<String, String> fileNameOverrides = new HashMap<>();
 
 	public static final void loadOverrides(JSONObject json) {
 		JSONObject overrides = json.optJSONObject("assetOverrides", null);

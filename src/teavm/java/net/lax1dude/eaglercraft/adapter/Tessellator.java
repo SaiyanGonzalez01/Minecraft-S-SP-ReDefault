@@ -93,9 +93,9 @@ public class Tessellator {
 
 	private Tessellator(int par1) {
 		this.bufferSize = par1;
-		ArrayBuffer a = ArrayBuffer.create(par1 * 4);
-		this.intBuffer = Int32Array.create(a);
-		this.floatBuffer = Float32Array.create(a);
+		ArrayBuffer a = new ArrayBuffer(par1 * 4);
+		this.intBuffer = new Int32Array(a);
+		this.floatBuffer = new Float32Array(a);
 	}
 
 	/**
@@ -128,7 +128,7 @@ public class Tessellator {
 					EaglerAdapter.glClientActiveTexture(EaglerAdapter.GL_TEXTURE0);
 				}
 				
-				EaglerAdapter.glDrawArrays(this.drawMode, 0, this.vertexCount, Int32Array.create(intBuffer.getBuffer(), 0, this.vertexCount * 8));
+				EaglerAdapter.glDrawArrays(this.drawMode, 0, this.vertexCount, new Int32Array(intBuffer.getBuffer(), 0, this.vertexCount * 8));
 				
 				if (this.hasTexture) {
 					EaglerAdapter.glDisableVertexAttrib(EaglerAdapter.GL_TEXTURE_COORD_ARRAY);

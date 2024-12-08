@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
+import net.lax1dude.eaglercraft.sp.SysUtil;
 import net.minecraft.server.MinecraftServer;
 
 public class WorldServer extends World {
@@ -166,7 +167,7 @@ public class WorldServer extends World {
 		_lu += Chunk.totalBlockLightUpdates;
 		Chunk.totalBlockLightUpdates = 0;
 		
-		long millis = System.currentTimeMillis();
+		long millis = SysUtil.steadyTimeMillis();
 		if(millis - rwgtuluTimer >= 1000l) {
 			rwgtuluTimer = millis;
 			r = _r; _r = 0;

@@ -3,15 +3,14 @@ package net.lax1dude.eaglercraft.adapter;
 import org.teavm.interop.Async;
 import org.teavm.interop.AsyncCallback;
 import org.teavm.jso.core.JSString;
+import org.teavm.jso.indexeddb.IDBDatabase;
+import org.teavm.jso.indexeddb.IDBFactory;
+import org.teavm.jso.indexeddb.IDBGetRequest;
+import org.teavm.jso.indexeddb.IDBObjectStore;
+import org.teavm.jso.indexeddb.IDBOpenDBRequest;
+import org.teavm.jso.indexeddb.IDBRequest;
 import org.teavm.jso.typedarrays.ArrayBuffer;
 import org.teavm.jso.typedarrays.Uint8Array;
-
-import net.lax1dude.eaglercraft.adapter.teavm.IDBDatabase;
-import net.lax1dude.eaglercraft.adapter.teavm.IDBFactory;
-import net.lax1dude.eaglercraft.adapter.teavm.IDBGetRequest;
-import net.lax1dude.eaglercraft.adapter.teavm.IDBObjectStore;
-import net.lax1dude.eaglercraft.adapter.teavm.IDBOpenDBRequest;
-import net.lax1dude.eaglercraft.adapter.teavm.IDBRequest;
 
 public class SimpleStorage {
 	private static IDBDatabase database;
@@ -51,7 +50,7 @@ public class SimpleStorage {
 		}
 		IDBGetRequest request = getStore().get(JSString.valueOf(key));
 		request.setOnSuccess(() -> {
-			Uint8Array a = Uint8Array.create((ArrayBuffer) request.getResult().cast());
+			Uint8Array a = new Uint8Array((ArrayBuffer) request.getResult().cast());
 			byte[] b = new byte[a.getByteLength()];
 			for(int i = 0; i < b.length; ++i) {
 				b[i] = (byte) (a.get(i) & 0xFF);
@@ -119,8 +118,8 @@ public class SimpleStorage {
 				});
 			});
 		} else {
-			ArrayBuffer arr = ArrayBuffer.create(value.length);
-			Uint8Array.create(arr).set(value);
+			ArrayBuffer arr = new ArrayBuffer(value.length);
+			(new Uint8Array(arr)).set(value);
 			IDBRequest request2 = getStore().put(arr, JSString.valueOf(key));
 			request2.setOnSuccess(() -> {
 				IDBGetRequest request3 = getStore().get(JSString.valueOf("__LIST__"));

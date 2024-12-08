@@ -87,7 +87,7 @@ public class GuiMainMenu extends GuiScreen {
 			}
 		}
 		this.field_92025_p = "Eaglercraft 1.5.2 Service Pack #1";
-		this.start = System.currentTimeMillis();
+		this.start = EaglerAdapter.steadyTimeMillis();
 		this.start += this.start % 10000l;
 		this.ackLines = new ArrayList();
 		
@@ -342,7 +342,7 @@ public class GuiMainMenu extends GuiScreen {
 				float var9 = 0.0F;
 				EaglerAdapter.glTranslatef(var7, var8, var9);
 				
-				float panTimer = (float)(System.currentTimeMillis() - start) * 0.03f;
+				float panTimer = (float)(EaglerAdapter.steadyTimeMillis() - start) * 0.03f;
 				EaglerAdapter.glRotatef(MathHelper.sin(panTimer / 400.0F) * 25.0F + 20.0F, 1.0F, 0.0F, 0.0F);
 				EaglerAdapter.glRotatef(-(panTimer) * 0.1F, 0.0F, 1.0F, 0.0F);
 			}
@@ -646,7 +646,7 @@ public class GuiMainMenu extends GuiScreen {
 			}else {
 				EaglerAdapter.glEnable(EaglerAdapter.GL_BLEND);
 				EaglerAdapter.glBlendFunc(EaglerAdapter.GL_SRC_ALPHA, EaglerAdapter.GL_ONE_MINUS_SRC_ALPHA);
-				EaglerAdapter.glColor4f(0.9f, 0.9f, 0.9f, MathHelper.sin((float)(System.currentTimeMillis() % 1000000l) / 300f) * 0.17f + 0.5f);
+				EaglerAdapter.glColor4f(0.9f, 0.9f, 0.9f, MathHelper.sin((float)(EaglerAdapter.steadyTimeMillis() % 1000000l) / 300f) * 0.17f + 0.5f);
 				
 				items.bindTexture();
 				

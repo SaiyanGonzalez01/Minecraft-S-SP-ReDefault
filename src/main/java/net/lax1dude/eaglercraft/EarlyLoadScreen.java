@@ -67,11 +67,7 @@ public class EarlyLoadScreen {
 		_wglDeleteShader(vert);
 		_wglDeleteShader(frag);
 		
-		try {
-			Thread.sleep(50l);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		sleep(50);
 		
 		_wglUseProgram(program);
 		_wglUniform1i(_wglGetUniformLocation(program, "tex"), 0);
@@ -128,11 +124,7 @@ public class EarlyLoadScreen {
 		upload.flip();
 		_wglTexImage2D(_wGL_TEXTURE_2D, 0, _wGL_RGBA, 128, 128, 0, _wGL_RGBA, _wGL_UNSIGNED_BYTE, upload);
 		
-		try {
-			Thread.sleep(50l);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		sleep(50);
 		
 		_wglUseProgram(program);
 

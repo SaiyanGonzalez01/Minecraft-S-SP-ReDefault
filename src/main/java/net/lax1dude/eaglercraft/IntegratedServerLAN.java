@@ -12,7 +12,7 @@ import net.lax1dude.eaglercraft.sp.relay.pkt.*;
 
 public class IntegratedServerLAN {
 	
-	public static final List<String> currentICEServers = new ArrayList();
+	public static final List<String> currentICEServers = new ArrayList<>();
 
 	private static RelayServerSocket lanRelaySocket = null;
 	
@@ -32,7 +32,7 @@ public class IntegratedServerLAN {
 			String code = hs.connectionCode;
 			System.out.println("Relay [" + sock.getURI() + "] connected as 'server', code: " + code);
 			progressCallback.accept("Opened '" + code + "' on " + sock.getURI());
-			long millis = System.currentTimeMillis();
+			long millis = EaglerAdapter.steadyTimeMillis();
 			do {
 				if(sock.isClosed()) {
 					System.out.println("Relay [" + sock.getURI() + "] connection lost");
@@ -58,11 +58,8 @@ public class IntegratedServerLAN {
 						return null;
 					}
 				}
-				try {
-					Thread.sleep(50l);
-				} catch (InterruptedException e) {
-				}
-			}while(System.currentTimeMillis() - millis < 1000l);
+				EaglerAdapter.sleep(50);
+			}while(EaglerAdapter.steadyTimeMillis() - millis < 1000l);
 			System.out.println("Relay [" + sock.getURI() + "] relay provide ICE servers timeout");
 			closeLAN();
 			return null;
@@ -107,7 +104,7 @@ public class IntegratedServerLAN {
 		return lanRelaySocket != null;
 	}
 	
-	private static final Map<String, LANClient> clients = new HashMap();
+	private static final Map<String, LANClient> clients = new HashMap<>();
 	
 	public static void updateLANServer() {
 		if(lanRelaySocket != null) {
@@ -195,7 +192,7 @@ public class IntegratedServerLAN {
 		protected void handleICECandidates(String candidates) {
 			if(state == SENT_DESCRIPTION) {
 				EaglerAdapter.serverLANPeerICECandidates(clientId, candidates);
-				long millis = System.currentTimeMillis();
+				long millis = EaglerAdapter.steadyTimeMillis();
 				do {
 					LANPeerEvent evt;
 					if((evt = EaglerAdapter.serverLANGetEvent(clientId)) != null) {
@@ -211,11 +208,8 @@ public class IntegratedServerLAN {
 						disconnect();
 						return;
 					}
-					try {
-						Thread.sleep(20l);
-					} catch (InterruptedException e) {
-					}
-				}while(System.currentTimeMillis() - millis < 5000l);
+					EaglerAdapter.sleep(20);
+				}while(EaglerAdapter.steadyTimeMillis() - millis < 5000l);
 				System.err.println("Getting server ICE candidates for '" + clientId + "' timed out!");
 				disconnect();
 			}else {
@@ -226,7 +220,7 @@ public class IntegratedServerLAN {
 		protected void handleDescription(String description) {
 			if(state == PRE) {
 				EaglerAdapter.serverLANPeerDescription(clientId, description);
-				long millis = System.currentTimeMillis();
+				long millis = EaglerAdapter.steadyTimeMillis();
 				do {
 					LANPeerEvent evt;
 					if((evt = EaglerAdapter.serverLANGetEvent(clientId)) != null) {
@@ -242,11 +236,8 @@ public class IntegratedServerLAN {
 						disconnect();
 						return;
 					}
-					try {
-						Thread.sleep(20l);
-					} catch (InterruptedException e) {
-					}
-				}while(System.currentTimeMillis() - millis < 5000l);
+					EaglerAdapter.sleep(20);
+				}while(EaglerAdapter.steadyTimeMillis() - millis < 5000l);
 				System.err.println("Getting server description for '" + clientId + "' timed out!");
 				disconnect();
 			}else {
@@ -256,7 +247,7 @@ public class IntegratedServerLAN {
 		
 		protected void handleSuccess() {
 			if(state == SENT_ICE_CANDIDATE) {
-				long millis = System.currentTimeMillis();
+				long millis = EaglerAdapter.steadyTimeMillis();
 				do {
 					LANPeerEvent evt;
 					while((evt = EaglerAdapter.serverLANGetEvent(clientId)) != null && evt instanceof LANPeerEvent.LANPeerICECandidateEvent) {
@@ -276,11 +267,8 @@ public class IntegratedServerLAN {
 						disconnect();
 						return;
 					}
-					try {
-						Thread.sleep(20l);
-					} catch (InterruptedException e) {
-					}
-				}while(System.currentTimeMillis() - millis < 5000l);
+					EaglerAdapter.sleep(20);
+				}while(EaglerAdapter.steadyTimeMillis() - millis < 5000l);
 				System.err.println("Getting server description for '" + clientId + "' timed out!");
 				disconnect();
 			}else {

@@ -379,7 +379,7 @@ public class Minecraft implements Runnable {
 		EaglerAdapter.glDisable(EaglerAdapter.GL_FOG);
 		EaglerAdapter.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
-		long t1 = System.currentTimeMillis();
+		long t1 = EaglerAdapter.steadyTimeMillis();
 		for(int i = 0; i < 20; i++) {
 			this.displayWidth = EaglerAdapter.getCanvasWidth();
 			this.displayHeight = EaglerAdapter.getCanvasHeight();
@@ -390,7 +390,7 @@ public class Minecraft implements Runnable {
 			EaglerAdapter.glOrtho(0.0F, var1.getScaledWidth(), var1.getScaledHeight(), 0.0F, 1000.0F, 3000.0F);
 			EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
 			
-			float f = ((float)(System.currentTimeMillis() - t1) / 333f);
+			float f = ((float)(EaglerAdapter.steadyTimeMillis() - t1) / 333f);
 			
 			EaglerAdapter.glClear(EaglerAdapter.GL_COLOR_BUFFER_BIT | EaglerAdapter.GL_DEPTH_BUFFER_BIT);
 			EaglerAdapter.glColor4f(1.0F, 1.0F, 1.0F, MathHelper.clamp_float(1.0f - f, 0.0F, 1.0F));
@@ -406,17 +406,13 @@ public class Minecraft implements Runnable {
 			EaglerAdapter.glFlush();
 			EaglerAdapter.updateDisplay();
 			
-			long t = t1 + 17 + 17*i - System.currentTimeMillis();
+			long t = t1 + 17 + 17*i - EaglerAdapter.steadyTimeMillis();
 			if(t > 0) {
-				try {
-					Thread.sleep(t);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				EaglerAdapter.sleep((int)t);
 			}
 		}
 		
-		t1 = System.currentTimeMillis();
+		t1 = EaglerAdapter.steadyTimeMillis();
 		for(int i = 0; i < 20; i++) {
 			this.displayWidth = EaglerAdapter.getCanvasWidth();
 			this.displayHeight = EaglerAdapter.getCanvasHeight();
@@ -427,7 +423,7 @@ public class Minecraft implements Runnable {
 			EaglerAdapter.glOrtho(0.0F, var1.getScaledWidth(), var1.getScaledHeight(), 0.0F, 1000.0F, 3000.0F);
 			EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
 			
-			float f = ((float)(System.currentTimeMillis() - t1) / 333f);
+			float f = ((float)(EaglerAdapter.steadyTimeMillis() - t1) / 333f);
 			
 			EaglerAdapter.glClear(EaglerAdapter.GL_COLOR_BUFFER_BIT | EaglerAdapter.GL_DEPTH_BUFFER_BIT);
 			EaglerAdapter.glColor4f(1.0F, 1.0F, 1.0F, MathHelper.clamp_float(f, 0.0F, 1.0F));
@@ -443,30 +439,22 @@ public class Minecraft implements Runnable {
 			EaglerAdapter.glFlush();
 			EaglerAdapter.updateDisplay();
 			
-			long t = t1 + 17 + 17*i - System.currentTimeMillis();
+			long t = t1 + 17 + 17*i - EaglerAdapter.steadyTimeMillis();
 			if(t > 0) {
-				try {
-					Thread.sleep(t);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				EaglerAdapter.sleep((int)t);
 			}
 		}
 		
-		try {
-			Thread.sleep(1600l);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		EaglerAdapter.sleep(1600);
 
-		t1 = System.currentTimeMillis();
+		t1 = EaglerAdapter.steadyTimeMillis();
 		for(int i = 0; i < 21; i++) {
 			this.displayWidth = EaglerAdapter.getCanvasWidth();
 			this.displayHeight = EaglerAdapter.getCanvasHeight();
 			EaglerAdapter.glViewport(0, 0, this.displayWidth, this.displayHeight);
 			var1 = new ScaledResolution(this.gameSettings, this.displayWidth, this.displayHeight);
 			
-			float f = ((float)(System.currentTimeMillis() - t1) / 340f);
+			float f = ((float)(EaglerAdapter.steadyTimeMillis() - t1) / 340f);
 			
 			EaglerAdapter.glClear(EaglerAdapter.GL_COLOR_BUFFER_BIT | EaglerAdapter.GL_DEPTH_BUFFER_BIT);
 			EaglerAdapter.glColor4f(1.0F, 1.0F, 1.0F, MathHelper.clamp_float((1.0f - f), 0.0F, 1.0F));
@@ -482,13 +470,9 @@ public class Minecraft implements Runnable {
 			EaglerAdapter.glFlush();
 			EaglerAdapter.updateDisplay();
 			
-			long t = t1 + 17 + 17*i - System.currentTimeMillis();
+			long t = t1 + 17 + 17*i - EaglerAdapter.steadyTimeMillis();
 			if(t > 0) {
-				try {
-					Thread.sleep(t);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				EaglerAdapter.sleep((int)t);
 			}
 		}
 		
@@ -496,11 +480,7 @@ public class Minecraft implements Runnable {
 		EaglerAdapter.glFlush();
 		EaglerAdapter.updateDisplay();
 		
-		try {
-			Thread.sleep(100l);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		EaglerAdapter.sleep(100);
 		
 		EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
 		EaglerAdapter.glEnable(EaglerAdapter.GL_ALPHA_TEST);
@@ -792,14 +772,14 @@ public class Minecraft implements Runnable {
 		//boolean var5 = this.isGamePaused;
 		//this.isGamePaused = false;
 		
-		if(System.currentTimeMillis() - secondTimer > 1000l) {
+		if(EaglerAdapter.steadyTimeMillis() - secondTimer > 1000l) {
 			debugFPS = fpsCounter;
 			fpsCounter = 0;
 			debugChunkUpdates = chunkUpdates;
 			chunkUpdates = 0;
 			debugChunkGeometryUpdates = chunkGeometryUpdates;
 			chunkGeometryUpdates = 0;
-			secondTimer = System.currentTimeMillis();
+			secondTimer = EaglerAdapter.steadyTimeMillis();
 		}
 		this.mcProfiler.startSection("syncDisplay");
 
@@ -1892,7 +1872,7 @@ public class Minecraft implements Runnable {
 	 * Gets the system time in milliseconds.
 	 */
 	public static long getSystemTime() {
-		return System.currentTimeMillis();
+		return EaglerAdapter.steadyTimeMillis();
 	}
 
 	/**

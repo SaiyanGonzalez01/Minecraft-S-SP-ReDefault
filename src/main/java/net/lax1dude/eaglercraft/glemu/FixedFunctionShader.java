@@ -14,7 +14,7 @@ import net.lax1dude.eaglercraft.glemu.vector.Vector4f;
 public class FixedFunctionShader {
 	
 	private static final FixedFunctionShader[] instances = new FixedFunctionShader[4096]; //lol
-	private static final List<FixedFunctionShader> instanceList = new ArrayList();
+	private static final List<FixedFunctionShader> instanceList = new ArrayList<>();
 	
 	public static void refreshCoreGL() {
 		for(int i = 0; i < instances.length; ++i) {

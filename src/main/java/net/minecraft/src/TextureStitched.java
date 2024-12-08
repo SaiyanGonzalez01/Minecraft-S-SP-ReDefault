@@ -183,11 +183,11 @@ public class TextureStitched implements Icon {
 					int var9 = var8.indexOf(42);
 
 					if (var9 > 0) {
-						Integer var10 = new Integer(var8.substring(0, var9));
-						Integer var11 = new Integer(var8.substring(var9 + 1));
+						Integer var10 = Integer.valueOf(var8.substring(0, var9));
+						Integer var11 = Integer.valueOf(var8.substring(var9 + 1));
 						var2.add(new Tuple(var10, var11));
 					} else {
-						var2.add(new Tuple(new Integer(var8), Integer.valueOf(1)));
+						var2.add(new Tuple(Integer.valueOf(var8), Integer.valueOf(1)));
 					}
 				}
 			}

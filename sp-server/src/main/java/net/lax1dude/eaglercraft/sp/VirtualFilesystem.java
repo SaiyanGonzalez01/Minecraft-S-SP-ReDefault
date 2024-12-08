@@ -63,7 +63,7 @@ public class VirtualFilesystem {
 		protected VFSFile(VirtualFilesystem vfs, String filePath, boolean cacheEnabled) {
 			this.virtualFilesystem = vfs;
 			this.filePath = filePath;
-			this.cacheHit = System.currentTimeMillis();
+			this.cacheHit = SysUtil.steadyTimeMillis();
 			if(cacheEnabled) {
 				setCacheEnabled();
 			}
@@ -82,7 +82,7 @@ public class VirtualFilesystem {
 		}
 		
 		public int getSize() {
-			cacheHit = System.currentTimeMillis();
+			cacheHit = SysUtil.steadyTimeMillis();
 			if(fileSize < 0) {
 				if(cacheEnabled) {
 					byte[] b = getAllBytes(false);
@@ -117,7 +117,7 @@ public class VirtualFilesystem {
 			}else if(hasBeenAccessed && !exists) {
 				throw new ArrayIndexOutOfBoundsException("file '" + filePath + "' does not exist");
 			}
-			cacheHit = System.currentTimeMillis();
+			cacheHit = SysUtil.steadyTimeMillis();
 			if(cacheEnabled && cache != null) {
 				System.arraycopy(cache, fileOffset, array, offset, length);
 			}else {
@@ -129,7 +129,7 @@ public class VirtualFilesystem {
 					exists = false;
 					throw new ArrayIndexOutOfBoundsException("file '" + filePath + "' does not exist");
 				}
-				Uint8Array a = Uint8Array.create(aa);
+				Uint8Array a = new Uint8Array(aa);
 				this.fileSize = a.getByteLength();
 				if(cacheEnabled) {
 					cache = new byte[fileSize];
@@ -148,7 +148,7 @@ public class VirtualFilesystem {
 		
 		public void setCacheEnabled() {
 			if(!cacheEnabled && !hasBeenDeleted && !(hasBeenAccessed && !exists)) {
-				cacheHit = System.currentTimeMillis();
+				cacheHit = SysUtil.steadyTimeMillis();
 				cache = getAllBytes(false);
 				cacheEnabled = true;
 			}
@@ -170,7 +170,7 @@ public class VirtualFilesystem {
 			if(hasBeenDeleted || (hasBeenAccessed && !exists)) {
 				return null;
 			}
-			cacheHit = System.currentTimeMillis();
+			cacheHit = SysUtil.steadyTimeMillis();
 			if(cacheEnabled && cache != null) {
 				byte[] b = cache;
 				if(copy) {
@@ -187,7 +187,7 @@ public class VirtualFilesystem {
 					exists = false;
 					return null;
 				}
-				Uint8Array a = Uint8Array.create(b);
+				Uint8Array a = new Uint8Array(b);
 				this.fileSize = a.getByteLength();
 				byte[] array = new byte[fileSize];
 				for(int i = 0; i < a.getByteLength(); ++i) {
@@ -217,7 +217,7 @@ public class VirtualFilesystem {
 			if(hasBeenDeleted || bytes == null) {
 				return false;
 			}
-			cacheHit = System.currentTimeMillis();
+			cacheHit = SysUtil.steadyTimeMillis();
 			this.fileSize = bytes.length;
 			if(cacheEnabled) {
 				byte[] copz = bytes;
@@ -228,8 +228,8 @@ public class VirtualFilesystem {
 				cache = copz;
 				return sync();
 			}else {
-				ArrayBuffer a = ArrayBuffer.create(bytes.length);
-				Uint8Array ar = Uint8Array.create(a);
+				ArrayBuffer a = new ArrayBuffer(bytes.length);
+				Uint8Array ar = new Uint8Array(a);
 				ar.set(bytes);
 				boolean s = AsyncHandlers.writeWholeFile(virtualFilesystem.indexeddb, filePath, a).bool;
 				hasBeenAccessed = true;
@@ -240,9 +240,9 @@ public class VirtualFilesystem {
 		
 		public boolean sync() {
 			if(cacheEnabled && cache != null && !hasBeenDeleted) {
-				cacheHit = System.currentTimeMillis();
-				ArrayBuffer a = ArrayBuffer.create(cache.length);
-				Uint8Array ar = Uint8Array.create(a);
+				cacheHit = SysUtil.steadyTimeMillis();
+				ArrayBuffer a = new ArrayBuffer(cache.length);
+				Uint8Array ar = new Uint8Array(a);
 				ar.set(cache);
 				boolean tryWrite = AsyncHandlers.writeWholeFile(virtualFilesystem.indexeddb, filePath, a).bool;
 				hasBeenAccessed = true;
@@ -254,7 +254,7 @@ public class VirtualFilesystem {
 		
 		public boolean delete() {
 			if(!hasBeenDeleted && !(hasBeenAccessed && !exists)) {
-				cacheHit = System.currentTimeMillis();
+				cacheHit = SysUtil.steadyTimeMillis();
 				if(!AsyncHandlers.deleteFile(virtualFilesystem.indexeddb, filePath).bool) {
 					hasBeenAccessed = true;
 					return false;
@@ -270,7 +270,7 @@ public class VirtualFilesystem {
 		
 		public boolean rename(String newName, boolean copy) {
 			if(!hasBeenDeleted && !(hasBeenAccessed && !exists)) {
-				cacheHit = System.currentTimeMillis();
+				cacheHit = SysUtil.steadyTimeMillis();
 				ArrayBuffer arr = AsyncHandlers.readWholeFile(virtualFilesystem.indexeddb, filePath);
 				hasBeenAccessed = true;
 				if(arr != null) {
@@ -298,7 +298,7 @@ public class VirtualFilesystem {
 			if(hasBeenDeleted) {
 				return false;
 			}
-			cacheHit = System.currentTimeMillis();
+			cacheHit = SysUtil.steadyTimeMillis();
 			if(hasBeenAccessed) {
 				return exists;
 			}
@@ -309,7 +309,7 @@ public class VirtualFilesystem {
 		
 	}
 
-	private final HashMap<String, VFSFile> fileMap = new HashMap();
+	private final HashMap<String, VFSFile> fileMap = new HashMap<>();
 	
 	public final String database;
 	private final IDBDatabase indexeddb;
@@ -395,7 +395,7 @@ public class VirtualFilesystem {
 	}
 	
 	public List<String> listFiles(String prefix) {
-		final ArrayList<String> list = new ArrayList();
+		final ArrayList<String> list = new ArrayList<>();
 		AsyncHandlers.iterateFiles(indexeddb, this, prefix, false, (v) -> {
 			list.add(v.getPath());
 		});
@@ -425,7 +425,7 @@ public class VirtualFilesystem {
 	}
 	
 	public void flushCache(long age) {
-		long curr = System.currentTimeMillis();
+		long curr = SysUtil.steadyTimeMillis();
 		Iterator<VFSFile> files = fileMap.values().iterator();
 		while(files.hasNext()) {
 			if(curr - files.next().cacheHit > age) {
@@ -487,7 +487,7 @@ public class VirtualFilesystem {
 			f.setOnUpgradeNeeded(new EventListener<IDBVersionChangeEvent>() {
 				@Override
 				public void handleEvent(IDBVersionChangeEvent evt) {
-					IDBObjectStorePatched.createObjectStorePatch(f.getResult(), "filesystem", IDBObjectStoreParameters.create().keyPath("path"));
+					f.getResult().createObjectStore("filesystem", IDBObjectStoreParameters.create().keyPath("path"));
 				}
 			});
 		}
@@ -497,7 +497,7 @@ public class VirtualFilesystem {
 		
 		private static void deleteFile(IDBDatabase db, String name, final AsyncCallback<BooleanResult> cb) {
 			IDBTransaction tx = db.transaction("filesystem", "readwrite");
-			final IDBRequest r = IDBObjectStorePatched.objectStorePatch(tx, "filesystem").delete(makeTheFuckingKeyWork(name));
+			final IDBRequest r = tx.objectStore("filesystem").delete(makeTheFuckingKeyWork(name));
 			
 			r.setOnSuccess(new EventHandler() {
 				@Override
@@ -524,7 +524,7 @@ public class VirtualFilesystem {
 		
 		private static void readWholeFile(IDBDatabase db, String name, final AsyncCallback<ArrayBuffer> cb) {
 			IDBTransaction tx = db.transaction("filesystem", "readonly");
-			final IDBGetRequest r = IDBObjectStorePatched.objectStorePatch(tx, "filesystem").get(makeTheFuckingKeyWork(name));
+			final IDBGetRequest r = tx.objectStore("filesystem").get(makeTheFuckingKeyWork(name));
 			r.setOnSuccess(new EventHandler() {
 				@Override
 				public void handleEvent() {
@@ -551,7 +551,7 @@ public class VirtualFilesystem {
 		
 		private static void iterateFiles(IDBDatabase db, final VirtualFilesystem vfs, final String prefix, boolean rw, final VFSIterator itr, final AsyncCallback<Integer> cb) {
 			IDBTransaction tx = db.transaction("filesystem", rw ? "readwrite" : "readonly");
-			final IDBCursorRequest r = IDBObjectStorePatched.objectStorePatch(tx, "filesystem").openCursor();
+			final IDBCursorRequest r = tx.objectStore("filesystem").openCursor();
 			final int[] res = new int[1];
 			r.setOnSuccess(new EventHandler() {
 				@Override
@@ -589,7 +589,7 @@ public class VirtualFilesystem {
 		
 		private static void deleteFiles(IDBDatabase db, final String prefix, final AsyncCallback<Integer> cb) {
 			IDBTransaction tx = db.transaction("filesystem", "readwrite");
-			final IDBCursorRequest r = IDBObjectStorePatched.objectStorePatch(tx, "filesystem").openCursor();
+			final IDBCursorRequest r = tx.objectStore("filesystem").openCursor();
 			final int[] res = new int[1];
 			r.setOnSuccess(new EventHandler() {
 				@Override
@@ -622,7 +622,7 @@ public class VirtualFilesystem {
 		
 		private static void fileExists(IDBDatabase db, String name, final AsyncCallback<BooleanResult> cb) {
 			IDBTransaction tx = db.transaction("filesystem", "readonly");
-			final IDBCountRequest r = IDBObjectStorePatched.objectStorePatch(tx, "filesystem").count(makeTheFuckingKeyWork(name));
+			final IDBCountRequest r = tx.objectStore("filesystem").count(makeTheFuckingKeyWork(name));
 			r.setOnSuccess(new EventHandler() {
 				@Override
 				public void handleEvent() {
@@ -645,7 +645,7 @@ public class VirtualFilesystem {
 		
 		private static void writeWholeFile(IDBDatabase db, String name, ArrayBuffer data, final AsyncCallback<BooleanResult> cb) {
 			IDBTransaction tx = db.transaction("filesystem", "readwrite");
-			final IDBRequest r = IDBObjectStorePatched.objectStorePatch(tx, "filesystem").put(writeRow(name, data));
+			final IDBRequest r = tx.objectStore("filesystem").put(writeRow(name, data));
 			
 			r.setOnSuccess(new EventHandler() {
 				@Override

@@ -133,7 +133,7 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 
 	public static final boolean isWebGL = _wisWebGL();
 
-	static final GLObjectMap<TextureGL> texObjects = new GLObjectMap(256);
+	static final GLObjectMap<TextureGL> texObjects = new GLObjectMap<>(256);
 
 	static boolean enableTexture2D = false;
 	static boolean enableTexture2D_1 = false;
@@ -302,8 +302,8 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 		}
 	}
 
-	private static final HashMap<Integer, DisplayList> displayLists = new HashMap();
-	private static final HashMap<Integer, DisplayList> displayListsInitialized = new HashMap();
+	private static final HashMap<Integer, DisplayList> displayLists = new HashMap<>();
+	private static final HashMap<Integer, DisplayList> displayListsInitialized = new HashMap<>();
 
 	public static final int getDisplayListCount() {
 		return displayListsInitialized.size();
@@ -1318,7 +1318,7 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 
 	}
 
-	private static final GLObjectMap<QueryGL> queryObjs = new GLObjectMap(256);
+	private static final GLObjectMap<QueryGL> queryObjs = new GLObjectMap<>(256);
 
 	public static final int glCreateQuery() {
 		return queryObjs.register(_wglCreateQuery());
@@ -1593,8 +1593,8 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 	private static int lastBandwidth = 0;
 
 	public static final int getBitsPerSecond() {
-		if (System.currentTimeMillis() - lastBandwidthReset > 1000) {
-			lastBandwidthReset = System.currentTimeMillis();
+		if (steadyTimeMillis() - lastBandwidthReset > 1000) {
+			lastBandwidthReset = steadyTimeMillis();
 			lastBandwidth = bytesUploaded * 8;
 			bytesUploaded = 0;
 		}

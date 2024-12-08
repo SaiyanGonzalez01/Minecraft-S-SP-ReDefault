@@ -2,6 +2,7 @@ package net.minecraft.src;
 
 import java.util.List;
 
+import net.lax1dude.eaglercraft.sp.SysUtil;
 import net.minecraft.server.MinecraftServer;
 
 public class CommandDebug extends CommandBase {
@@ -27,7 +28,7 @@ public class CommandDebug extends CommandBase {
 			if (par2ArrayOfStr[0].equals("start")) {
 				notifyAdmins(par1ICommandSender, "commands.debug.start", new Object[0]);
 				MinecraftServer.getServer().enableProfiling();
-				this.startTime = System.currentTimeMillis();
+				this.startTime = SysUtil.steadyTimeMillis();
 				this.startTicks = MinecraftServer.getServer().getTickCounter();
 				return;
 			}
@@ -37,7 +38,7 @@ public class CommandDebug extends CommandBase {
 					throw new CommandException("commands.debug.notStarted", new Object[0]);
 				}
 
-				long var3 = System.currentTimeMillis();
+				long var3 = SysUtil.steadyTimeMillis();
 				int var5 = MinecraftServer.getServer().getTickCounter();
 				long var6 = var3 - this.startTime;
 				int var8 = var5 - this.startTicks;

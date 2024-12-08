@@ -78,7 +78,7 @@ public class GuiScreenRelay extends GuiScreen {
 				selected = 0;
 			}
 		} else if(btn.id == 4) {
-			long millis = System.currentTimeMillis();
+			long millis = EaglerAdapter.steadyTimeMillis();
 			if(millis - lastRefresh > 700l) {
 				lastRefresh = millis;
 				slots.relayManager.ping();
@@ -86,7 +86,7 @@ public class GuiScreenRelay extends GuiScreen {
 			lastRefresh += 60l;
 		} else if(btn.id == 5) {
 			slots.relayManager.loadDefaults();
-			long millis = System.currentTimeMillis();
+			long millis = EaglerAdapter.steadyTimeMillis();
 			if(millis - lastRefresh > 700l) {
 				lastRefresh = millis;
 				slots.relayManager.ping();

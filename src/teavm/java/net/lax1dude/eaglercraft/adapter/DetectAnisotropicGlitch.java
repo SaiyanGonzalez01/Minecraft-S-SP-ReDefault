@@ -127,7 +127,7 @@ public class DetectAnisotropicGlitch {
 					x0, x0, x0, x1
 			};
 			
-			Uint8Array pixels = Uint8Array.create(pixelsData.length);
+			Uint8Array pixels = new Uint8Array(pixelsData.length);
 			pixels.set(pixelsData);
 			
 			WebGLTexture tex = ctx.createTexture();
@@ -152,7 +152,7 @@ public class DetectAnisotropicGlitch {
 					0.0f, 1.0f
 			};
 			
-			Float32Array verts = Float32Array.create(vertsData.length);
+			Float32Array verts = new Float32Array(vertsData.length);
 			verts.set(vertsData);
 			
 			WebGLBuffer buf = ctx.createBuffer();
@@ -175,7 +175,7 @@ public class DetectAnisotropicGlitch {
 			ctx.deleteTexture(tex);
 			ctx.deleteProgram(pr);
 			
-			Uint8Array readPx = Uint8Array.create(4);
+			Uint8Array readPx = new Uint8Array(4);
 			ctx.readPixels(175, 150, 1, 1, RGBA, UNSIGNED_BYTE, readPx);
 			
 			boolean b = (readPx.get(0) + readPx.get(1) + readPx.get(2)) != 0;

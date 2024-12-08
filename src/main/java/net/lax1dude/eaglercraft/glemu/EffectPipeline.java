@@ -6,13 +6,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
-import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.GLAllocation;
-import net.minecraft.src.Gui;
 import net.minecraft.src.MathHelper;
 
 public class EffectPipeline {
@@ -124,7 +122,7 @@ public class EffectPipeline {
 			_wglViewport(0, 0, NOISE_WIDTH, NOISE_HEIGHT);
 			_wglUseProgram(noiseProgram);
 			
-			long l = System.currentTimeMillis();
+			long l = steadyTimeMillis();
 			if(timer > 0l && l - timer < 20000l) {
 				counter += (float)((l - timer) * 0.0007) * intensity;
 				if(counter > 10000.0f) {

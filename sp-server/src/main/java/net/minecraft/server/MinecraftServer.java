@@ -8,6 +8,7 @@ import java.util.List;
 
 import net.lax1dude.eaglercraft.sp.IntegratedServer;
 import net.lax1dude.eaglercraft.sp.SYS;
+import net.lax1dude.eaglercraft.sp.SysUtil;
 import net.lax1dude.eaglercraft.sp.VFSSaveHandler;
 import net.lax1dude.eaglercraft.sp.VFile;
 import net.lax1dude.eaglercraft.sp.WorkerListenThread;
@@ -355,10 +356,10 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	public void run() {
 		try {
 			if (this.startServer()) {
-				long var1 = System.currentTimeMillis();
+				long var1 = SysUtil.steadyTimeMillis();
 
 				for (long var50 = 0L; this.serverRunning; this.serverIsRunning = true) {
-					long var5 = System.currentTimeMillis();
+					long var5 = SysUtil.steadyTimeMillis();
 					long var7 = var5 - var1;
 
 					if (var7 > 2000L && var1 - this.timeOfLastWarning >= 15000L) {
@@ -386,7 +387,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 						}
 					}
 
-					Thread.sleep(1L);
+					SysUtil.sleep(1);
 				}
 			} else {
 				throw new RuntimeException("Server did not init correctly");
@@ -456,7 +457,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 		this.theProfiler.endSection();
 		
 		++tpsCounter;
-		long millis = System.currentTimeMillis();
+		long millis = SysUtil.steadyTimeMillis();
 		long elapsed = millis - tpsTimer;
 		if(elapsed >= 1000l) {
 			tpsTimer = millis;
