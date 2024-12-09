@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.ConfigConstants;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
@@ -172,7 +171,7 @@ public class GuiMainMenu extends GuiScreen {
 			this.field_92019_w = this.field_92021_u + 12;
 		}
 
-		ConfigConstants.panoramaBlur = AssetRepository.getResource("/title/no-pano-blur.flag") == null;
+		ConfigConstants.panoramaBlur = mc.texturePackList.getSelectedTexturePack().getResourceAsBytes("/title/no-pano-blur.flag") == null;
 		
 		if(this.ackLines.isEmpty()) {
 			int width = 315;

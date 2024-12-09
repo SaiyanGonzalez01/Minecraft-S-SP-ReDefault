@@ -150,7 +150,7 @@ public class TextureTerrainMap implements IconRegister {
 		}
 		
 		private void loadData() {
-			byte[] data = EaglerAdapter.loadResourceBytes("/" + map.basePath + name + ".png");
+			byte[] data = Minecraft.getMinecraft().texturePackList.getSelectedTexturePack().getResourceAsBytes("/" + map.basePath + name + ".png");
 			if(data == null) {
 				map.replaceTexture(this, map.missingData);
 			}else {

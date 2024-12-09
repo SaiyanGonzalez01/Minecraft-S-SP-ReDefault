@@ -93,7 +93,7 @@ public class GuiScreenRelay extends GuiScreen {
 			}
 			lastRefresh += 60l;
 		} else if(btn.id == 6) {
-			EaglerAdapter.downloadBytes("EaglerSPRelay.zip", AssetRepository.getResource("relay_download.zip"));
+			EaglerAdapter.downloadBytes("EaglerSPRelay.zip", EaglerAdapter.loadResourceBytes("relay_download.zip"));
 		}
 	}
 	

@@ -1,12 +1,10 @@
 package net.minecraft.client;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.List;
 
-import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.DefaultSkinRenderer;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerProfile;
@@ -19,7 +17,6 @@ import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.IntegratedServerLAN;
 import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.WorkerNetworkManager;
-import net.lax1dude.eaglercraft.adapter.SimpleStorage;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.lax1dude.eaglercraft.glemu.FixedFunctionShader;
 import net.minecraft.src.AchievementList;
@@ -83,7 +80,6 @@ import net.minecraft.src.StatCollector;
 import net.minecraft.src.StatStringFormatKeyInv;
 import net.minecraft.src.StringTranslate;
 import net.minecraft.src.TextureManager;
-import net.minecraft.src.TexturePackCustom;
 import net.minecraft.src.TexturePackList;
 import net.minecraft.src.Timer;
 import net.minecraft.src.WorldClient;
@@ -339,14 +335,6 @@ public class Minecraft implements Runnable {
 		
 		String s = EaglerAdapter.getServerToJoinOnLaunch();
 		GuiScreen scr;
-
-		if (!TexturePackList.defaultTexturePack.getTexturePackFileName().equals(this.gameSettings.skin)) {
-			try {
-				AssetRepository.reset();
-				AssetRepository.install(SimpleStorage.get(this.gameSettings.skin));
-				this.texturePackList.selectedTexturePack = new TexturePackCustom(this.gameSettings.skin, TexturePackList.defaultTexturePack);
-			} catch (IOException ignored) {}
-		}
 		
 		if(s != null) {
 			scr = new GuiScreenEditProfile(new GuiConnecting(new GuiMainMenu(), this, new ServerData("Eaglercraft Server", s, false)));

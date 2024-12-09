@@ -1,8 +1,15 @@
 package net.minecraft.src;
 
+import net.lax1dude.eaglercraft.EPKDecompiler;
 import net.lax1dude.eaglercraft.EaglerAdapter;
-import net.lax1dude.eaglercraft.adapter.SimpleStorage;
+import net.lax1dude.eaglercraft.EaglerInflater;
+import net.lax1dude.eaglercraft.adapter.teavm.vfs.VFile;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class GuiTexturePacks extends GuiScreen {
 	protected GuiScreen guiScreen;
@@ -33,7 +40,7 @@ public class GuiTexturePacks extends GuiScreen {
 		this.buttonList.add(new GuiSmallButton(5, this.width / 2 - 154, this.height - 48, var1.translateKey("texturePack.openFolder")));
 		this.buttonList.add(new GuiSmallButton(6, this.width / 2 + 4, this.height - 48, var1.translateKey("gui.done")));
 		this.mc.texturePackList.updateAvaliableTexturePacks();
-		//this.fileLocation = (new File("texturepacks")).getAbsolutePath();
+		this.fileLocation = "texturepacks";
 		this.guiTexturePackSlot = new GuiTexturePackSlot(this);
 		this.guiTexturePackSlot.registerScrollButtons(this.buttonList, 7, 8);
 	}
@@ -98,7 +105,26 @@ public class GuiTexturePacks extends GuiScreen {
 		if (isSelectingPack && EaglerAdapter.getFileChooserResultAvailable()) {
 			isSelectingPack = false;
 			String name = EaglerAdapter.getFileChooserResultName();
-			SimpleStorage.set(name.replaceAll("[^A-Za-z0-9_]", "_"), name.toLowerCase().endsWith(".zip") ? TexturePackList.zipToEpk(EaglerAdapter.getFileChooserResult()) : EaglerAdapter.getFileChooserResult());
+			String safeName = name.replaceAll("[^A-Za-z0-9_]", "_");
+			try {
+				if (name.toLowerCase().endsWith(".zip")) {
+					ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(EaglerAdapter.getFileChooserResult()));
+					ZipEntry entry;
+					while ((entry = zipInputStream.getNextEntry()) != null) {
+						if (entry.isDirectory()) continue;
+						new VFile(fileLocation, safeName, entry.getName()).setAllBytes(EaglerInflater.getBytesFromInputStream(zipInputStream));
+					}
+					zipInputStream.close();
+				} else {
+					EPKDecompiler epkDecompiler = new EPKDecompiler(EaglerAdapter.getFileChooserResult());
+					EPKDecompiler.FileEntry file;
+					while ((file = epkDecompiler.readFile()) != null) {
+						new VFile(fileLocation, safeName, file.name).setAllBytes(file.data);
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			EaglerAdapter.clearFileChooserResult();
 			this.mc.displayGuiScreen(this);
 		}
@@ -111,7 +137,7 @@ public class GuiTexturePacks extends GuiScreen {
 		List var3 = this.mc.texturePackList.availableTexturePacks();
 
 		if (par1) {
-			SimpleStorage.set(((ITexturePack) var3.get(par2)).getTexturePackFileName(), null);
+			new VFile(fileLocation, ((ITexturePack) var3.get(par2)).getTexturePackFileName()).deleteAll();
 		} else {
 			try {
 				this.mc.texturePackList.setTexturePack((ITexturePack) var3.get(par2));
@@ -122,7 +148,7 @@ public class GuiTexturePacks extends GuiScreen {
 				this.mc.texturePackList.setTexturePack((ITexturePack) var3.get(0));
 				this.mc.renderEngine.refreshTextures();
 				this.mc.renderGlobal.loadRenderers();
-				SimpleStorage.set(((ITexturePack) var3.get(par2)).getTexturePackFileName(), null);
+				new VFile(fileLocation, ((ITexturePack) var3.get(par2)).getTexturePackFileName()).deleteAll();
 			}
 		}
 	}
