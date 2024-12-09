@@ -176,42 +176,33 @@ public class IntegratedServerLAN {
 	}
 	
 	private static final class LANClient {
-
-		private static final int PRE = 0, SENT_ICE_CANDIDATE = 2, SENT_DESCRIPTION = 3, CONNECTED = 4, CLOSED = 5;
+		
+		private static final int PRE = 0, RECEIVED_ICE_CANDIDATE = 1, SENT_ICE_CANDIDATE = 2, RECEIVED_DESCRIPTION = 3,
+				SENT_DESCRIPTION = 4, RECEIVED_SUCCESS = 5, CONNECTED = 6, CLOSED = 7;
 		
 		protected final String clientId;
 		
 		protected int state = PRE;
 		protected boolean dead = false;
+		protected String localICECandidate = null;
+		protected final long startTime;
 		
 		protected LANClient(String clientId) {
 			this.clientId = clientId;
+			this.startTime = EaglerAdapter.steadyTimeMillis();
 			EaglerAdapter.serverLANCreatePeer(clientId);
 		}
 		
 		protected void handleICECandidates(String candidates) {
 			if(state == SENT_DESCRIPTION) {
 				EaglerAdapter.serverLANPeerICECandidates(clientId, candidates);
-				long millis = EaglerAdapter.steadyTimeMillis();
-				do {
-					LANPeerEvent evt;
-					if((evt = EaglerAdapter.serverLANGetEvent(clientId)) != null) {
-						if(evt instanceof LANPeerEvent.LANPeerICECandidateEvent) {
-							lanRelaySocket.writePacket(new IPacket03ICECandidate(clientId, ((LANPeerEvent.LANPeerICECandidateEvent)evt).candidates));
-							state = SENT_ICE_CANDIDATE;
-							return;
-						}else if(evt instanceof LANPeerEvent.LANPeerDisconnectEvent) {
-							System.err.println("LAN client '" + clientId + "' disconnected while waiting for server ICE candidates");
-						}else {
-							System.err.println("LAN client '" + clientId + "' had an accident: " + evt.getClass().getSimpleName());
-						}
-						disconnect();
-						return;
-					}
-					EaglerAdapter.sleep(20);
-				}while(EaglerAdapter.steadyTimeMillis() - millis < 5000l);
-				System.err.println("Getting server ICE candidates for '" + clientId + "' timed out!");
-				disconnect();
+				if(localICECandidate != null) {
+					lanRelaySocket.writePacket(new IPacket03ICECandidate(clientId, localICECandidate));
+					localICECandidate = null;
+					state = SENT_ICE_CANDIDATE;
+				}else {
+					state = RECEIVED_ICE_CANDIDATE;
+				}
 			}else {
 				System.err.println("Relay [" + lanRelaySocket.getURI() + "] unexpected IPacket03ICECandidate for '" + clientId + "'");
 			}
@@ -220,26 +211,7 @@ public class IntegratedServerLAN {
 		protected void handleDescription(String description) {
 			if(state == PRE) {
 				EaglerAdapter.serverLANPeerDescription(clientId, description);
-				long millis = EaglerAdapter.steadyTimeMillis();
-				do {
-					LANPeerEvent evt;
-					if((evt = EaglerAdapter.serverLANGetEvent(clientId)) != null) {
-						if(evt instanceof LANPeerEvent.LANPeerDescriptionEvent) {
-							lanRelaySocket.writePacket(new IPacket04Description(clientId, ((LANPeerEvent.LANPeerDescriptionEvent)evt).description));
-							state = SENT_DESCRIPTION;
-							return;
-						}else if(evt instanceof LANPeerEvent.LANPeerDisconnectEvent) {
-							System.err.println("LAN client '" + clientId + "' disconnected while waiting for server description");
-						}else {
-							System.err.println("LAN client '" + clientId + "' had an accident: " + evt.getClass().getSimpleName());
-						}
-						disconnect();
-						return;
-					}
-					EaglerAdapter.sleep(20);
-				}while(EaglerAdapter.steadyTimeMillis() - millis < 5000l);
-				System.err.println("Getting server description for '" + clientId + "' timed out!");
-				disconnect();
+				state = RECEIVED_DESCRIPTION;
 			}else {
 				System.err.println("Relay [" + lanRelaySocket.getURI() + "] unexpected IPacket04Description for '" + clientId + "'");
 			}
@@ -247,30 +219,7 @@ public class IntegratedServerLAN {
 		
 		protected void handleSuccess() {
 			if(state == SENT_ICE_CANDIDATE) {
-				long millis = EaglerAdapter.steadyTimeMillis();
-				do {
-					LANPeerEvent evt;
-					while((evt = EaglerAdapter.serverLANGetEvent(clientId)) != null && evt instanceof LANPeerEvent.LANPeerICECandidateEvent) {
-						// skip ice candidates
-					}
-					if(evt != null) {
-						if(evt instanceof LANPeerEvent.LANPeerDataChannelEvent) {
-							EaglerAdapter.enableChannel("NET|" + clientId);
-							IntegratedServer.sendIPCPacket(new IPCPacket0CPlayerChannel(clientId, true));
-							state = CONNECTED;
-							return;
-						}else if(evt instanceof LANPeerEvent.LANPeerDisconnectEvent) {
-							System.err.println("LAN client '" + clientId + "' disconnected while waiting for connection");
-						}else {
-							System.err.println("LAN client '" + clientId + "' had an accident: " + evt.getClass().getSimpleName());
-						}
-						disconnect();
-						return;
-					}
-					EaglerAdapter.sleep(20);
-				}while(EaglerAdapter.steadyTimeMillis() - millis < 5000l);
-				System.err.println("Getting server description for '" + clientId + "' timed out!");
-				disconnect();
+				state = RECEIVED_SUCCESS;
 			}else {
 				System.err.println("Relay [" + lanRelaySocket.getURI() + "] unexpected IPacket05ClientSuccess for '" + clientId + "'");
 			}
@@ -286,23 +235,70 @@ public class IntegratedServerLAN {
 		}
 		
 		protected void update() {
-			if(state == CONNECTED) {
-				PKT pk;
-				while(state == CONNECTED && (pk = EaglerAdapter.recieveFromIntegratedServer("NET|" + clientId)) != null) {
-					EaglerAdapter.serverLANWritePacket(clientId, pk.data);
+			if(state != CLOSED) {
+				if(state != CONNECTED && EaglerAdapter.steadyTimeMillis() - startTime > 13000l) {
+					System.out.println("LAN client '" + clientId + "' handshake timed out");
+					disconnect();
+					return;
 				}
-				LANPeerEvent evt;
-				while(state == CONNECTED && (evt = EaglerAdapter.serverLANGetEvent(clientId)) != null) {
-					if(evt instanceof LANPeerEvent.LANPeerPacketEvent) {
-						EaglerAdapter.sendToIntegratedServer("NET|" + clientId, ((LANPeerEvent.LANPeerPacketEvent)evt).payload);
-					}else if(evt instanceof LANPeerEvent.LANPeerDisconnectEvent) {
+				List<LANPeerEvent> l = EaglerAdapter.serverLANGetAllEvent(clientId);
+				if(l == null) {
+					return;
+				}
+				read_loop: for(int i = 0, s = l.size(); i < s; ++i) {
+					LANPeerEvent evt = l.get(i);
+					if(evt instanceof LANPeerEvent.LANPeerDisconnectEvent) {
 						System.out.println("LAN client '" + clientId + "' disconnected");
 						disconnect();
 					}else {
-						System.err.println("LAN client '" + clientId + "' had an accident: " + evt.getClass().getSimpleName());
+						switch(state) {
+							case SENT_DESCRIPTION:{
+								if(evt instanceof LANPeerEvent.LANPeerICECandidateEvent) {
+									localICECandidate = ((LANPeerEvent.LANPeerICECandidateEvent)evt).candidates;
+									continue read_loop;
+								}
+							}
+							case RECEIVED_ICE_CANDIDATE: {
+								if(evt instanceof LANPeerEvent.LANPeerICECandidateEvent) {
+									lanRelaySocket.writePacket(new IPacket03ICECandidate(clientId, ((LANPeerEvent.LANPeerICECandidateEvent)evt).candidates));
+									state = SENT_ICE_CANDIDATE;
+									continue read_loop;
+								}
+							}
+							case RECEIVED_DESCRIPTION: {
+								if(evt instanceof LANPeerEvent.LANPeerDescriptionEvent) {
+									lanRelaySocket.writePacket(new IPacket04Description(clientId, ((LANPeerEvent.LANPeerDescriptionEvent)evt).description));
+									state = SENT_DESCRIPTION;
+									continue read_loop;
+								}
+							}
+							case SENT_ICE_CANDIDATE:
+							case RECEIVED_SUCCESS: {
+								if(evt instanceof LANPeerEvent.LANPeerDataChannelEvent) {
+									EaglerAdapter.enableChannel("NET|" + clientId);
+									state = CONNECTED;
+									continue read_loop;
+								}
+							}
+							case CONNECTED: {
+								if(evt instanceof LANPeerEvent.LANPeerPacketEvent) {
+									EaglerAdapter.sendToIntegratedServer("NET|" + clientId, ((LANPeerEvent.LANPeerPacketEvent)evt).payload);
+									continue read_loop;
+								}
+							}
+							default: {
+								break;
+							}
+						}
+						if(state != CLOSED) {
+							System.err.println("LAN client '" + clientId + "' had an accident: " + evt.getClass().getSimpleName());
+						}
 						disconnect();
+						return;
 					}
 				}
+			}else {
+				disconnect();
 			}
 		}
 		

@@ -58,7 +58,6 @@ import org.teavm.jso.dom.html.HTMLVideoElement;
 import org.teavm.jso.media.MediaError;
 import org.teavm.jso.typedarrays.ArrayBuffer;
 import org.teavm.jso.typedarrays.DataView;
-import org.teavm.jso.typedarrays.Float32Array;
 import org.teavm.jso.typedarrays.Int32Array;
 import org.teavm.jso.typedarrays.Uint8Array;
 import org.teavm.jso.typedarrays.Uint8ClampedArray;
@@ -2632,7 +2631,6 @@ public class EaglerAdapterImpl2 {
 
 	public static final void enableVoice(Voice.VoiceChannel enable) {
 		if (enabledChannel == enable) return;
-		voiceClient.resetPeerStates();
 		if (enabledChannel == Voice.VoiceChannel.PROXIMITY) {
 			for (String username : nearbyPlayers) voiceClient.signalDisconnect(username, false);
 			for (String username : recentlyNearbyPlayers) voiceClient.signalDisconnect(username, false);
@@ -2752,13 +2750,10 @@ public class EaglerAdapterImpl2 {
 	public static final Voice.VoiceChannel getVoiceChannel() {
 		return enabledChannel;
 	}
-	public static final boolean voicePeerErrored() {
-		return voiceClient.getPeerState() == EaglercraftVoiceClient.PEERSTATE_FAILED || voiceClient.getPeerStateConnect() == EaglercraftVoiceClient.PEERSTATE_FAILED || voiceClient.getPeerStateInitial() == EaglercraftVoiceClient.PEERSTATE_FAILED || voiceClient.getPeerStateDesc() == EaglercraftVoiceClient.PEERSTATE_FAILED || voiceClient.getPeerStateIce() == EaglercraftVoiceClient.PEERSTATE_FAILED;
-	}
 	public static final Voice.VoiceStatus getVoiceStatus() {
 		return (!voiceAvailable() || !voiceAllowed()) ? Voice.VoiceStatus.UNAVAILABLE :
 			(voiceClient.getReadyState() != EaglercraftVoiceClient.READYSTATE_DEVICE_INITIALIZED ?
-					Voice.VoiceStatus.CONNECTING : (voicePeerErrored() ? Voice.VoiceStatus.UNAVAILABLE : Voice.VoiceStatus.CONNECTED));
+					Voice.VoiceStatus.CONNECTING : Voice.VoiceStatus.CONNECTED);
 	}
 
 	private static boolean talkStatus = false;
@@ -4254,6 +4249,26 @@ public class EaglerAdapterImpl2 {
 				}
 			}
 			return null;
+		}else {
+			return null;
+		}
+	}
+	
+	public static final List<LANPeerEvent> serverLANGetAllEvent(String clientId) {
+		if(serverLANEventBuffer.size() > 0) {
+			List<LANPeerEvent> lst = null;
+			Iterator<LANPeerEvent> i = serverLANEventBuffer.iterator();
+			while(i.hasNext()) {
+				LANPeerEvent evt = i.next();
+				if(evt.getPeerId().equals(clientId)) {
+					i.remove();
+					if(lst == null) {
+						lst = new ArrayList<>();
+					}
+					lst.add(evt);
+				}
+			}
+			return lst;
 		}else {
 			return null;
 		}
