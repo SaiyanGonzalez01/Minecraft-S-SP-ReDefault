@@ -13,6 +13,7 @@ import net.lax1dude.eaglercraft.EaglerProfile;
 import net.lax1dude.eaglercraft.GuiScreenEditProfile;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerConnecting;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
+import net.lax1dude.eaglercraft.GuiScreenVSyncWarning;
 import net.lax1dude.eaglercraft.GuiVoiceOverlay;
 import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.IntegratedServerLAN;
@@ -351,6 +352,10 @@ public class Minecraft implements Runnable {
 			scr = new GuiScreenEditProfile(new GuiConnecting(new GuiMainMenu(), this, new ServerData("Eaglercraft Server", s, false)));
 		}else {
 			scr = new GuiScreenEditProfile(new GuiMainMenu());
+		}
+		
+		if(!gameSettings.enableVsync && !gameSettings.hideVsyncWarning) {
+			scr = new GuiScreenVSyncWarning(scr);
 		}
 		
 		displayGuiScreen(scr);
@@ -1102,8 +1107,12 @@ public class Minecraft implements Runnable {
 	}
 	
 	public void updateDisplay() {
-		int i = this.func_90020_K();
-		EaglerAdapter.updateDisplay(i > 0 ? EntityRenderer.performanceToFps(i) : 0, false);
+		if(gameSettings.enableVsync) {
+			EaglerAdapter.updateDisplay(0, true);
+		}else {
+			int i = this.func_90020_K();
+			EaglerAdapter.updateDisplay(i > 0 ? EntityRenderer.performanceToFps(i) : 0, false);
+		}
 	}
 	
 	private boolean wasPaused = false;

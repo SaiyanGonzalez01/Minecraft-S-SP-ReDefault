@@ -2,6 +2,7 @@ package net.lax1dude.eaglercraft.sp;
 
 import java.io.IOException;
 
+import net.lax1dude.eaglercraft.sp.ipc.IPCPacket14StringList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.EnumGameType;
 import net.minecraft.src.ILogAgent;
@@ -15,6 +16,9 @@ public class EAGMinecraftServer extends MinecraftServer {
 	protected WorkerListenThread listenThreadImpl;
 	protected WorldSettings newWorldSettings;
 	protected boolean paused;
+	private int tpsCounter = 0;
+	private int tpsMeasure = 0;
+	private long tpsTimer = 0l;
 
 	public EAGMinecraftServer(String world, String owner, WorldSettings currentWorldSettings) {
 		super(world);
@@ -36,12 +40,21 @@ public class EAGMinecraftServer extends MinecraftServer {
 	}
 	
 	public void mainLoop() {
+		long ctm = SysUtil.steadyTimeMillis();
+		
+		long elapsed = ctm - tpsTimer;
+		if(elapsed >= 1000l) {
+			tpsTimer = ctm;
+			tpsMeasure = tpsCounter;
+			IntegratedServer.sendIPCPacket(new IPCPacket14StringList(IPCPacket14StringList.SERVER_TPS, getTPSAndChunkBuffer(tpsMeasure)));
+			tpsCounter = 0;
+		}
+		
 		if(paused && this.playersOnline.size() <= 1) {
-			lastTick = SysUtil.steadyTimeMillis();
+			lastTick = ctm;
 			return;
 		}
 		
-		long ctm = SysUtil.steadyTimeMillis();
 		long delta = ctm - lastTick;
 		
 		if (delta > 2000L && ctm - this.timeOfLastWarning >= 15000L) {
@@ -57,12 +70,14 @@ public class EAGMinecraftServer extends MinecraftServer {
 		
 		if (this.worldServers[0].areAllPlayersAsleep()) {
 			this.tick();
+			++tpsCounter;
 			lastTick = SysUtil.steadyTimeMillis();
 		} else {
-			if (delta >= 50l) {
+			if (delta > 50l) {
 				delta -= 50L;
 				lastTick += 50l;
 				this.tick();
+				++tpsCounter;
 			}
 		}
 		

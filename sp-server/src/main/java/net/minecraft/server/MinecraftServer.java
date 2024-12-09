@@ -126,10 +126,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	protected boolean startProfiling;
 	protected boolean field_104057_T = false;
 
-	private int tpsCounter = 0;
-	private int tpsMeasure = 0;
-	private long tpsTimer = 0l;
-
 	public MinecraftServer(String folder) {
 		mcServer = this;
 		this.folderName = folder;
@@ -455,19 +451,9 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 		this.lastReceivedSize = Packet.receivedSize;
 		this.theProfiler.endSection();
 		this.theProfiler.endSection();
-		
-		++tpsCounter;
-		long millis = SysUtil.steadyTimeMillis();
-		long elapsed = millis - tpsTimer;
-		if(elapsed >= 1000l) {
-			tpsTimer = millis;
-			tpsMeasure = (int)(tpsCounter * 1000l / elapsed);
-			IntegratedServer.sendIPCPacket(new IPCPacket14StringList(IPCPacket14StringList.SERVER_TPS, getTPSAndChunkBuffer()));
-			tpsCounter = 0;
-		}
 	}
 	
-	public List<String> getTPSAndChunkBuffer() {
+	public List<String> getTPSAndChunkBuffer(int tpsCounter) {
 		ArrayList<String> strs = new ArrayList();
 		strs.add("Ticks/Second: " + tpsCounter + "/20");
 		

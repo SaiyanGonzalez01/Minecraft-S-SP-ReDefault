@@ -492,6 +492,18 @@ performance.max=Max FPS
 performance.balanced=Balanced
 performance.powersaver=Power saver
 
+options.vsyncWarning.title=Issues Detected
+options.vsyncWarning.0=Some of your video settings may be causing
+options.vsyncWarning.1=the game to lag excessively
+options.vsyncWarning.2=VSync is disabled, some browsers require
+options.vsyncWarning.3=VSync to be enabled to hint when the
+options.vsyncWarning.4=framebuffer has updated. If the game feels
+options.vsyncWarning.5=significantly slower than is indicated by
+options.vsyncWarning.6=the FPS counter, you should enable VSync.
+options.vsyncWarning.fixSettings=Fix Settings
+options.vsyncWarning.continueAnyway=Continue Anyway
+options.vsyncWarning.doNotShowAgain=Do Not Show Again
+
 controls.title=Controls
 
 key.forward=Forward

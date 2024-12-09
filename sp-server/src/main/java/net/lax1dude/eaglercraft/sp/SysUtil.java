@@ -52,7 +52,6 @@ public class SysUtil {
 	private static boolean hasCheckedImmediateContinue = false;
 	private static MessageChannel immediateContinueChannel = null;
 	private static Runnable currentContinueHack = null;
-	private static final Object immediateContLock = new Object();
 	private static final JSString emptyJSString = JSString.valueOf("");
 
 	public static void immediateContinue() {
@@ -71,20 +70,18 @@ public class SysUtil {
 	private static native void immediateContinueTeaVM();
 
 	private static void immediateContinueTeaVM(final AsyncCallback<Void> cb) {
-		synchronized(immediateContLock) {
-			if(currentContinueHack != null) {
-				cb.error(new IllegalStateException("Worker thread is already waiting for an immediate continue callback!"));
-				return;
-			}
-			currentContinueHack = () -> {
-				cb.complete(null);
-			};
-			try {
-				immediateContinueChannel.getPort2().postMessage(emptyJSString);
-			}catch(Throwable t) {
-				System.err.println("Caught error posting immediate continue, using setTimeout instead");
-				Window.setTimeout(() -> cb.complete(null), 0);
-			}
+		if(currentContinueHack != null) {
+			cb.error(new IllegalStateException("Worker thread is already waiting for an immediate continue callback!"));
+			return;
+		}
+		currentContinueHack = () -> {
+			cb.complete(null);
+		};
+		try {
+			immediateContinueChannel.getPort2().postMessage(emptyJSString);
+		}catch(Throwable t) {
+			System.err.println("Caught error posting immediate continue, using setTimeout instead");
+			Window.setTimeout(() -> cb.complete(null), 0);
 		}
 	}
 
@@ -99,11 +96,8 @@ public class SysUtil {
 			immediateContinueChannel.getPort1().addEventListener("message", new EventListener<MessageEvent>() {
 				@Override
 				public void handleEvent(MessageEvent evt) {
-					Runnable toRun;
-					synchronized(immediateContLock) {
-						toRun = currentContinueHack;
-						currentContinueHack = null;
-					}
+					Runnable toRun = currentContinueHack;
+					currentContinueHack = null;
 					if(toRun != null) {
 						toRun.run();
 					}
