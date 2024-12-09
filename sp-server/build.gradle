@@ -24,6 +24,7 @@ repositories {
 dependencies {
     teavm(teavm.libs.jso)
     teavm(teavm.libs.jsoApis)
+    compileOnly "org.teavm:teavm-core:0.10.2" // workaround for a few hacks
 }
 
 def folder = "../javascript"

@@ -29,6 +29,7 @@ import org.teavm.jso.indexeddb.IDBRequest;
 import org.teavm.jso.indexeddb.IDBTransaction;
 import org.teavm.jso.indexeddb.IDBVersionChangeEvent;
 import org.teavm.jso.typedarrays.ArrayBuffer;
+import org.teavm.jso.typedarrays.Int8Array;
 import org.teavm.jso.typedarrays.Uint8Array;
 
 public class VirtualFilesystem {
@@ -129,20 +130,14 @@ public class VirtualFilesystem {
 					exists = false;
 					throw new ArrayIndexOutOfBoundsException("file '" + filePath + "' does not exist");
 				}
-				Uint8Array a = new Uint8Array(aa);
-				this.fileSize = a.getByteLength();
+				this.fileSize = aa.getByteLength();
 				if(cacheEnabled) {
-					cache = new byte[fileSize];
-					for(int i = 0; i < fileSize; ++i) {
-						cache[i] = (byte)a.get(i);
-					}
+					cache = TeaVMUtils.wrapByteArrayBuffer(aa);
 				}
-				if(a.getLength() < fileOffset + length) {
-					throw new ArrayIndexOutOfBoundsException("file '" + filePath + "' size was "+a.getLength()+" but user tried to read index "+(fileOffset + length - 1));
+				if(fileSize < fileOffset + length) {
+					throw new ArrayIndexOutOfBoundsException("file '" + filePath + "' size was "+fileSize+" but user tried to read index "+(fileOffset + length - 1));
 				}
-				for(int i = 0; i < length; ++i) {
-					array[i + offset] = (byte)a.get(i + fileOffset);
-				}
+				TeaVMUtils.unwrapByteArray(array).set(new Int8Array(aa, fileOffset, length), offset);
 			}
 		}
 		
@@ -187,21 +182,16 @@ public class VirtualFilesystem {
 					exists = false;
 					return null;
 				}
-				Uint8Array a = new Uint8Array(b);
-				this.fileSize = a.getByteLength();
-				byte[] array = new byte[fileSize];
-				for(int i = 0; i < a.getByteLength(); ++i) {
-					array[i] = (byte)a.get(i);
-				}
+				this.fileSize = b.getByteLength();
 				if(cacheEnabled) {
 					if(copy) {
 						cache = new byte[fileSize];
-						System.arraycopy(b, 0, cache, 0, cache.length);
+						TeaVMUtils.unwrapByteArray(cache).set(new Int8Array(b));
 					}else {
-						cache = array;
+						cache = TeaVMUtils.wrapByteArrayBuffer(b);
 					}
 				}
-				return array;
+				return TeaVMUtils.wrapByteArrayBuffer(b);
 			}
 		}
 		
@@ -228,10 +218,8 @@ public class VirtualFilesystem {
 				cache = copz;
 				return sync();
 			}else {
-				ArrayBuffer a = new ArrayBuffer(bytes.length);
-				Uint8Array ar = new Uint8Array(a);
-				ar.set(bytes);
-				boolean s = AsyncHandlers.writeWholeFile(virtualFilesystem.indexeddb, filePath, a).bool;
+				boolean s = AsyncHandlers.writeWholeFile(virtualFilesystem.indexeddb, filePath,
+						TeaVMUtils.unwrapArrayBuffer(bytes)).bool;
 				hasBeenAccessed = true;
 				exists = exists || s;
 				return s;
@@ -241,10 +229,8 @@ public class VirtualFilesystem {
 		public boolean sync() {
 			if(cacheEnabled && cache != null && !hasBeenDeleted) {
 				cacheHit = SysUtil.steadyTimeMillis();
-				ArrayBuffer a = new ArrayBuffer(cache.length);
-				Uint8Array ar = new Uint8Array(a);
-				ar.set(cache);
-				boolean tryWrite = AsyncHandlers.writeWholeFile(virtualFilesystem.indexeddb, filePath, a).bool;
+				boolean tryWrite = AsyncHandlers.writeWholeFile(virtualFilesystem.indexeddb, filePath,
+						TeaVMUtils.unwrapArrayBuffer(cache)).bool;
 				hasBeenAccessed = true;
 				exists = exists || tryWrite;
 				return tryWrite;

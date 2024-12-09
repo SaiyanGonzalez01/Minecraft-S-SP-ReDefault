@@ -71,14 +71,8 @@ public class IntegratedServer {
 				return;
 			}
 			
-			Uint8Array a = new Uint8Array(buf);
-			byte[] pkt = new byte[a.getLength()];
-			for(int i = 0; i < pkt.length; ++i) {
-				pkt[i] = (byte) a.get(i);
-			}
-			
 			synchronized(messageQueue) {
-				messageQueue.add(new PKT(channel, pkt));
+				messageQueue.add(new PKT(channel, TeaVMUtils.wrapByteArrayBuffer(buf)));
 			}
 		}
 		
@@ -720,18 +714,12 @@ public class IntegratedServer {
 			return;
 		}
 		
-		ArrayBuffer arb = new ArrayBuffer(serialized.length);
-		Uint8Array ar = new Uint8Array(arb);
-		ar.set(serialized);
-		sendWorkerPacket("IPC", arb);
+		sendWorkerPacket("IPC", TeaVMUtils.unwrapArrayBuffer(serialized));
 	}
 	
 	public static void sendPlayerPacket(String channel, byte[] buf) {
 		//System.out.println("[Server][SEND][" + channel + "]: " + buf.length);
-		ArrayBuffer arb = new ArrayBuffer(buf.length);
-		Uint8Array ar = new Uint8Array(arb);
-		ar.set(buf);
-		sendWorkerPacket("NET|" + channel, arb);
+		sendWorkerPacket("NET|" + channel, TeaVMUtils.unwrapArrayBuffer(buf));
 	}
 	
 	private static boolean isRunning = false;

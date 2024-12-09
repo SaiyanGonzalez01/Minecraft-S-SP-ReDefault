@@ -107,11 +107,13 @@ import net.lax1dude.eaglercraft.RelayServerSocket;
 import net.lax1dude.eaglercraft.RelayWorldsQuery;
 import net.lax1dude.eaglercraft.ServerQuery;
 import net.lax1dude.eaglercraft.Voice;
+import net.lax1dude.eaglercraft.adapter.teavm.BufferConverter;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftLANClient;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftLANServer;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftVoiceClient;
 import net.lax1dude.eaglercraft.adapter.teavm.MessageChannel;
 import net.lax1dude.eaglercraft.adapter.teavm.SelfDefence;
+import net.lax1dude.eaglercraft.adapter.teavm.TeaVMUtils;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLQuery;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLVertexArray;
@@ -182,11 +184,7 @@ public class EaglerAdapterImpl2 {
 			@Override
 			public void stateChanged() {
 				if(request.getReadyState() == XMLHttpRequest.DONE) {
-					Uint8Array bl = new Uint8Array((ArrayBuffer)request.getResponse());
-					loadedPackage = new byte[bl.getByteLength()];
-					for(int i = 0; i < loadedPackage.length; ++i) {
-						loadedPackage[i] = (byte) bl.get(i);
-					}
+					loadedPackage = TeaVMUtils.wrapByteArrayBuffer((ArrayBuffer)request.getResponse());
 					cb.complete("yee");
 				}
 			}
@@ -209,12 +207,7 @@ public class EaglerAdapterImpl2 {
 			@Override
 			public void stateChanged() {
 				if(request.getReadyState() == XMLHttpRequest.DONE) {
-					Uint8Array bl = new Uint8Array((ArrayBuffer)request.getResponse());
-					byte[] res = new byte[bl.getByteLength()];
-					for(int i = 0; i < res.length; ++i) {
-						res[i] = (byte) bl.get(i);
-					}
-					cb.complete(res);
+					cb.complete(TeaVMUtils.wrapByteArrayBuffer((ArrayBuffer)request.getResponse()));
 				}
 			}
 		});
@@ -763,19 +756,8 @@ public class EaglerAdapterImpl2 {
 	public static final void _wglFlush() {
 		//webgl.flush();
 	}
-	private static Uint8Array uploadBuffer = new Uint8Array(new ArrayBuffer(4 * 1024 * 1024));
 	public static final void _wglTexImage2D(int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, ByteBuffer p9) {
-		if(p9 == null) {
-			webgl.texImage2D(p1, p2, p3, p4, p5, p6, p7, p8, null);
-		}else {
-			int len = p9.remaining();
-			Uint8Array uploadBuffer1 = uploadBuffer;
-			for(int i = 0; i < len; ++i) {
-				uploadBuffer1.set(i, (short) ((int)p9.get() & 0xff));
-			}
-			Uint8Array data = new Uint8Array(uploadBuffer.getBuffer(), 0, len);
-			webgl.texImage2D(p1, p2, p3, p4, p5, p6, p7, p8, data);
-		}
+		webgl.texImage2D(p1, p2, p3, p4, p5, p6, p7, p8, p9 != null ? BufferConverter.convertByteBufferUnsigned(p9) : null);
 	}
 	public static final void _wglBlendFunc(int p1, int p2) {
 		webgl.blendFunc(p1, p2);
@@ -805,22 +787,10 @@ public class EaglerAdapterImpl2 {
 		webgl.texParameterf(p1, p2, p3);
 	}
 	public static final void _wglTexImage2D(int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, IntBuffer p9) {
-		int len = p9.remaining();
-		DataView deevis = new DataView(uploadBuffer.getBuffer());
-		for(int i = 0; i < len; ++i) {
-			deevis.setInt32(i * 4, p9.get(), true);
-		}
-		Uint8Array data = new Uint8Array(uploadBuffer.getBuffer(), 0, len*4);
-		webgl.texImage2D(p1, p2, p3, p4, p5, p6, p7, p8, data);
+		webgl.texImage2D(p1, p2, p3, p4, p5, p6, p7, p8, p9 != null ? BufferConverter.convertIntBufferUnsigned(p9) : null);
 	}
 	public static final void _wglTexSubImage2D(int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, IntBuffer p9) {
-		int len = p9.remaining();
-		DataView deevis = new DataView(uploadBuffer.getBuffer());
-		for(int i = 0; i < len; ++i) {
-			deevis.setInt32(i * 4, p9.get(), true);
-		}
-		Uint8Array data = new Uint8Array(uploadBuffer.getBuffer(), 0, len*4);
-		webgl.texSubImage2D(p1, p2, p3, p4, p5, p6, p7, p8, data);
+		webgl.texSubImage2D(p1, p2, p3, p4, p5, p6, p7, p8, p9 != null ? BufferConverter.convertIntBufferUnsigned(p9) : null);
 	}
 	public static final void _wglDeleteTextures(TextureGL p1) {
 		webgl.deleteTexture(p1.obj);
@@ -835,13 +805,7 @@ public class EaglerAdapterImpl2 {
 		return new TextureGL(webgl.createTexture());
 	}
 	public static final void _wglTexSubImage2D(int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, ByteBuffer p9) {
-		int len = p9.remaining();
-		for(int i = 0; i < len; ++i) {
-			//uploadBuffer.set(swapEndian ? ((i >> 2) + (3 - (i & 3))) : i, (short) ((int)p9.get() & 0xff));
-			uploadBuffer.set(i, (short) ((int)p9.get() & 0xff));
-		}
-		Uint8Array data = new Uint8Array(uploadBuffer.getBuffer(), 0, len);
-		webgl.texSubImage2D(p1, p2, p3, p4, p5, p6, p7, p8, data);
+		webgl.texSubImage2D(p1, p2, p3, p4, p5, p6, p7, p8, p9 != null ? BufferConverter.convertByteBufferUnsigned(p9) : null);
 	}
 	public static final void _wglActiveTexture(int p1) {
 		webgl.activeTexture(p1);
@@ -895,22 +859,10 @@ public class EaglerAdapterImpl2 {
 		webgl.bindBuffer(p1, p2 == null ? null : p2.obj);
 	}
 	public static final void _wglBufferData0(int p1, IntBuffer p2, int p3) {
-		int len = p2.remaining();
-		DataView deevis = new DataView(uploadBuffer.getBuffer());
-		for(int i = 0; i < len; ++i) {
-			deevis.setInt32(i * 4, p2.get(), true);
-		}
-		Uint8Array data = new Uint8Array(uploadBuffer.getBuffer(), 0, len*4);
-		webgl.bufferData(p1, data, p3);
+		webgl.bufferData(p1, p2 != null ? BufferConverter.convertIntBufferUnsigned(p2) : null, p3);
 	}
 	public static final void _wglBufferSubData0(int p1, int p2, IntBuffer p3) {
-		int len = p3.remaining();
-		DataView deevis = new DataView(uploadBuffer.getBuffer());
-		for(int i = 0; i < len; ++i) {
-			deevis.setInt32(i * 4, p3.get(), true);
-		}
-		Uint8Array data = new Uint8Array(uploadBuffer.getBuffer(), 0, len*4);
-		webgl.bufferSubData(p1, p2, data);
+		webgl.bufferSubData(p1, p2, p3 != null ? BufferConverter.convertIntBufferUnsigned(p3) : null);
 	}
 	public static final void _wglBufferData(int p1, Object p2, int p3) {
 		webgl.bufferData(p1, (Int32Array)p2, p3);
@@ -961,20 +913,14 @@ public class EaglerAdapterImpl2 {
 	public static final void _wglUniform4i(UniformGL p1, int p2, int p3, int p4, int p5) {
 		if(p1 != null) webgl.uniform4i(p1.obj, p2, p3, p4, p5);
 	}
-	private static Float32Array mat2 = new Float32Array(4);
-	private static Float32Array mat3 = new Float32Array(9);
-	private static Float32Array mat4 = new Float32Array(16);
 	public static final void _wglUniformMat2fv(UniformGL p1, float[] mat) {
-		mat2.set(mat);
-		if(p1 != null) webgl.uniformMatrix2fv(p1.obj, false, mat2);
+		if(p1 != null) webgl.uniformMatrix2fv(p1.obj, false, TeaVMUtils.unwrapFloatArray(mat));
 	}
 	public static final void _wglUniformMat3fv(UniformGL p1, float[] mat) {
-		mat3.set(mat);
-		if(p1 != null) webgl.uniformMatrix3fv(p1.obj, false, mat3);
+		if(p1 != null) webgl.uniformMatrix3fv(p1.obj, false, TeaVMUtils.unwrapFloatArray(mat));
 	}
 	public static final void _wglUniformMat4fv(UniformGL p1, float[] mat) {
-		mat4.set(mat);
-		if(p1 != null) webgl.uniformMatrix4fv(p1.obj, false, mat4);
+		if(p1 != null) webgl.uniformMatrix4fv(p1.obj, false, TeaVMUtils.unwrapFloatArray(mat));
 	}
 	private static int currentProgram = -1;
 	public static final void _wglUseProgram(ProgramGL p1) {
@@ -1094,9 +1040,7 @@ public class EaglerAdapterImpl2 {
 	private static native void freeDataURL(String url);
 	
 	public static final EaglerImage loadPNG(byte[] data) {
-		ArrayBuffer arr = new ArrayBuffer(data.length);
-		(new Uint8Array(arr)).set(data);
-		return loadPNG0(arr);
+		return loadPNG0(TeaVMUtils.unwrapArrayBuffer(data));
 	}
 	
 	@JSBody(params = { "cccc", "ennn" }, script = "cccc.imageSmoothingEnabled = ennn;")
@@ -2124,12 +2068,7 @@ public class EaglerAdapterImpl2 {
 					sock.close();
 					return;
 				}
-				Uint8Array a = new Uint8Array(evt.getDataAsArray());
-				byte[] b = new byte[a.getByteLength()];
-				for(int i = 0; i < b.length; ++i) {
-					b[i] = (byte) (a.get(i) & 0xFF);
-				}
-				readPackets.add(b);
+				readPackets.add(TeaVMUtils.wrapByteArrayBuffer(evt.getDataAsArray()));
 			}
 		});
 	}
@@ -2162,9 +2101,7 @@ public class EaglerAdapterImpl2 {
 	private static native void nativeBinarySend(WebSocket sock, ArrayBuffer buffer);
 	public static final void writePacket(byte[] packet) {
 		if(sock != null && !sockIsConnecting) {
-			Uint8Array arr = new Uint8Array(packet.length);
-			arr.set(packet);
-			nativeBinarySend(sock, arr.getBuffer());
+			nativeBinarySend(sock, TeaVMUtils.unwrapArrayBuffer(packet));
 		}
 	}
 	public static final byte[] readPacket() {
@@ -2221,12 +2158,7 @@ public class EaglerAdapterImpl2 {
 	public static final byte[] getFileChooserResult() {
 		ArrayBuffer b = getFileChooserResult0();
 		if(b == null) return null;
-		Uint8Array array = new Uint8Array(b);
-		byte[] ret = new byte[array.getByteLength()];
-		for(int i = 0; i < ret.length; ++i) {
-			ret[i] = (byte) array.get(i);
-		}
-		return ret;
+		return TeaVMUtils.wrapByteArrayBuffer(b);
 	}
 	
 	public static final void clearFileChooserResult() {
@@ -3049,13 +2981,7 @@ public class EaglerAdapterImpl2 {
 					return;
 				}
 				
-				Uint8Array a = new Uint8Array(buf);
-				byte[] pkt = new byte[a.getLength()];
-				for(int i = 0; i < pkt.length; ++i) {
-					pkt[i] = (byte) a.get(i);
-				}
-				
-				existingQueue.add(new PKT(channel, pkt));
+				existingQueue.add(new PKT(channel, TeaVMUtils.wrapByteArrayBuffer(buf)));
 			}
 		}
 		
@@ -3105,10 +3031,7 @@ public class EaglerAdapterImpl2 {
 	}
 	
 	public static final void sendToIntegratedServer(String channel, byte[] pkt) {
-		ArrayBuffer arb = new ArrayBuffer(pkt.length);
-		Uint8Array ar = new Uint8Array(arb);
-		ar.set(pkt);
-		sendWorkerPacket(server, channel, arb);
+		sendWorkerPacket(server, channel, TeaVMUtils.unwrapArrayBuffer(pkt));
 		//System.out.println("[Client][WRITE][" + channel + "]: " + pkt.length);
 	}
 	
@@ -3152,9 +3075,7 @@ public class EaglerAdapterImpl2 {
 	private static final native void downloadBytesImpl(String str, ArrayBuffer buf);
 	
 	public static final void downloadBytes(String str, byte[] dat) {
-		ArrayBuffer d = new ArrayBuffer(dat.length);
-		(new Uint8Array(d)).set(dat);
-		downloadBytesImpl(str, d);
+		downloadBytesImpl(str, TeaVMUtils.unwrapArrayBuffer(dat));
 	}
 	
 	@JSFunctor
@@ -3281,12 +3202,7 @@ public class EaglerAdapterImpl2 {
 								System.err.println("Query response could not be parsed: " + t.toString());
 							}
 						}else {
-							Uint8Array a = new Uint8Array(evt.getDataAsArray());
-							byte[] b = new byte[a.getByteLength()];
-							for(int i = 0; i < b.length; ++i) {
-								b[i] = (byte) (a.get(i) & 0xFF);
-							}
-							queryResponsesBytes.add(b);
+							queryResponsesBytes.add(TeaVMUtils.wrapByteArrayBuffer(evt.getDataAsArray()));
 						}
 					}
 				});
@@ -3415,12 +3331,6 @@ public class EaglerAdapterImpl2 {
 		return !isLittleEndian;
 	}
 	
-	private static final ArrayBuffer convertToArrayBuffer(byte[] arr) {
-		Uint8Array buf = new Uint8Array(arr.length);
-		buf.set(arr);
-		return buf.getBuffer();
-	}
-	
 	private static final Map<String,Long> relayQueryLimited = new HashMap<>();
 	private static final Map<String,Long> relayQueryBlocked = new HashMap<>();
 	
@@ -3468,7 +3378,7 @@ public class EaglerAdapterImpl2 {
 				public void handleEvent(Event evt) {
 					try {
 						connectionPingStart = steadyTimeMillis();
-						nativeBinarySend(sock, convertToArrayBuffer(
+						nativeBinarySend(sock, TeaVMUtils.unwrapArrayBuffer(
 								IPacket.writePacket(new IPacket00Handshake(0x03, IntegratedServer.preferredRelayVersion, ""))
 						));
 					} catch (IOException e) {
@@ -3483,11 +3393,7 @@ public class EaglerAdapterImpl2 {
 				public void handleEvent(MessageEvent evt) {
 					if(evt.getData() != null && !isString(evt.getData())) {
 						hasRecievedAnyData = true;
-						Uint8Array buf = new Uint8Array(evt.getDataAsArray());
-						byte[] arr = new byte[buf.getLength()];
-						for(int i = 0; i < arr.length; ++i) {
-							arr[i] = (byte)buf.get(i);
-						}
+						byte[] arr = TeaVMUtils.wrapByteArrayBuffer(evt.getDataAsArray());
 						if(arr.length == 2 && arr[0] == (byte)0xFC) {
 							long millis = steadyTimeMillis();
 							if(arr[1] == (byte)0x00 || arr[1] == (byte)0x01) {
@@ -3731,7 +3637,7 @@ public class EaglerAdapterImpl2 {
 				@Override
 				public void handleEvent(Event evt) {
 					try {
-						nativeBinarySend(sock, convertToArrayBuffer(
+						nativeBinarySend(sock, TeaVMUtils.unwrapArrayBuffer(
 								IPacket.writePacket(new IPacket00Handshake(0x04, IntegratedServer.preferredRelayVersion, ""))
 						));
 					} catch (IOException e) {
@@ -3747,11 +3653,7 @@ public class EaglerAdapterImpl2 {
 				public void handleEvent(MessageEvent evt) {
 					if(evt.getData() != null && !isString(evt.getData())) {
 						hasRecievedAnyData = true;
-						Uint8Array buf = new Uint8Array(evt.getDataAsArray());
-						byte[] arr = new byte[buf.getLength()];
-						for(int i = 0; i < arr.length; ++i) {
-							arr[i] = (byte)buf.get(i);
-						}
+						byte[] arr = TeaVMUtils.wrapByteArrayBuffer(evt.getDataAsArray());
 						if(arr.length == 2 && arr[0] == (byte)0xFC) {
 							long millis = steadyTimeMillis();
 							if(arr[1] == (byte)0x00 || arr[1] == (byte)0x01) {
@@ -3966,11 +3868,7 @@ public class EaglerAdapterImpl2 {
 				public void handleEvent(MessageEvent evt) {
 					if(evt.getData() != null && !isString(evt.getData())) {
 						hasRecievedAnyData = true;
-						Uint8Array buf = new Uint8Array(evt.getDataAsArray());
-						byte[] arr = new byte[buf.getLength()];
-						for(int i = 0; i < arr.length; ++i) {
-							arr[i] = (byte)buf.get(i);
-						}
+						byte[] arr = TeaVMUtils.wrapByteArrayBuffer(evt.getDataAsArray());
 						try {
 							packets.add(IPacket.readPacket(new DataInputStream(new ByteArrayInputStream(arr))));
 						} catch (IOException e) {
@@ -4044,7 +3942,7 @@ public class EaglerAdapterImpl2 {
 		@Override
 		public void writePacket(IPacket pkt) {
 			try {
-				nativeBinarySend(sock, convertToArrayBuffer(IPacket.writePacket(pkt)));
+				nativeBinarySend(sock, TeaVMUtils.unwrapArrayBuffer(IPacket.writePacket(pkt)));
 			} catch (Throwable e) {
 				System.err.println("Relay connection error: " + e.toString());
 				e.printStackTrace();
@@ -4192,7 +4090,7 @@ public class EaglerAdapterImpl2 {
 	}
 	
 	public static final void clientLANSendPacket(byte[] pkt) {
-		rtcLANClient.sendPacketToServer(convertToArrayBuffer(pkt));
+		rtcLANClient.sendPacketToServer(TeaVMUtils.unwrapArrayBuffer(pkt));
 	}
 	
 	public static final byte[] clientLANReadPacket() {
@@ -4224,12 +4122,7 @@ public class EaglerAdapterImpl2 {
 			rtcLANClient.setRemotePacketHandler(new EaglercraftLANClient.RemotePacketHandler() {
 				@Override
 				public void call(ArrayBuffer buffer) {
-					Uint8Array array = new Uint8Array(buffer);
-					byte[] ret = new byte[array.getByteLength()];
-					for(int i = 0; i < ret.length; ++i) {
-						ret[i] = (byte) array.get(i);
-					}
-					clientLANPacketBuffer.add(ret);
+					clientLANPacketBuffer.add(TeaVMUtils.wrapByteArrayBuffer(buffer));
 				}
 			});
 			rtcLANClient.setRemoteDisconnectHandler(new EaglercraftLANClient.ClientSignalHandler() {
@@ -4334,12 +4227,7 @@ public class EaglerAdapterImpl2 {
 			rtcLANServer.setRemoteClientPacketHandler(new EaglercraftLANServer.PeerPacketHandler() {
 				@Override
 				public void call(String peerId, ArrayBuffer buffer) {
-					Uint8Array array = new Uint8Array(buffer);
-					byte[] ret = new byte[array.getByteLength()];
-					for(int i = 0; i < ret.length; ++i) {
-						ret[i] = (byte) array.get(i);
-					}
-					serverLANEventBuffer.add(new LANPeerEvent.LANPeerPacketEvent(peerId, ret));
+					serverLANEventBuffer.add(new LANPeerEvent.LANPeerPacketEvent(peerId, TeaVMUtils.wrapByteArrayBuffer(buffer)));
 				}
 			});
 			rtcLANServer.setRemoteClientDisconnectHandler(new EaglercraftLANServer.ClientSignalHandler() {
@@ -4379,17 +4267,13 @@ public class EaglerAdapterImpl2 {
 				byte[] fragData = new byte[((i + fragmentSize > data.length) ? (data.length % fragmentSize) : fragmentSize) + 1];
 				System.arraycopy(data, i, fragData, 1, fragData.length - 1);
 				fragData[0] = (i + fragmentSize < data.length) ? (byte) 1 : (byte) 0;
-				ArrayBuffer arr = new ArrayBuffer(fragData.length);
-				(new Uint8Array(arr)).set(fragData);
-				rtcLANServer.sendPacketToRemoteClient(peer, arr);
+				rtcLANServer.sendPacketToRemoteClient(peer, TeaVMUtils.unwrapArrayBuffer(fragData));
 			}
 		} else {
 			byte[] sendData = new byte[data.length + 1];
 			sendData[0] = 0;
 			System.arraycopy(data, 0, sendData, 1, data.length);
-			ArrayBuffer arr = new ArrayBuffer(sendData.length);
-			(new Uint8Array(arr)).set(sendData);
-			rtcLANServer.sendPacketToRemoteClient(peer, arr);
+			rtcLANServer.sendPacketToRemoteClient(peer, TeaVMUtils.unwrapArrayBuffer(sendData));
 		}
 	}
 	
