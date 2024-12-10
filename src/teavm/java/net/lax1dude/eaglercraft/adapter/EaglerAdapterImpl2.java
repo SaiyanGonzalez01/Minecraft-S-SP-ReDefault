@@ -4274,7 +4274,7 @@ public class EaglerAdapterImpl2 {
 		}
 	}
 
-	private static final int fragmentSize = 65536;
+	private static final int fragmentSize = 0xFF00;
 
 	public static final void serverLANWritePacket(String peer, byte[] data) {
 		if (data.length > fragmentSize) {

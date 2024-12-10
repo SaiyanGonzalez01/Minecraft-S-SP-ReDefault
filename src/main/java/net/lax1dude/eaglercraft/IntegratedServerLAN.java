@@ -59,7 +59,7 @@ public class IntegratedServerLAN {
 					}
 				}
 				EaglerAdapter.sleep(50);
-			}while(EaglerAdapter.steadyTimeMillis() - millis < 1000l);
+			}while(EaglerAdapter.steadyTimeMillis() - millis < 2500l);
 			System.out.println("Relay [" + sock.getURI() + "] relay provide ICE servers timeout");
 			closeLAN();
 			return null;
@@ -257,6 +257,15 @@ public class IntegratedServerLAN {
 									localICECandidate = ((LANPeerEvent.LANPeerICECandidateEvent)evt).candidates;
 									continue read_loop;
 								}
+								break;
+							}
+							case RECEIVED_DESCRIPTION: {
+								if(evt instanceof LANPeerEvent.LANPeerDescriptionEvent) {
+									lanRelaySocket.writePacket(new IPacket04Description(clientId, ((LANPeerEvent.LANPeerDescriptionEvent)evt).description));
+									state = SENT_DESCRIPTION;
+									continue read_loop;
+								}
+								break;
 							}
 							case RECEIVED_ICE_CANDIDATE: {
 								if(evt instanceof LANPeerEvent.LANPeerICECandidateEvent) {
@@ -265,33 +274,31 @@ public class IntegratedServerLAN {
 									continue read_loop;
 								}
 							}
-							case RECEIVED_DESCRIPTION: {
-								if(evt instanceof LANPeerEvent.LANPeerDescriptionEvent) {
-									lanRelaySocket.writePacket(new IPacket04Description(clientId, ((LANPeerEvent.LANPeerDescriptionEvent)evt).description));
-									state = SENT_DESCRIPTION;
-									continue read_loop;
-								}
-							}
 							case SENT_ICE_CANDIDATE:
 							case RECEIVED_SUCCESS: {
 								if(evt instanceof LANPeerEvent.LANPeerDataChannelEvent) {
 									EaglerAdapter.enableChannel("NET|" + clientId);
+									IntegratedServer.sendIPCPacket(new IPCPacket0CPlayerChannel(clientId, true));
 									state = CONNECTED;
 									continue read_loop;
 								}
+								break;
 							}
 							case CONNECTED: {
 								if(evt instanceof LANPeerEvent.LANPeerPacketEvent) {
 									EaglerAdapter.sendToIntegratedServer("NET|" + clientId, ((LANPeerEvent.LANPeerPacketEvent)evt).payload);
 									continue read_loop;
+								}else if(evt instanceof LANPeerEvent.LANPeerICECandidateEvent) {
+									continue read_loop;
 								}
+								break;
 							}
 							default: {
 								break;
 							}
 						}
 						if(state != CLOSED) {
-							System.err.println("LAN client '" + clientId + "' had an accident: " + evt.getClass().getSimpleName());
+							System.err.println("LAN client '" + clientId + "' had an accident: " + evt.getClass().getSimpleName() + " (state " + state + ")");
 						}
 						disconnect();
 						return;

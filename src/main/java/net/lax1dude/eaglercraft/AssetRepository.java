@@ -14,8 +14,8 @@ import org.json.JSONObject;
 
 public class AssetRepository {
 
-	private static final HashMap<String,byte[]> filePool = new HashMap();
-	public static final HashMap<String, String> fileNameOverrides = new HashMap();
+	private static final HashMap<String,byte[]> filePool = new HashMap<>();
+	public static final HashMap<String, String> fileNameOverrides = new HashMap<>();
 
 	public static final void loadOverrides(JSONObject json) {
 		JSONObject overrides = json.optJSONObject("assetOverrides", null);

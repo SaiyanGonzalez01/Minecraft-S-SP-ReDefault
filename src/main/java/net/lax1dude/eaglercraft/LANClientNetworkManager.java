@@ -128,7 +128,7 @@ public class LANClientNetworkManager implements INetworkManager {
 
 							}
 							EaglerAdapter.sleep(20);
-						}while(EaglerAdapter.steadyTimeMillis() - lm < 5000l);
+						}while(EaglerAdapter.steadyTimeMillis() - lm < 10000l);
 
 						// no channel was opened
 						sock.writePacket(new IPacket06ClientFailure(ipkt.peerId));
@@ -167,7 +167,7 @@ public class LANClientNetworkManager implements INetworkManager {
 								continue mainLoop;
 							}
 							EaglerAdapter.sleep(20);
-						}while(EaglerAdapter.steadyTimeMillis() - lm < 5000l);
+						}while(EaglerAdapter.steadyTimeMillis() - lm < 10000l);
 
 						// no ice candidates were sent
 						sock.close();

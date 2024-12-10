@@ -351,12 +351,22 @@ window.initializeLANClient = (() => {
 
 			this.peerConnection.addEventListener("icecandidate", (evt) => {
 				if(evt.candidate) {
-					if(iceCandidates.length === 0) setTimeout(() => {
-                    	if(this.peerConnection !== null && this.peerConnection.connectionState !== "disconnected") {
-                    		this.iceCandidateHandler(JSON.stringify(iceCandidates));
-                    		iceCandidates.length = 0;
-                    	}
-                    }, 3000);
+					if(iceCandidates.length === 0) {
+						let candidateState = [ 0, 0 ];
+						let runnable;
+						setTimeout(runnable = () => {
+							if(this.peerConnection !== null && this.peerConnection.connectionState !== "disconnected") {
+								const trial = ++candidateState[1];
+								if(candidateState[0] !== iceCandidates.length && trial < 3) {
+									candidateState[0] = iceCandidates.length;
+									setTimeout(runnable, 2000);
+									return;
+								}
+								this.iceCandidateHandler(JSON.stringify(iceCandidates));
+								iceCandidates.length = 0;
+							}
+						}, 2000);
+					}
                     iceCandidates.push({ sdpMLineIndex: evt.candidate.sdpMLineIndex, candidate: evt.candidate.candidate });
 				}
 			});
@@ -366,7 +376,7 @@ window.initializeLANClient = (() => {
 
 			this.dataChannel.addEventListener("open", async (evt) => {
 				while(iceCandidates.length > 0) {
-					await new Promise(resolve => setTimeout(resolve, 0));
+					await new Promise(resolve => setTimeout(resolve, 10));
 				}
 				this.remoteDataChannelHandler(this.dataChannel);
 			});
@@ -467,19 +477,29 @@ window.initializeLANServer = (() => {
 
 			this.peerConnection.addEventListener("icecandidate", (evt) => {
 				if(evt.candidate) {
-					if(iceCandidates.length === 0) setTimeout(() => {
-                    	if(this.peerConnection !== null && this.peerConnection.connectionState !== "disconnected") {
-                    		this.client.iceCandidateHandler(this.peerId, JSON.stringify(iceCandidates));
-                    		iceCandidates.length = 0;
-                    	}
-                    }, 3000);
+					if(iceCandidates.length === 0) {
+						let candidateState = [ 0, 0 ];
+						let runnable;
+						setTimeout(runnable = () => {
+							if(this.peerConnection !== null && this.peerConnection.connectionState !== "disconnected") {
+								const trial = ++candidateState[1];
+								if(candidateState[0] !== iceCandidates.length && trial < 3) {
+									candidateState[0] = iceCandidates.length;
+									setTimeout(runnable, 2000);
+									return;
+								}
+								this.client.iceCandidateHandler(JSON.stringify(iceCandidates));
+								iceCandidates.length = 0;
+							}
+						}, 2000);
+					}
                     iceCandidates.push({ sdpMLineIndex: evt.candidate.sdpMLineIndex, candidate: evt.candidate.candidate });
 				}
 			});
 
 			this.peerConnection.addEventListener("datachannel", async (evt) => {
 				while(iceCandidates.length > 0) {
-					await new Promise(resolve => setTimeout(resolve, 0));
+					await new Promise(resolve => setTimeout(resolve, 10));
 				}
 				this.dataChannel = evt.channel;
 				this.client.remoteClientDataChannelHandler(this.peerId, this.dataChannel);
