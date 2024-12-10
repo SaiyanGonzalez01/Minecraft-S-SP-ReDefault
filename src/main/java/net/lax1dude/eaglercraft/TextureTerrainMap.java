@@ -207,8 +207,8 @@ public class TextureTerrainMap implements IconRegister {
 								EaglerAdapter.GL_RGBA, EaglerAdapter.GL_UNSIGNED_BYTE, uploadBuffer);
 						
 						EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAX_LEVEL, 4);
-						
-						String dat = EaglerAdapter.fileContents("/" + map.basePath + name + ".txt");
+
+						String dat = EaglerMisc.bytesToString(Minecraft.getMinecraft().texturePackList.getSelectedTexturePack().getResourceAsBytes("/" + map.basePath + name + ".txt"));
 						if(dat != null) System.out.println("Found animation info for: " + map.basePath + name + ".png");
 						if(dat == null || (dat = dat.trim()).isEmpty()) {
 							framesIdx = new int[divs];

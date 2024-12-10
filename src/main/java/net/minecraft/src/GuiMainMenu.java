@@ -13,6 +13,7 @@ import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
 import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.TextureLocation;
+import net.lax1dude.eaglercraft.EaglerMisc;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.minecraft.client.Minecraft;
 
@@ -175,7 +176,7 @@ public class GuiMainMenu extends GuiScreen {
 		
 		if(this.ackLines.isEmpty()) {
 			int width = 315;
-			String file = EaglerAdapter.fileContents("/credits.txt");
+			String file = EaglerMisc.bytesToString(Minecraft.getMinecraft().texturePackList.getSelectedTexturePack().getResourceAsBytes("/credits.txt"));
 			if(file == null) {
 				for(int i = 0; i < 30; ++i) {
 					this.ackLines.add(" -- file not found -- ");

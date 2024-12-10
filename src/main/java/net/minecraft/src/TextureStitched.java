@@ -3,7 +3,8 @@ package net.minecraft.src;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.EaglerMisc;
+import net.minecraft.client.Minecraft;
 
 public class TextureStitched implements Icon {
 	private final String textureName;
@@ -171,7 +172,7 @@ public class TextureStitched implements Icon {
 	public void readAnimationInfo(String path) {
 		ArrayList var2 = new ArrayList();
 		try {
-			String var3 = EaglerAdapter.fileContents(path).trim();
+			String var3 = EaglerMisc.bytesToString(Minecraft.getMinecraft().texturePackList.getSelectedTexturePack().getResourceAsBytes(path)).trim();
 
 			if (var3.length() > 0) {
 				String[] var4 = var3.split(",");

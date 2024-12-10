@@ -2,7 +2,7 @@ package net.minecraft.src;
 
 import net.lax1dude.eaglercraft.EPKDecompiler;
 import net.lax1dude.eaglercraft.EaglerAdapter;
-import net.lax1dude.eaglercraft.EaglerInflater;
+import net.lax1dude.eaglercraft.EaglerMisc;
 import net.lax1dude.eaglercraft.adapter.teavm.vfs.VFile;
 
 import java.io.ByteArrayInputStream;
@@ -112,7 +112,7 @@ public class GuiTexturePacks extends GuiScreen {
 					ZipEntry entry;
 					while ((entry = zipInputStream.getNextEntry()) != null) {
 						if (entry.isDirectory()) continue;
-						new VFile(fileLocation, safeName, entry.getName()).setAllBytes(EaglerInflater.getBytesFromInputStream(zipInputStream));
+						new VFile(fileLocation, safeName, entry.getName()).setAllBytes(EaglerMisc.getBytesFromInputStream(zipInputStream));
 					}
 					zipInputStream.close();
 				} else {
@@ -138,6 +138,9 @@ public class GuiTexturePacks extends GuiScreen {
 
 		if (par1) {
 			new VFile(fileLocation, ((ITexturePack) var3.get(par2)).getTexturePackFileName()).deleteAll();
+			this.mc.texturePackList.setTexturePack((ITexturePack) var3.get(0));
+			this.mc.renderEngine.refreshTextures();
+			this.mc.renderGlobal.loadRenderers();
 		} else {
 			try {
 				this.mc.texturePackList.setTexturePack((ITexturePack) var3.get(par2));

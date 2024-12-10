@@ -5,7 +5,8 @@ import java.util.IllegalFormatException;
 import java.util.Properties;
 import java.util.TreeMap;
 
-import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.EaglerMisc;
+import net.minecraft.client.Minecraft;
 
 public class StringTranslate {
 	/** Is the private singleton instance of StringTranslate. */
@@ -42,7 +43,7 @@ public class StringTranslate {
 	}
 
 	private void loadLanguage(Properties par1Properties, String par2Str) throws IOException {
-		String[] var3 = EaglerAdapter.fileContents("/lang/" + par2Str + ".lang").replace('\r', '\n')
+		String[] var3 = EaglerMisc.bytesToString(Minecraft.getMinecraft().texturePackList.getSelectedTexturePack().getResourceAsBytes("/lang/" + par2Str + ".lang")).replace('\r', '\n')
 				.replaceAll("\n+", "\n").split("\n");
 
 		for (String var4 : var3) {

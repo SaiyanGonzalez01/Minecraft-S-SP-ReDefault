@@ -4,10 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import com.jcraft.jzlib.InflaterInputStream;
 
-public class EaglerInflater {
+public class EaglerMisc {
 	
     public static byte[] uncompress(byte[] input) throws IOException {
     	return getBytesFromInputStream(new InflaterInputStream(new ByteArrayInputStream(input)));
@@ -21,5 +22,18 @@ public class EaglerInflater {
         }
         return os.toByteArray();
     }
-    
+
+    public static String bytesToString(byte[] bb) {
+        if (bb == null) return "";
+        return new String(bb, Charset.forName("UTF-8"));
+    }
+
+    public static String[] bytesToLines(byte[] bb) {
+        String contents = bytesToString(bb);
+        if(contents.isEmpty()) {
+            return new String[0];
+        }else {
+            return contents.replace("\r\n", "\n").split("[\r\n]");
+        }
+    }
 }

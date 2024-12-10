@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerImage;
-import net.lax1dude.eaglercraft.EaglerInflater;
+import net.lax1dude.eaglercraft.EaglerMisc;
 import net.lax1dude.eaglercraft.adapter.teavm.vfs.VFile;
 
 public abstract class TexturePackImplementation implements ITexturePack
@@ -77,7 +77,9 @@ public abstract class TexturePackImplementation implements ITexturePack
 		try
 		{
 			var1 = this.func_98137_a("/pack.png", false);
-			this.thumbnailImage = EaglerImage.loadImage(EaglerInflater.getBytesFromInputStream(var1));
+			if (var1 != null) {
+				this.thumbnailImage = EaglerImage.loadImage(EaglerMisc.getBytesFromInputStream(var1));
+			}
 		}
 		catch (IOException var11)
 		{
@@ -163,11 +165,24 @@ public abstract class TexturePackImplementation implements ITexturePack
 	 */
 	public byte[] getResourceAsBytes(String par1Str)
 	{
+		InputStream is = null;
+		byte[] res = null;
 		try {
-			return EaglerInflater.getBytesFromInputStream(this.func_98137_a(par1Str, true));
+			is = this.func_98137_a(par1Str, true);
+			if (is == null) return null;
+			res = EaglerMisc.getBytesFromInputStream(is);
 		} catch (IOException e) {
 			return null;
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException ignored) {
+					//
+				}
+			}
 		}
+		return res;
 	}
 
 	protected abstract InputStream func_98139_b(String var1) throws IOException;

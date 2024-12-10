@@ -6,7 +6,7 @@ public class SYS {
 
 	static {
 
-		VirtualFilesystem.VFSHandle vh = VirtualFilesystem.openVFS("_net_lax1dude_eaglercraft_adapter_teavm_vfs_VirtualFilesystem_1_5_2_eagStorage");
+		VirtualFilesystem.VFSHandle vh = VirtualFilesystem.openVFS("eagStorage2");
 
 		if(vh.vfs == null) {
 			System.err.println("Could not init filesystem!");
