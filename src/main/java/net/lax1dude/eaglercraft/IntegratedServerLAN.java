@@ -3,6 +3,7 @@ package net.lax1dude.eaglercraft;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -179,16 +180,20 @@ public class IntegratedServerLAN {
 		
 		private static final int PRE = 0, RECEIVED_ICE_CANDIDATE = 1, SENT_ICE_CANDIDATE = 2, RECEIVED_DESCRIPTION = 3,
 				SENT_DESCRIPTION = 4, RECEIVED_SUCCESS = 5, CONNECTED = 6, CLOSED = 7;
-		
+
 		protected final String clientId;
+		protected final String channelId;
 		
 		protected int state = PRE;
 		protected boolean dead = false;
 		protected String localICECandidate = null;
+		protected boolean localChannel = false;
+		protected List<byte[]> packetPreBuffer = null;
 		protected final long startTime;
 		
 		protected LANClient(String clientId) {
 			this.clientId = clientId;
+			this.channelId = "NET|" + clientId;
 			this.startTime = EaglerAdapter.steadyTimeMillis();
 			EaglerAdapter.serverLANCreatePeer(clientId);
 		}
@@ -219,7 +224,20 @@ public class IntegratedServerLAN {
 		
 		protected void handleSuccess() {
 			if(state == SENT_ICE_CANDIDATE) {
-				state = RECEIVED_SUCCESS;
+				if(localChannel) {
+					EaglerAdapter.enableChannel(channelId);
+					IntegratedServer.sendIPCPacket(new IPCPacket0CPlayerChannel(clientId, true));
+					localChannel = false;
+					if(packetPreBuffer != null) {
+						for(byte[] b : packetPreBuffer) {
+							EaglerAdapter.sendToIntegratedServer(channelId, b);
+						}
+						packetPreBuffer = null;
+					}
+					state = CONNECTED;
+				}else {
+					state = RECEIVED_SUCCESS;
+				}
 			}else {
 				System.err.println("Relay [" + lanRelaySocket.getURI() + "] unexpected IPacket05ClientSuccess for '" + clientId + "'");
 			}
@@ -241,6 +259,10 @@ public class IntegratedServerLAN {
 					disconnect();
 					return;
 				}
+				PKT pk;
+				while(state == CONNECTED && (pk = EaglerAdapter.recieveFromIntegratedServer("NET|" + clientId)) != null) {
+					EaglerAdapter.serverLANWritePacket(clientId, pk.data);
+				}
 				List<LANPeerEvent> l = EaglerAdapter.serverLANGetAllEvent(clientId);
 				if(l == null) {
 					return;
@@ -251,6 +273,7 @@ public class IntegratedServerLAN {
 						System.out.println("LAN client '" + clientId + "' disconnected");
 						disconnect();
 					}else {
+						System.out.println(evt.getClass().getSimpleName());
 						switch(state) {
 							case SENT_DESCRIPTION:{
 								if(evt instanceof LANPeerEvent.LANPeerICECandidateEvent) {
@@ -272,13 +295,37 @@ public class IntegratedServerLAN {
 									lanRelaySocket.writePacket(new IPacket03ICECandidate(clientId, ((LANPeerEvent.LANPeerICECandidateEvent)evt).candidates));
 									state = SENT_ICE_CANDIDATE;
 									continue read_loop;
+								}else if(evt instanceof LANPeerEvent.LANPeerDataChannelEvent) {
+									localChannel = true;
+									continue read_loop;
+								}else if(evt instanceof LANPeerEvent.LANPeerPacketEvent) {
+									if(packetPreBuffer == null) packetPreBuffer = new LinkedList<>();
+									packetPreBuffer.add(((LANPeerEvent.LANPeerPacketEvent)evt).payload);
+									continue read_loop;
 								}
+								break;
 							}
-							case SENT_ICE_CANDIDATE:
+							case SENT_ICE_CANDIDATE: {
+								if(evt instanceof LANPeerEvent.LANPeerDataChannelEvent) {
+									localChannel = true;
+									continue read_loop;
+								}else if(evt instanceof LANPeerEvent.LANPeerPacketEvent) {
+									if(packetPreBuffer == null) packetPreBuffer = new LinkedList<>();
+									packetPreBuffer.add(((LANPeerEvent.LANPeerPacketEvent)evt).payload);
+									continue read_loop;
+								}
+								break;
+							}
 							case RECEIVED_SUCCESS: {
 								if(evt instanceof LANPeerEvent.LANPeerDataChannelEvent) {
-									EaglerAdapter.enableChannel("NET|" + clientId);
+									EaglerAdapter.enableChannel(channelId);
 									IntegratedServer.sendIPCPacket(new IPCPacket0CPlayerChannel(clientId, true));
+									if(packetPreBuffer != null) {
+										for(byte[] b : packetPreBuffer) {
+											EaglerAdapter.sendToIntegratedServer(channelId, b);
+										}
+										packetPreBuffer = null;
+									}
 									state = CONNECTED;
 									continue read_loop;
 								}
@@ -286,9 +333,7 @@ public class IntegratedServerLAN {
 							}
 							case CONNECTED: {
 								if(evt instanceof LANPeerEvent.LANPeerPacketEvent) {
-									EaglerAdapter.sendToIntegratedServer("NET|" + clientId, ((LANPeerEvent.LANPeerPacketEvent)evt).payload);
-									continue read_loop;
-								}else if(evt instanceof LANPeerEvent.LANPeerICECandidateEvent) {
+									EaglerAdapter.sendToIntegratedServer(channelId, ((LANPeerEvent.LANPeerPacketEvent)evt).payload);
 									continue read_loop;
 								}
 								break;

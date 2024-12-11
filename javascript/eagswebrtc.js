@@ -474,6 +474,7 @@ window.initializeLANServer = (() => {
 			this.dataChannel = null;
 
 			const iceCandidates = [];
+			let hasICE = false;
 
 			this.peerConnection.addEventListener("icecandidate", (evt) => {
 				if(evt.candidate) {
@@ -488,8 +489,9 @@ window.initializeLANServer = (() => {
 									setTimeout(runnable, 2000);
 									return;
 								}
-								this.client.iceCandidateHandler(JSON.stringify(iceCandidates));
+								this.client.iceCandidateHandler(this.peerId, JSON.stringify(iceCandidates));
 								iceCandidates.length = 0;
+								hasICE = true;
 							}
 						}, 2000);
 					}
@@ -498,7 +500,7 @@ window.initializeLANServer = (() => {
 			});
 
 			this.peerConnection.addEventListener("datachannel", async (evt) => {
-				while(iceCandidates.length > 0) {
+				while(!hasICE) {
 					await new Promise(resolve => setTimeout(resolve, 10));
 				}
 				this.dataChannel = evt.channel;
