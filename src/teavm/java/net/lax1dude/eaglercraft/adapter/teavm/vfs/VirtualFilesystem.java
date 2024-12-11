@@ -12,7 +12,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.EaglerInputStream;
 import net.lax1dude.eaglercraft.adapter.teavm.TeaVMUtils;
+
 import org.teavm.interop.Async;
 import org.teavm.interop.AsyncCallback;
 import org.teavm.jso.JSBody;
@@ -102,11 +104,11 @@ public class VirtualFilesystem {
 		}
 		
 		public InputStream getInputStream() {
-			byte[] dat = getAllBytes(false);
+			byte[] dat = getAllBytes(true);
 			if(dat == null) {
 				return null;
 			}
-			return new ByteArrayInputStream(dat);
+			return new EaglerInputStream(dat);
 		}
 		
 		public OutputStream getOutputStream() {
@@ -385,6 +387,14 @@ public class VirtualFilesystem {
 		final ArrayList<String> list = new ArrayList<>();
 		AsyncHandlers.iterateFiles(indexeddb, this, prefix, false, (v) -> {
 			list.add(v.getPath());
+		});
+		return list;
+	}
+	
+	public List<VFile> listVFiles(String prefix) {
+		final ArrayList<VFile> list = new ArrayList<>();
+		AsyncHandlers.iterateFiles(indexeddb, this, prefix, false, (v) -> {
+			list.add(new VFile(v.getPath()));
 		});
 		return list;
 	}

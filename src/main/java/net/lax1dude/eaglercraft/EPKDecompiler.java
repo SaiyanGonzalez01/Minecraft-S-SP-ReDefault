@@ -1,6 +1,5 @@
 package net.lax1dude.eaglercraft;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +22,7 @@ public class EPKDecompiler {
 		}
 	}
 
-	private ByteArrayInputStream in2;
+	private EaglerInputStream in2;
 	private DataInputStream in;
 	private InputStream zis;
 	private SHA1Digest dg;
@@ -33,7 +32,7 @@ public class EPKDecompiler {
 	private boolean isOldFormat = false;
 
 	public EPKDecompiler(byte[] data) throws IOException {
-		in2 = new ByteArrayInputStream(data);
+		in2 = new EaglerInputStream(data);
 
 		byte[] header = new byte[8];
 		in2.read(header);
@@ -46,7 +45,7 @@ public class EPKDecompiler {
 					throw new IOException("EPK file is missing EOF code (:::YEE:>)");
 				}
 			}
-			in2 = new ByteArrayInputStream(data, 8, data.length - 16);
+			in2 = new EaglerInputStream(data, 8, data.length - 16);
 			initNew();
 		}else if(Arrays.equals(header, new byte[]{(byte)69,(byte)65,(byte)71,(byte)80,(byte)75,(byte)71,(byte)33,(byte)33})) {
 			initOld();

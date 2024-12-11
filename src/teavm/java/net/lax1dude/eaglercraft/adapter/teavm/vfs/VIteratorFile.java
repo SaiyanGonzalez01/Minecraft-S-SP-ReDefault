@@ -1,6 +1,5 @@
 package net.lax1dude.eaglercraft.adapter.teavm.vfs;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +16,8 @@ import org.teavm.jso.indexeddb.IDBCursor;
 import org.teavm.jso.indexeddb.IDBRequest;
 import org.teavm.jso.typedarrays.ArrayBuffer;
 import org.teavm.jso.typedarrays.Uint8Array;
+
+import net.lax1dude.eaglercraft.EaglerInputStream;
 
 /**
  * Do not use an instance of this class outside of the VFSIterator.next() method
@@ -78,7 +79,7 @@ public class VIteratorFile extends VFile {
 	}
 	
 	public InputStream getInputStream() {
-		return !wasDeleted ? new ByteArrayInputStream(getAllBytes()) : null;
+		return !wasDeleted ? new EaglerInputStream(getAllBytes()) : null;
 	}
 	
 	public OutputStream getOutputStream() {

@@ -2,6 +2,7 @@ package net.minecraft.src;
 
 import net.lax1dude.eaglercraft.EPKDecompiler;
 import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.EaglerInputStream;
 import net.lax1dude.eaglercraft.EaglerMisc;
 import net.lax1dude.eaglercraft.adapter.teavm.vfs.VFile;
 
@@ -108,13 +109,13 @@ public class GuiTexturePacks extends GuiScreen {
 			String safeName = name.replaceAll("[^A-Za-z0-9_]", "_");
 			try {
 				if (name.toLowerCase().endsWith(".zip")) {
-					ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(EaglerAdapter.getFileChooserResult()));
-					ZipEntry entry;
-					while ((entry = zipInputStream.getNextEntry()) != null) {
-						if (entry.isDirectory()) continue;
-						new VFile(fileLocation, safeName, entry.getName()).setAllBytes(EaglerMisc.getBytesFromInputStream(zipInputStream));
+					try(ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(EaglerAdapter.getFileChooserResult()))) {
+						ZipEntry entry;
+						while ((entry = zipInputStream.getNextEntry()) != null) {
+							if (entry.isDirectory()) continue;
+							new VFile(fileLocation, safeName, entry.getName()).setAllBytes(EaglerInputStream.inputStreamToBytesNoClose(zipInputStream));
+						}
 					}
-					zipInputStream.close();
 				} else {
 					EPKDecompiler epkDecompiler = new EPKDecompiler(EaglerAdapter.getFileChooserResult());
 					EPKDecompiler.FileEntry file;

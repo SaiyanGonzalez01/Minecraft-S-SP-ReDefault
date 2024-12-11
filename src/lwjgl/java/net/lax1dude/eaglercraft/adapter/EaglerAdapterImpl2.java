@@ -14,7 +14,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -72,6 +71,7 @@ import org.lwjgl.util.glu.GLU;
 import de.cuina.fireandfuel.CodecJLayerMP3;
 import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.EaglerImage;
+import net.lax1dude.eaglercraft.EaglerInputStream;
 import net.lax1dude.eaglercraft.EarlyLoadScreen;
 import net.lax1dude.eaglercraft.LANPeerEvent;
 import net.lax1dude.eaglercraft.PKT;
@@ -104,7 +104,7 @@ public class EaglerAdapterImpl2 {
 	public static final InputStream loadResource(String path) {
 		byte[] file = loadResourceBytes(path);
 		if (file != null) {
-			return new ByteArrayInputStream(file);
+			return new EaglerInputStream(file);
 		} else {
 			return null;
 		}
@@ -638,7 +638,7 @@ public class EaglerAdapterImpl2 {
 	
 	public static final EaglerImage loadPNG(byte[] data) {
 		try {
-			BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
+			BufferedImage img = ImageIO.read(new EaglerInputStream(data));
 			int[] pxls = img.getRGB(0, 0, img.getWidth(), img.getHeight(), null, 0, img.getWidth());
 			return new EaglerImage(pxls, img.getWidth(), img.getHeight(), true);
 		} catch (IOException e) {

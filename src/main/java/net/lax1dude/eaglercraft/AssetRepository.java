@@ -1,6 +1,5 @@
 package net.lax1dude.eaglercraft;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +33,7 @@ public class AssetRepository {
 	}
 
 	public static final void install(byte[] pkg) throws IOException {
-		ByteArrayInputStream in = new ByteArrayInputStream(pkg);
+		EaglerInputStream in = new EaglerInputStream(pkg);
 
 		byte[] header = new byte[8];
 		in.read(header);
@@ -52,7 +51,7 @@ public class AssetRepository {
 					throw new IOException("EPK file is missing EOF code (:::YEE:>)");
 				}
 			}
-			loadNew(new ByteArrayInputStream(pkg, 8, pkg.length - 16));
+			loadNew(new EaglerInputStream(pkg, 8, pkg.length - 16));
 		}else if("EAGPKG!!".equals(type)) {
 			loadOld(in);
 		}else {
@@ -178,7 +177,7 @@ public class AssetRepository {
 						int len2 = (((int)load[off] & 0xff) << 24) | (((int)load[off + 1] & 0xff) << 16) |
 								(((int)load[off + 2] & 0xff) << 8) | ((int)load[off + 3] & 0xff);
 						if(off + 8 + len2 < load.length) {
-							loadNew(new ByteArrayInputStream(load, off + 8, len2));
+							loadNew(new EaglerInputStream(load, off + 8, len2));
 						}
 					}catch(Throwable t) {
 					}

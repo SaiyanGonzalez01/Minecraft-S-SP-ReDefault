@@ -2,7 +2,6 @@ package net.lax1dude.eaglercraft.adapter;
 
 import static net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext.*;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -94,6 +93,7 @@ import net.lax1dude.eaglercraft.Base64;
 import net.lax1dude.eaglercraft.Client;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerImage;
+import net.lax1dude.eaglercraft.EaglerInputStream;
 import net.lax1dude.eaglercraft.EaglerProfile;
 import net.lax1dude.eaglercraft.EarlyLoadScreen;
 import net.lax1dude.eaglercraft.ExpiringSet;
@@ -144,7 +144,7 @@ public class EaglerAdapterImpl2 {
 	public static final InputStream loadResource(String path) {
 		byte[] file = loadResourceBytes(path);
 		if (file != null) {
-			return new ByteArrayInputStream(file);
+			return new EaglerInputStream(file);
 		} else {
 			return null;
 		}
@@ -2515,7 +2515,7 @@ public class EaglerAdapterImpl2 {
 
 	public static void handleVoiceSignal(byte[] data) {
 		try {
-			DataInputStream streamIn = new DataInputStream(new ByteArrayInputStream(data));
+			DataInputStream streamIn = new DataInputStream(new EaglerInputStream(data));
 			int sig = streamIn.read();
 			switch(sig) {
 				case VOICE_SIGNAL_GLOBAL:
@@ -3408,7 +3408,7 @@ public class EaglerAdapterImpl2 {
 						}else {
 							if(open) {
 								try {
-									IPacket pkt = IPacket.readPacket(new DataInputStream(new ByteArrayInputStream(arr)));
+									IPacket pkt = IPacket.readPacket(new DataInputStream(new EaglerInputStream(arr)));
 									if(pkt instanceof IPacket69Pong) {
 										IPacket69Pong ipkt = (IPacket69Pong)pkt;
 										versError = RelayQuery.VersionMismatch.COMPATIBLE;
@@ -3668,7 +3668,7 @@ public class EaglerAdapterImpl2 {
 						}else {
 							if(open) {
 								try {
-									IPacket pkt = IPacket.readPacket(new DataInputStream(new ByteArrayInputStream(arr)));
+									IPacket pkt = IPacket.readPacket(new DataInputStream(new EaglerInputStream(arr)));
 									if(pkt instanceof IPacket07LocalWorlds) {
 										worlds = ((IPacket07LocalWorlds)pkt).worldsList;
 										sock.close();
@@ -3865,7 +3865,7 @@ public class EaglerAdapterImpl2 {
 						hasRecievedAnyData = true;
 						byte[] arr = TeaVMUtils.wrapByteArrayBuffer(evt.getDataAsArray());
 						try {
-							packets.add(IPacket.readPacket(new DataInputStream(new ByteArrayInputStream(arr))));
+							packets.add(IPacket.readPacket(new DataInputStream(new EaglerInputStream(arr))));
 						} catch (IOException e) {
 							exceptions.add(e);
 							System.err.println("Relay Socket Error: " + e.toString());

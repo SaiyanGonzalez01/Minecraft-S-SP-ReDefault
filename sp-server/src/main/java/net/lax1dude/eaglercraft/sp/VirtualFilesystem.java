@@ -388,6 +388,14 @@ public class VirtualFilesystem {
 		return list;
 	}
 	
+	public List<VFile> listVFiles(String prefix) {
+		final ArrayList<VFile> list = new ArrayList<>();
+		AsyncHandlers.iterateFiles(indexeddb, this, prefix, false, (v) -> {
+			list.add(new VFile(v.getPath()));
+		});
+		return list;
+	}
+	
 	public int deleteFiles(String prefix) {
 		return AsyncHandlers.deleteFiles(indexeddb, prefix);
 	}

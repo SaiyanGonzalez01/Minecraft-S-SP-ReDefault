@@ -358,7 +358,7 @@ public class IntegratedServerLAN {
 			if(!dead) {
 				if(state == CONNECTED) {
 					IntegratedServer.sendIPCPacket(new IPCPacket0CPlayerChannel(clientId, false));
-					EaglerAdapter.disableChannel("NET|" + clientId);
+					EaglerAdapter.disableChannel(channelId);
 				}
 				state = CLOSED;
 				EaglerAdapter.serverLANDisconnectPeer(clientId);
