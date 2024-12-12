@@ -106,7 +106,7 @@ public class VFile {
 		if(path == null) {
 			return null;
 		}
-		int i = path.indexOf(pathSeperator);
+		int i = path.lastIndexOf(pathSeperator);
 		return i == -1 ? path : path.substring(i + 1);
 	}
 	

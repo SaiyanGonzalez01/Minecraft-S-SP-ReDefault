@@ -105,7 +105,7 @@ public class WorldConverterMCA {
 								prog += b.length;
 								if (prog - lastProgUpdate > 25000) {
 									lastProgUpdate = prog;
-									IntegratedServer.updateStatusString("selectWorld.progress.importing.2", prog);
+									IntegratedServer.updateStatusString("selectWorld.progress.importing.1", prog);
 								}
 							}
 						}

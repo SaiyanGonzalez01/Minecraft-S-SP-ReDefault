@@ -37,7 +37,7 @@ public class WorldConverterEPK {
 				prog += b.length;
 				if(prog - lastProgUpdate > 10000) {
 					lastProgUpdate = prog;
-					IntegratedServer.updateStatusString("selectWorld.progress.importing.1", prog);
+					IntegratedServer.updateStatusString("selectWorld.progress.importing.0", prog);
 				}
 			}
 		}
