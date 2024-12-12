@@ -1614,25 +1614,31 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 	}
 
 	public static boolean sync(int limitFramerate, long[] timerPtr) {
-		boolean limitFPS = limitFramerate > 0 && limitFramerate < 1000;
+		boolean limitFPS = limitFramerate > 0 && limitFramerate <= 1000;
 		boolean blocked = false;
 		
 		if(limitFPS) {
+			long frameMillis = (1000l / limitFramerate);
 			if(timerPtr[0] == 0l) {
-				timerPtr[0] = steadyTimeMillis();
+				timerPtr[0] = steadyTimeMillis() + frameMillis;
 			}else {
 				long millis = steadyTimeMillis();
-				long frameMillis = (1000l / limitFramerate);
-				long frameTime = millis - timerPtr[0];
-				if(frameTime > 2000l || frameTime < 0l) {
-					frameTime = frameMillis;
-					timerPtr[0] = millis;
-				}else {
-					timerPtr[0] += frameMillis;
-				}
-				if(frameTime >= 0l && frameTime < frameMillis) {
-					sleep((int)(frameMillis - frameTime));
+				long remaining = timerPtr[0] - millis;
+				if(remaining > 0) {
+					if(isWebGL) {
+						immediateContinue(); // cannot stack setTimeouts, or it will throttle
+						millis = steadyTimeMillis();
+						remaining = timerPtr[0] - millis;
+						if(remaining > 0) {
+							sleep((int)remaining);
+						}
+					}else {
+						sleep((int)remaining);
+					}
 					blocked = true;
+				}
+				if((timerPtr[0] += frameMillis) < millis) {
+					timerPtr[0] = millis;
 				}
 			}
 		}else {
