@@ -1190,8 +1190,8 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 			bindTheShader();
 
 			StreamBufferInstance sb = shader.streamBuffer.getBuffer(bl);
-			_wglBindVertexArray0(sb.vertexArray);
-			_wglBindBuffer(_wGL_ARRAY_BUFFER, sb.vertexBuffer);
+			_wglBindVertexArray0(sb.getVertexArray());
+			_wglBindBuffer(_wGL_ARRAY_BUFFER, sb.getVertexBuffer());
 			if (!shader.bufferIsInitialized) {
 				shader.bufferIsInitialized = true;
 				_wglBufferData(_wGL_ARRAY_BUFFER, blankUploadArray, _wGL_DYNAMIC_DRAW);
@@ -1625,15 +1625,17 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 				long millis = steadyTimeMillis();
 				long remaining = timerPtr[0] - millis;
 				if(remaining > 0) {
-					if(isWebGL) {
+					if(isWebGL && immediateContinueSupported()) {
 						immediateContinue(); // cannot stack setTimeouts, or it will throttle
 						millis = steadyTimeMillis();
 						remaining = timerPtr[0] - millis;
 						if(remaining > 0) {
 							sleep((int)remaining);
+							millis = steadyTimeMillis();
 						}
 					}else {
 						sleep((int)remaining);
+						millis = steadyTimeMillis();
 					}
 					blocked = true;
 				}

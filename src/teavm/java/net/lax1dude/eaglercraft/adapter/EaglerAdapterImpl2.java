@@ -1774,6 +1774,9 @@ public class EaglerAdapterImpl2 {
 			sleep(0);
 		}
 	}
+	public static final boolean immediateContinueSupported() {
+		return immediateContinueChannel != null;
+	}
 	private static final JSString emptyJSString = JSString.valueOf("");
 	@Async
 	private static native void immediateContinueTeaVM0();
