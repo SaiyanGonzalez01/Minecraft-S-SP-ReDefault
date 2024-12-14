@@ -1,4 +1,4 @@
-package net.lax1dude.eaglercraft.adapter.teavm.vfs;
+package net.lax1dude.eaglercraft.adapter.vfs;
 
 public class SYS {
 

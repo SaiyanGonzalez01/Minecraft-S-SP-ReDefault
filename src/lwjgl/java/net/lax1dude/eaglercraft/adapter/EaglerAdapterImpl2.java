@@ -2010,4 +2010,16 @@ public class EaglerAdapterImpl2 {
 		}
 	}
 
+	public static final boolean immediateContinueSupported() {
+		return false;
+	}
+
+	public static final void immediateContinue() {
+		//
+	}
+
+	public static final List<LANPeerEvent> serverLANGetAllEvent(String clientId) {
+		return null;
+	}
+
 }

@@ -8,8 +8,7 @@ import java.io.InputStreamReader;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerImage;
 import net.lax1dude.eaglercraft.EaglerInputStream;
-import net.lax1dude.eaglercraft.EaglerMisc;
-import net.lax1dude.eaglercraft.adapter.teavm.vfs.VFile;
+import net.lax1dude.eaglercraft.adapter.vfs.VFile;
 
 public abstract class TexturePackImplementation implements ITexturePack
 {

@@ -14,7 +14,7 @@ import java.util.zip.ZipInputStream;
 import net.lax1dude.eaglercraft.EPKDecompiler;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerInputStream;
-import net.lax1dude.eaglercraft.adapter.teavm.vfs.VFile;
+import net.lax1dude.eaglercraft.adapter.vfs.VFile;
 import net.minecraft.client.Minecraft;
 
 public class TexturePackList

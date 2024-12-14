@@ -3,7 +3,7 @@ package net.minecraft.src;
 import net.lax1dude.eaglercraft.EPKDecompiler;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerInputStream;
-import net.lax1dude.eaglercraft.adapter.teavm.vfs.VFile;
+import net.lax1dude.eaglercraft.adapter.vfs.VFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
