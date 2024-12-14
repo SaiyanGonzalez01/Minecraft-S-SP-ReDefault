@@ -86,12 +86,12 @@ public class GuiMainMenu extends GuiScreen {
 				this.splashText = "missingno";
 			}
 		}
-		this.field_92025_p = "Eaglercraft 1.5.2 Service Pack #1";
+		this.field_92025_p = "Eaglercraft 1.5.2 Service Pack #2";
 		this.start = EaglerAdapter.steadyTimeMillis();
 		this.start += this.start % 10000l;
 		this.ackLines = new ArrayList();
 		
-		if(!LocalStorageManager.gameSettingsStorage.getBoolean("seenAcknowledgementsSP1")) {
+		if(!LocalStorageManager.gameSettingsStorage.getBoolean("seenAcknowledgementsSP2")) {
 			this.showAck = true;
 		}
 	}
@@ -128,8 +128,8 @@ public class GuiMainMenu extends GuiScreen {
 	}
 	
 	private void hideAck() {
-		if(!LocalStorageManager.gameSettingsStorage.getBoolean("seenAcknowledgementsSP1")) {
-			LocalStorageManager.gameSettingsStorage.setBoolean("seenAcknowledgementsSP1", true);
+		if(!LocalStorageManager.gameSettingsStorage.getBoolean("seenAcknowledgementsSP2")) {
+			LocalStorageManager.gameSettingsStorage.setBoolean("seenAcknowledgementsSP2", true);
 			LocalStorageManager.saveStorageG();
 		}
 		showAck = false;
