@@ -1,24 +1,18 @@
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-Eaglercraft 1.5.2 - Service Pack 1.01
+Eaglercraft 1.5.2 - Service Pack 2
 
-Released: October 27th, 2023 - "23w43a"
+Released: December 14th, 2024 - "24w50a"
 
-New in Service Pack 1:
+New in Service Pack 2:
 
-Huge FPS boosts, lessons learned during the development of EaglercraftX 1.8
-have been applied to 1.5, and ayunami2000 added basic support for resource
-packs. Update your unblocked game websites ASAP for the best user experience
-on slow hardware.
-
-  - fixed sunrise/sunset fog color
-  - better optimized pipeline shader
-  - backported X's state management
-  - backported X's buffer streaming
-  - backported X's hotbar FPS fix
-  - backported X's double buffering
-  - backported X's FXAA shader
+ - improved resource packs (by ayunami2000)
+ - improved the FPS even more
+ - improved voice chat reliability
+ - improved shared worlds reliability
+ - backported X's vanilla world export
+ - backported X's vsync mode
 
 Made by lax1dude
 
@@ -27,10 +21,10 @@ Run "GetRepositorySignature.bat", and verify that this is the result:
 
 ~~~ Repository SHA-256: ~~~
 
-     11970c765400f505
-     739c3581523fffe2
-     782b39675871077f
-     f0b187b0bfd5ba9f
+     3f95bf5556982de1
+     3cd4c52e572d6102
+     3e82b835979f0430
+     c05a4989dacc51ce
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -42,7 +36,7 @@ GetRepositorySignature.bat: 4B995076348E03A5322F3EB6AF72948E4C27CEB6
 GetRepositorySignature.sh: 8B269BA0D54C2B4BD7E9199B10C9769D39F00DC6
 
 
-If this is all correct, then this is the official Eaglercraft 1.5.2 Service Pack 1.01
+If this is all correct, then this is the official Eaglercraft 1.5.2 Service Pack 2
 
 
 You can download a clean copy of "GetRepositorySignature.jar" here: [https://deev.is/eagler/GetRepositorySignature.jar]
@@ -58,17 +52,17 @@ To verify the PGP signature on this message, my public key is here: [https://dee
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEcBgAq2s4AHU8tLsdcu68cJImpGoFAmV1bG8ACgkQcu68cJIm
-pGrx7w/9EGKIQCRBB6SxHeuQ/XIovdzlxtbWm/EprtCR3Qch1X0dkaTDZIb6nE2D
-2vkiolOPc8jtJk0AuR6PPIaaA1/dcwRPT02DqPxZeq8R7zesHMfxlNMMLLxfHY6s
-+r0SShcncVjJxCsLYGBnyg4UReEStaMvyts/zFtmZwHhjdERiJIBKfEQGnNAOLja
-Rb1kLqhpQ7B6rewgzIR52hVzabMh+a2dWBf2XorRYujhgpOD35jEqOdt5j/nc2s0
-EMfC11MRUdrxyL7j8ecqZFqLf/TLPvNhyp6h82E82ixdmWV8XjEUkqSaV+KgleBv
-y/E4SCAOyffpA3i7jzBSZm66HtpMlQtD/y6i6o/5WQLntyiPA+w7V6PSJ8UzsLna
-RHe/KqBwd+7I0w4LWwCaDkBp1HkhdHmAJ7a0DQGk3TztHtG0DJPsoZnI4X644b7e
-9BOmnjdX7tHRbIPxlUaem4PXQdcWmWE9qaPhYjKXkPm/MaVUf2zBCSw9K7CSpEMs
-c5g2SZs9oZhXmIzG40SALVkICnVdA03i4PWGeMRrJhD0FSm6XjGk/MMFn9O5noum
-Cfy8kqZ9zc/cfiF4n18E3AwCTNgl02MLyI70UquiEujRQGc/HoVLKsXOKA6VIEfY
-vbvc5fd1od+BgB5H9+PT6Cx1Y4F6TIB2a5gckQJxBX2nkB0d8To=
-=K0tf
+iQIzBAEBCAAdFiEEcBgAq2s4AHU8tLsdcu68cJImpGoFAmdd8f4ACgkQcu68cJIm
+pGoP9Q/7BaDOQpyjnv60IeS3cnzJEEM5Mo5CFfmooQaorunfRFJ8/6JQzmqWtwc4
+tV7aYUgTTSf/UXDA/Ii9husjFLAldrFMC2L+IaUpuNfW4X7fDElOUAOeCHpbJG2u
+XylSM+2jR2QShRkr5qKa7cR6X4ZD0HCmtJGF0q/gfmDFDWu+ZXn9hSIOhK/3eYo1
+aQ5NPEdIW7UtwXE+uA4nAsdZ3sD/GeQcsPEMBrJHPfwwhXY4BMJGQ41Knmz8wQQx
+qgbEp1r7rNaSBKaPE3FHoBk+pey12wxlH5uMIWSIYdPdt6eVbwhZlhQ2Tz226U8y
+//ngP6zj+dZwAkIG2mnxgN4DbTpq2TnMzSrApTpw41/FPXmqOu0P869yGfyG/qT2
+hzyAdBoA+F7RCx6fS4kRNFJPQsYBt8akvbwmx5RxZfKBFbhr0bQCAOvwhltXih8N
+WjVsAWi0dQtofXx5qrZIyxnSlHjvsdEGE1wwbQDiAi9dTyWS+2n1PBd4IPBKbVm0
+xfqAQJXzhrOtCAB34AVGvl/ZlGZHgUxs2J8ZcIB+OzmZCOBKxxOyXYs1qHMQjoDt
+x15frsA0m7Aub9mE4LelAKKukzduRaKIpHxaioNIf2pk5kVjIrW/WOF81jhxSB3D
+Xk340UMSjPk8FnjoxJAN+MNEcTwYOy/ZwaTQd+OYIVSyl3JobbI=
+=KEvn
 -----END PGP SIGNATURE-----
