@@ -1,6 +1,5 @@
-package net.lax1dude.eaglercraft.adapter.teavm.vfs;
+package net.lax1dude.eaglercraft.adapter.vfs;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

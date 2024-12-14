@@ -1,14 +1,20 @@
 package net.minecraft.src;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
-import net.lax1dude.eaglercraft.EaglerProfile;
-import net.lax1dude.eaglercraft.adapter.teavm.vfs.VFile;
+import net.lax1dude.eaglercraft.EPKDecompiler;
+import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.EaglerInputStream;
+import net.lax1dude.eaglercraft.adapter.vfs.VFile;
 import net.minecraft.client.Minecraft;
 
 public class TexturePackList
@@ -47,6 +53,7 @@ public class TexturePackList
 		this.mc = par2Minecraft;
 		this.texturePackDir = new VFile("texturepacks");
 		this.mpTexturePackFolder = new VFile("texturepacks-mp-cache");
+		this.mpTexturePackFolder.deleteAll();
 		this.updateAvaliableTexturePacks();
 	}
 
@@ -81,26 +88,41 @@ public class TexturePackList
 			var2 = var2.substring(0, var2.indexOf("?"));
 		}
 
-		if (var2.endsWith(".zip"))
+		if (var2.toLowerCase().endsWith(".zip") || var2.toLowerCase().endsWith(".epk"))
 		{
-			VFile var3 = new VFile(this.mpTexturePackFolder, var2);
+			VFile var3 = new VFile(this.mpTexturePackFolder, var2.replaceAll("[^A-Za-z0-9_]", "_"));
 			this.downloadTexture(par1Str, var3);
 		}
 	}
 
 	private void downloadTexture(String par1Str, VFile par2File)
 	{
-		HashMap var3 = new HashMap();
-		GuiProgress var4 = new GuiProgress();
-		var3.put("X-Minecraft-Username", EaglerProfile.username);
-		var3.put("X-Minecraft-Version", "1.5.2");
-		var3.put("X-Minecraft-Supported-Resolutions", "16");
 		this.isDownloading = true;
-		this.mc.displayGuiScreen(var4);
-		// todo: extract epk/zip to VFS, activate, and signal success
-		onDownloadFinished(); // temp
-		// SimpleStorage.set(par2File.replaceAll("[^A-Za-z0-9_]", "_"), par2File.toLowerCase().endsWith(".zip") ? zipToEpk(EaglerAdapter.downloadURL(par1Str)) : EaglerAdapter.downloadURL(par1Str));
-		// HttpUtil.downloadTexturePack(par2File, par1Str, new TexturePackDownloadSuccess(this), var3, 10000000, var4);
+		try {
+			byte[] data = EaglerAdapter.downloadURL(par1Str);
+			if (data == null) throw new IOException("Unable to download texture pack!");
+			if (par2File.getName().toLowerCase().endsWith(".epk")) {
+				EPKDecompiler epkDecompiler = new EPKDecompiler(data);
+				EPKDecompiler.FileEntry file;
+				while ((file = epkDecompiler.readFile()) != null) {
+					new VFile(par2File, file.name).setAllBytes(file.data);
+				}
+			} else {
+				try(ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(data))) {
+					ZipEntry entry;
+					while ((entry = zipInputStream.getNextEntry()) != null) {
+						if (entry.isDirectory()) continue;
+						new VFile(par2File, entry.getName()).setAllBytes(EaglerInputStream.inputStreamToBytesNoClose(zipInputStream));
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (this.isDownloading) {
+			setSelectedTexturePack(this, new TexturePackFolder(TexturePackList.generateTexturePackID(this, par2File), par2File, defaultTexturePack));
+			this.mc.scheduleTexturePackRefresh();
+		}
 	}
 
 	/**
@@ -183,20 +205,12 @@ public class TexturePackList
 	 */
 	private List getTexturePackDirContents()
 	{
-		// TODO: MAKE THIS MORE EFFICIENT!! THIS IS A TEMPORARY FIX BC IM TIRED
-		List<String> strings = this.texturePackDir.list();
-		List<String> strings2 = new ArrayList<>();
+		if (!GuiTexturePacks.texturePackListFile.exists()) return Collections.emptyList();
+		String[] lines = GuiTexturePacks.texturePackListFile.getAllLines();
 		List<VFile> files = new ArrayList<>();
-		for (String name : strings) {
-			name = name.substring(this.texturePackDir.getPath().length() + 1);
-			name = name.substring(0, name.indexOf('/'));
-			name = this.texturePackDir.getPath() + "/" + name;
-			if (strings2.contains(name)) continue;
-			strings2.add(name);
-			files.add(new VFile(name));
+		for (String line : lines) {
+			files.add(new VFile(this.texturePackDir, line));
 		}
-		strings2.clear();
-		strings.clear();
 		return files;
 	}
 

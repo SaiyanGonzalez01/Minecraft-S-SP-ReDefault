@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.adapter.teavm.vfs.VFile;
+import net.lax1dude.eaglercraft.adapter.vfs.VFile;
 
 import java.io.IOException;
 import java.io.InputStream;
