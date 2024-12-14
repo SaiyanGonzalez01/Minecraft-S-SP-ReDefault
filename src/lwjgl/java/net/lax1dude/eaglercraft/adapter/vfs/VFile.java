@@ -45,7 +45,7 @@ public class VFile extends File {
 
 	public String getAllChars() {
 		try {
-			return Files.readString(this.toPath(), StandardCharsets.UTF_8);
+			return new String(Files.readAllBytes(this.toPath()), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			return null;
 		}
@@ -57,8 +57,9 @@ public class VFile extends File {
 
 	public boolean setAllBytes(byte[] bytes) {
 		try {
-			if (this.getParentFile() != null) {
-				this.getParentFile().mkdirs();
+			File f = this.getParentFile();
+			if (f != null) {
+				f.mkdirs();
 			}
 			Files.write(this.toPath(), bytes);
 			return true;

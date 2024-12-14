@@ -563,6 +563,9 @@ public class EaglerAdapterImpl2 {
 	@JSBody(params = { }, script = "return {antialias: false, depth: true, powerPreference: \"high-performance\", desynchronized: true, preserveDrawingBuffer: false, premultipliedAlpha: false, alpha: false};")
 	public static native JSObject youEagler();
 	
+	@JSBody(params = { }, script = "return { willReadFrequently: true };")
+	public static native JSObject youEagler2();
+	
 	public static final int _wGL_TEXTURE_2D = TEXTURE_2D;
 	public static final int _wGL_DEPTH_TEST = DEPTH_TEST;
 	public static final int _wGL_LEQUAL = LEQUAL;
@@ -1063,7 +1066,7 @@ public class EaglerAdapterImpl2 {
 					imageLoadCanvas.setHeight(toLoad.getHeight());
 				}
 				if(imageLoadContext == null) {
-					imageLoadContext = (CanvasRenderingContext2D) imageLoadCanvas.getContext("2d");
+					imageLoadContext = (CanvasRenderingContext2D) imageLoadCanvas.getContext("2d", youEagler2());
 					setImageSmoothingMode(imageLoadContext, false);
 				}
 				imageLoadContext.clearRect(0, 0, toLoad.getWidth(), toLoad.getHeight());
@@ -1942,7 +1945,7 @@ public class EaglerAdapterImpl2 {
 		HTMLCanvasElement retardedCanvas = (HTMLCanvasElement)doc.createElement("canvas");
 		retardedCanvas.setWidth(canvas.getWidth());
 		retardedCanvas.setHeight(canvas.getHeight());
-		CanvasRenderingContext2D cc = (CanvasRenderingContext2D)retardedCanvas.getContext("2d");
+		CanvasRenderingContext2D cc = (CanvasRenderingContext2D)retardedCanvas.getContext("2d", youEagler2());
 		setImageSmoothingMode(cc, false);
 		cc.setFillStyle("black");
 		cc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());

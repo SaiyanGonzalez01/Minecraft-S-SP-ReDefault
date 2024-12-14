@@ -273,7 +273,6 @@ public class IntegratedServerLAN {
 						System.out.println("LAN client '" + clientId + "' disconnected");
 						disconnect();
 					}else {
-						System.out.println(evt.getClass().getSimpleName());
 						switch(state) {
 							case SENT_DESCRIPTION:{
 								if(evt instanceof LANPeerEvent.LANPeerICECandidateEvent) {
