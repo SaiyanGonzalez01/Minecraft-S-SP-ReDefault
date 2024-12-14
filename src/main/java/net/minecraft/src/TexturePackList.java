@@ -53,6 +53,7 @@ public class TexturePackList
 		this.mc = par2Minecraft;
 		this.texturePackDir = new VFile("texturepacks");
 		this.mpTexturePackFolder = new VFile("texturepacks-mp-cache");
+		this.mpTexturePackFolder.deleteAll();
 		this.updateAvaliableTexturePacks();
 	}
 
@@ -204,20 +205,12 @@ public class TexturePackList
 	 */
 	private List getTexturePackDirContents()
 	{
-		// TODO: MAKE THIS MORE EFFICIENT!! THIS IS A TEMPORARY FIX BC IM TIRED
-		List<String> strings = this.texturePackDir.list();
-		List<String> strings2 = new ArrayList<>();
+		if (!GuiTexturePacks.texturePackListFile.exists()) return Collections.emptyList();
+		String[] lines = GuiTexturePacks.texturePackListFile.getAllLines();
 		List<VFile> files = new ArrayList<>();
-		for (String name : strings) {
-			name = name.substring(this.texturePackDir.getPath().length() + 1);
-			name = name.substring(0, name.indexOf('/'));
-			name = this.texturePackDir.getPath() + "/" + name;
-			if (strings2.contains(name)) continue;
-			strings2.add(name);
-			files.add(new VFile(name));
+		for (String line : lines) {
+			files.add(new VFile(this.texturePackDir, line));
 		}
-		strings2.clear();
-		strings.clear();
 		return files;
 	}
 

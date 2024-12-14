@@ -3,7 +3,6 @@ package net.minecraft.src;
 import net.lax1dude.eaglercraft.EPKDecompiler;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerInputStream;
-import net.lax1dude.eaglercraft.EaglerMisc;
 import net.lax1dude.eaglercraft.adapter.teavm.vfs.VFile;
 
 import java.io.ByteArrayInputStream;
@@ -27,6 +26,8 @@ public class GuiTexturePacks extends GuiScreen {
 	 */
 	private GuiTexturePackSlot guiTexturePackSlot;
 	private GameSettings field_96146_n;
+
+	protected static final VFile texturePackListFile = new VFile("__LIST__");
 
 	public GuiTexturePacks(GuiScreen par1, GameSettings par2) {
 		this.guiScreen = par1;
@@ -107,6 +108,11 @@ public class GuiTexturePacks extends GuiScreen {
 			isSelectingPack = false;
 			String name = EaglerAdapter.getFileChooserResultName();
 			String safeName = name.replaceAll("[^A-Za-z0-9_]", "_");
+			if (texturePackListFile.exists()) {
+				texturePackListFile.setAllChars(texturePackListFile.getAllChars() + "\n" + safeName);
+			} else {
+				texturePackListFile.setAllChars(safeName);
+			}
 			try {
 				if (name.toLowerCase().endsWith(".zip")) {
 					try(ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(EaglerAdapter.getFileChooserResult()))) {
@@ -138,10 +144,19 @@ public class GuiTexturePacks extends GuiScreen {
 		List var3 = this.mc.texturePackList.availableTexturePacks();
 
 		if (par1) {
-			new VFile(fileLocation, ((ITexturePack) var3.get(par2)).getTexturePackFileName()).deleteAll();
 			this.mc.texturePackList.setTexturePack((ITexturePack) var3.get(0));
 			this.mc.renderEngine.refreshTextures();
 			this.mc.renderGlobal.loadRenderers();
+			String safeName = ((ITexturePack) var3.get(par2)).getTexturePackFileName();
+			new VFile(fileLocation, safeName).deleteAll();
+			if (texturePackListFile.exists()) {
+				String res = texturePackListFile.getAllChars().replaceFirst(safeName, "").replace("\n\n", "\n");
+				if (res.isEmpty()) {
+					texturePackListFile.delete();
+				} else {
+					texturePackListFile.setAllChars(res);
+				}
+			}
 		} else {
 			try {
 				this.mc.texturePackList.setTexturePack((ITexturePack) var3.get(par2));
@@ -152,7 +167,16 @@ public class GuiTexturePacks extends GuiScreen {
 				this.mc.texturePackList.setTexturePack((ITexturePack) var3.get(0));
 				this.mc.renderEngine.refreshTextures();
 				this.mc.renderGlobal.loadRenderers();
-				new VFile(fileLocation, ((ITexturePack) var3.get(par2)).getTexturePackFileName()).deleteAll();
+				String safeName = ((ITexturePack) var3.get(par2)).getTexturePackFileName();
+				new VFile(fileLocation, safeName).deleteAll();
+				if (texturePackListFile.exists()) {
+					String res = texturePackListFile.getAllChars().replaceFirst(safeName, "").replace("\n\n", "\n");
+					if (res.isEmpty()) {
+						texturePackListFile.delete();
+					} else {
+						texturePackListFile.setAllChars(res);
+					}
+				}
 			}
 		}
 	}
