@@ -6,7 +6,6 @@ import java.util.List;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
-import net.minecraft.client.Minecraft;
 
 public class WorldRenderer {
 	/** Reference to the World object. */
@@ -149,7 +148,6 @@ public class WorldRenderer {
 			this.tileEntityRenderers.clear();
 			byte var8 = 1;
 			ChunkCache var9 = new ChunkCache(this.worldObj, var1 - var8, var2 - var8, var3 - var8, var4 + var8, var5 + var8, var6 + var8, var8);
-			Profiler p = Minecraft.getMinecraft().mcProfiler;
 			if (!var9.extendedLevelsInChunkCache()) {
 				EaglerAdapter.hintAnisotropicFix(true);
 				++chunksUpdated;
@@ -157,7 +155,6 @@ public class WorldRenderer {
 				this.bytesDrawn = 0;
 
 				for (int var11 = 0; var11 < 2; ++var11) {
-					p.startSection("rebuild");
 					boolean var12 = false;
 					boolean var13 = false;
 					boolean var14 = false;
@@ -206,7 +203,6 @@ public class WorldRenderer {
 					}
 
 					if (var14) {
-						p.endStartSection("upload");
 						this.bytesDrawn += tessellator.draw();
 						//EaglerAdapter.glPopMatrix();
 						EaglerAdapter.glEndList();
@@ -214,7 +210,6 @@ public class WorldRenderer {
 					} else {
 						var13 = false;
 					}
-					p.endSection();
 
 					if (var13) {
 						this.skipRenderPass[var11] = false;

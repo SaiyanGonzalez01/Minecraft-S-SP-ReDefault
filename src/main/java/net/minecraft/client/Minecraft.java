@@ -1,9 +1,7 @@
 package net.minecraft.client;
 
 import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
 import java.util.HashSet;
-import java.util.List;
 
 import net.lax1dude.eaglercraft.DefaultSkinRenderer;
 import net.lax1dude.eaglercraft.EaglerAdapter;
@@ -67,8 +65,6 @@ import net.minecraft.src.NetClientHandler;
 import net.minecraft.src.OpenGlHelper;
 import net.minecraft.src.Packet3Chat;
 import net.minecraft.src.PlayerControllerMP;
-import net.minecraft.src.Profiler;
-import net.minecraft.src.ProfilerResult;
 import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.RenderEngine;
 import net.minecraft.src.RenderGlobal;
@@ -201,9 +197,6 @@ public class Minecraft implements Runnable {
 	private boolean isDemo;
 	private INetworkManager myNetworkManager;
 	private boolean integratedServerIsRunning;
-
-	/** The profiler instance */
-	public final Profiler mcProfiler = new Profiler();
 	private long field_83002_am = -1L;
 
 	public int chunkUpdates = 0;
@@ -667,8 +660,6 @@ public class Minecraft implements Runnable {
 			this.theWorld.getWorldVec3Pool().clear();
 		}
 
-		this.mcProfiler.startSection("root");
-
 		if (EaglerAdapter.shouldShutdown()) {
 			this.shutdown();
 		}
@@ -682,7 +673,6 @@ public class Minecraft implements Runnable {
 		}
 
 		long var6 = System.nanoTime();
-		this.mcProfiler.startSection("tick");
 
 		for (int var3 = 0; var3 < this.timer.elapsedTicks; ++var3) {
 			this.runTick();
@@ -690,20 +680,15 @@ public class Minecraft implements Runnable {
 		
 		IntegratedServer.processICP();
 
-		this.mcProfiler.endStartSection("preRenderErrors");
 		long var7 = System.nanoTime() - var6;
 		this.checkGLError("Pre render");
 		RenderBlocks.fancyGrass = this.gameSettings.fancyGraphics;
-		this.mcProfiler.endStartSection("sound");
 		this.sndManager.setListener(this.thePlayer, this.timer.renderPartialTicks);
 
 		if (!this.isGamePaused) {
 			this.sndManager.func_92071_g();
 		}
 
-		this.mcProfiler.endSection();
-		this.mcProfiler.startSection("render");
-		this.mcProfiler.startSection("display");
 		EaglerAdapter.glEnable(EaglerAdapter.GL_TEXTURE_2D);
 
 		if (!EaglerAdapter.isKeyDown(65)) {
@@ -713,38 +698,22 @@ public class Minecraft implements Runnable {
 		if (this.thePlayer != null && this.thePlayer.isEntityInsideOpaqueBlock()) {
 			this.gameSettings.thirdPersonView = 0;
 		}
-
-		this.mcProfiler.endSection();
 		
 		EaglerAdapter.glClearStack();
 		
 		if (!this.skipRenderWorld) {
-			this.mcProfiler.endStartSection("gameRenderer");
 			this.entityRenderer.updateCameraAndRender(this.timer.renderPartialTicks);
-			this.mcProfiler.endSection();
 		}
 
 		EaglerAdapter.glFlush();
-		this.mcProfiler.endSection();
 
 		//if (!EaglerAdapter.isFocused() && this.fullscreen) {
 		//	this.toggleFullscreen();
 		//}
 
-		if (this.gameSettings.showDebugInfo && this.gameSettings.showDebugProfilerChart) {
-			if (!this.mcProfiler.profilingEnabled) {
-				this.mcProfiler.clearProfiling();
-			}
-
-			this.mcProfiler.profilingEnabled = true;
-			this.displayDebugInfo(var7);
-		} else {
-			this.mcProfiler.profilingEnabled = false;
-			this.prevFrameTime = System.nanoTime();
-		}
+		this.prevFrameTime = System.nanoTime();
 
 		this.guiAchievement.updateAchievementWindow();
-		this.mcProfiler.startSection("root");
 
 		if (!this.fullscreen && (EaglerAdapter.getCanvasWidth() != this.displayWidth || EaglerAdapter.getCanvasHeight() != this.displayHeight)) {
 			this.displayWidth = EaglerAdapter.getCanvasWidth();
@@ -783,148 +752,10 @@ public class Minecraft implements Runnable {
 		}
 		
 		EaglerAdapter.doJavascriptCoroutines();
-
-		this.mcProfiler.endSection();
-		this.mcProfiler.endSection();
 	}
 
 	private int func_90020_K() {
 		return this.currentScreen != null && this.currentScreen instanceof GuiMainMenu ? 2 : this.gameSettings.limitFramerate;
-	}
-
-	/**
-	 * Update debugProfilerName in response to number keys in debug screen
-	 */
-	private void updateDebugProfilerName(int par1) {
-		List var2 = this.mcProfiler.getProfilingData(this.debugProfilerName);
-
-		if (var2 != null && !var2.isEmpty()) {
-			ProfilerResult var3 = (ProfilerResult) var2.remove(0);
-
-			if (par1 == 0) {
-				if (var3.field_76331_c.length() > 0) {
-					int var4 = this.debugProfilerName.lastIndexOf(".");
-
-					if (var4 >= 0) {
-						this.debugProfilerName = this.debugProfilerName.substring(0, var4);
-					}
-				}
-			} else {
-				--par1;
-
-				if (par1 < var2.size() && !((ProfilerResult) var2.get(par1)).field_76331_c.equals("unspecified")) {
-					if (this.debugProfilerName.length() > 0) {
-						this.debugProfilerName = this.debugProfilerName + ".";
-					}
-
-					this.debugProfilerName = this.debugProfilerName + ((ProfilerResult) var2.get(par1)).field_76331_c;
-				}
-			}
-		}
-	}
-
-	private void displayDebugInfo(long par1) {
-		if (this.mcProfiler.profilingEnabled) {
-			List var3 = this.mcProfiler.getProfilingData(this.debugProfilerName);
-			ProfilerResult var4 = (ProfilerResult) var3.remove(0);
-			EaglerAdapter.glClear(EaglerAdapter.GL_DEPTH_BUFFER_BIT);
-			EaglerAdapter.glMatrixMode(EaglerAdapter.GL_PROJECTION);
-			EaglerAdapter.glEnable(EaglerAdapter.GL_COLOR_MATERIAL);
-			EaglerAdapter.glLoadIdentity();
-			EaglerAdapter.glOrtho(0.0F, this.displayWidth, this.displayHeight, 0.0F, 1000.0F, 3000.0F);
-			EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
-			EaglerAdapter.glLoadIdentity();
-			EaglerAdapter.glTranslatef(0.0F, 0.0F, -2000.0F);
-			EaglerAdapter.glLineWidth(1.0F);
-			EaglerAdapter.glDisable(EaglerAdapter.GL_TEXTURE_2D);
-			EaglerAdapter.glEnable(EaglerAdapter.GL_DEPTH_TEST);
-			EaglerAdapter.glColor4f(1f, 1f, 1f, 1f);
-			Tessellator var5 = Tessellator.instance;
-			short var6 = 160;
-			int var7 = this.displayWidth - var6 - 10;
-			int var8 = this.displayHeight - var6 * 2;
-			EaglerAdapter.glEnable(EaglerAdapter.GL_BLEND);
-			var5.startDrawingQuads();
-			var5.setColorRGBA_I(0, 200);
-			var5.addVertex((double) ((float) var7 - (float) var6 * 1.1F), (double) ((float) var8 - (float) var6 * 0.6F - 16.0F), 0.0D);
-			var5.addVertex((double) ((float) var7 - (float) var6 * 1.1F), (double) (var8 + var6 * 2), 0.0D);
-			var5.addVertex((double) ((float) var7 + (float) var6 * 1.1F), (double) (var8 + var6 * 2), 0.0D);
-			var5.addVertex((double) ((float) var7 + (float) var6 * 1.1F), (double) ((float) var8 - (float) var6 * 0.6F - 16.0F), 0.0D);
-			var5.draw();
-			EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
-			double var9 = 0.0D;
-			int var13;
-
-			EaglerAdapter.glDepthMask(true);
-			
-			for (int var11 = 0; var11 < var3.size(); ++var11) {
-				ProfilerResult var12 = (ProfilerResult) var3.get(var11);
-				var13 = MathHelper.floor_double(var12.field_76332_a / 4.0D) + 1;
-				var5.startDrawing(EaglerAdapter.GL_TRIANGLE_FAN);
-				var5.setColorOpaque_I(var12.func_76329_a());
-				var5.addVertex((double) var7, (double) var8, 0.0D);
-				int var14;
-				float var15;
-				float var16;
-				float var17;
-
-				for (var14 = var13; var14 >= 0; --var14) {
-					var15 = (float) ((var9 + var12.field_76332_a * (double) var14 / (double) var13) * Math.PI * 2.0D / 100.0D);
-					var16 = MathHelper.sin(var15) * (float) var6;
-					var17 = MathHelper.cos(var15) * (float) var6 * 0.5F;
-					var5.addVertex((double) ((float) var7 + var16), (double) ((float) var8 - var17), 0.0D);
-				}
-
-				var5.draw();
-				var5.startDrawing(EaglerAdapter.GL_TRIANGLE_STRIP);
-				var5.setColorOpaque_I((var12.func_76329_a() & 16711422) >> 1);
-
-				for (var14 = var13; var14 >= 0; --var14) {
-					var15 = (float) ((var9 + var12.field_76332_a * (double) var14 / (double) var13) * Math.PI * 2.0D / 100.0D);
-					var16 = MathHelper.sin(var15) * (float) var6;
-					var17 = MathHelper.cos(var15) * (float) var6 * 0.5F;
-					var5.addVertex((double) ((float) var7 + var16), (double) ((float) var8 - var17), 0.0D);
-					var5.addVertex((double) ((float) var7 + var16), (double) ((float) var8 - var17 + 10.0F), 0.0D);
-				}
-
-				var5.draw();
-				var9 += var12.field_76332_a;
-			}
-
-			DecimalFormat var18 = new DecimalFormat("##0.00");
-			EaglerAdapter.glEnable(EaglerAdapter.GL_TEXTURE_2D);
-			String var19 = "";
-
-			if (!var4.field_76331_c.equals("unspecified")) {
-				var19 = var19 + "[0] ";
-			}
-
-			if (var4.field_76331_c.length() == 0) {
-				var19 = var19 + "ROOT ";
-			} else {
-				var19 = var19 + var4.field_76331_c + " ";
-			}
-
-			var13 = 16777215;
-			this.fontRenderer.drawStringWithShadow(var19, var7 - var6, var8 - var6 / 2 - 16, var13);
-			this.fontRenderer.drawStringWithShadow(var19 = var18.format(var4.field_76330_b) + "%", var7 + var6 - this.fontRenderer.getStringWidth(var19), var8 - var6 / 2 - 16, var13);
-
-			for (int var21 = 0; var21 < var3.size(); ++var21) {
-				ProfilerResult var20 = (ProfilerResult) var3.get(var21);
-				String var22 = "";
-
-				if (var20.field_76331_c.equals("unspecified")) {
-					var22 = var22 + "[?] ";
-				} else {
-					var22 = var22 + "[" + (var21 + 1) + "] ";
-				}
-
-				var22 = var22 + var20.field_76331_c;
-				this.fontRenderer.drawStringWithShadow(var22, var7 - var6, var8 + var6 / 2 + var21 * 8 + 20, var20.func_76329_a());
-				this.fontRenderer.drawStringWithShadow(var22 = var18.format(var20.field_76332_a) + "%", var7 + var6 - 50 - this.fontRenderer.getStringWidth(var22), var8 + var6 / 2 + var21 * 8 + 20, var20.func_76329_a());
-				this.fontRenderer.drawStringWithShadow(var22 = var18.format(var20.field_76330_b) + "%", var7 + var6 - this.fontRenderer.getStringWidth(var22), var8 + var6 / 2 + var21 * 8 + 20, var20.func_76329_a());
-			}
-		}
 	}
 
 	/**
@@ -1113,9 +944,6 @@ public class Minecraft implements Runnable {
 			--this.rightClickDelayTimer;
 		}
 
-		this.mcProfiler.startSection("stats");
-		this.mcProfiler.endStartSection("gui");
-		
 		this.isGamePaused = this.isSingleplayer() && this.theWorld != null && this.thePlayer != null && this.currentScreen != null
 				&& this.currentScreen.doesGuiPauseGame() && !IntegratedServerLAN.isHostingLAN();
 		
@@ -1135,15 +963,11 @@ public class Minecraft implements Runnable {
 			this.ingameGUI.updateTick();
 		}
 
-		this.mcProfiler.endStartSection("pick");
 		this.entityRenderer.getMouseOver(1.0F);
-		this.mcProfiler.endStartSection("gameMode");
 
 		if (!this.isGamePaused && this.theWorld != null) {
 			this.playerController.updateController();
 		}
-		
-		this.mcProfiler.endStartSection("textures");
 
 		if (!this.isGamePaused) {
 			this.renderEngine.updateDynamicTextures();
@@ -1198,7 +1022,6 @@ public class Minecraft implements Runnable {
 		}
 
 		if (this.currentScreen == null || this.currentScreen.allowUserInput) {
-			this.mcProfiler.endStartSection("mouse");
 
 			while (EaglerAdapter.mouseNext()) {
 				KeyBinding.setKeyBindState(EaglerAdapter.mouseGetEventButton() - 100, EaglerAdapter.mouseGetEventButtonState());
@@ -1242,7 +1065,6 @@ public class Minecraft implements Runnable {
 				--this.leftClickCounter;
 			}
 
-			this.mcProfiler.endStartSection("keyboard");
 			boolean var8;
 
 			while (EaglerAdapter.keysNext()) {
@@ -1345,18 +1167,6 @@ public class Minecraft implements Runnable {
 								}
 							}
 						}
-
-						if (this.gameSettings.showDebugInfo && this.gameSettings.showDebugProfilerChart && !this.gameSettings.keyBindFunction.pressed) {
-							if (EaglerAdapter.getEventKey() == 11) {
-								this.updateDebugProfilerName(0);
-							}
-
-							for (int var9 = 0; var9 < 9; ++var9) {
-								if (EaglerAdapter.getEventKey() == 2 + var9) {
-									this.updateDebugProfilerName(var9 + 1);
-								}
-							}
-						}
 					}
 				}
 			}
@@ -1446,19 +1256,13 @@ public class Minecraft implements Runnable {
 				}
 			}
 
-			this.mcProfiler.endStartSection("gameRenderer");
-
 			if (!this.isGamePaused) {
 				this.entityRenderer.updateRenderer();
 			}
 
-			this.mcProfiler.endStartSection("levelRenderer");
-
 			if (!this.isGamePaused) {
 				this.renderGlobal.updateClouds();
 			}
-
-			this.mcProfiler.endStartSection("level");
 
 			if (!this.isGamePaused) {
 				if (this.theWorld.lastLightningBolt > 0) {
@@ -1474,19 +1278,14 @@ public class Minecraft implements Runnable {
 				this.theWorld.tick();
 			}
 
-			this.mcProfiler.endStartSection("animateTick");
-
 			if (!this.isGamePaused && this.theWorld != null) {
 				this.theWorld.doVoidFogParticles(MathHelper.floor_double(this.thePlayer.posX), MathHelper.floor_double(this.thePlayer.posY), MathHelper.floor_double(this.thePlayer.posZ));
 			}
-
-			this.mcProfiler.endStartSection("particles");
 
 			if (!this.isGamePaused) {
 				this.effectRenderer.updateEffects();
 			}
 		} else if (this.myNetworkManager != null) {
-			this.mcProfiler.endStartSection("pendingConnection");
 			this.myNetworkManager.processReadPackets();
 		} else {
 			this.entityRenderer.startup = 0;
@@ -1518,7 +1317,6 @@ public class Minecraft implements Runnable {
 			reconnectAddress = null;
 		}
 
-		this.mcProfiler.endSection();
 		this.systemTime = getSystemTime();
 	}
 	

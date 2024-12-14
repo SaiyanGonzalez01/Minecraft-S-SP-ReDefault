@@ -857,13 +857,10 @@ public class EntityRenderer {
 	 * the world and GUI
 	 */
 	public void updateCameraAndRender(float par1) {
-		this.mc.mcProfiler.startSection("lightTex");
-
 		if (this.lightmapUpdateNeeded) {
 			this.updateLightmap(par1);
 		}
 
-		this.mc.mcProfiler.endSection();
 		boolean var2 = EaglerAdapter.isFocused();
 
 		if (!var2 && this.mc.gameSettings.pauseOnLostFocus) {
@@ -871,8 +868,6 @@ public class EntityRenderer {
 		} else {
 			this.prevFrameTime = Minecraft.getSystemTime();
 		}
-
-		this.mc.mcProfiler.startSection("mouse");
 
 		if (this.mc.inGameHasFocus && var2) {
 			this.mc.mouseHelper.mouseXYChange();
@@ -900,8 +895,6 @@ public class EntityRenderer {
 			}
 		}
 
-		this.mc.mcProfiler.endSection();
-
 		if (!this.mc.skipRenderWorld) {
 			anaglyphEnable = this.mc.gameSettings.anaglyph;
 			ScaledResolution var13 = new ScaledResolution(this.mc.gameSettings, this.mc.displayWidth, this.mc.displayHeight);
@@ -912,8 +905,6 @@ public class EntityRenderer {
 			int var18 = performanceToFps(this.mc.gameSettings.limitFramerate);
 
 			if (this.mc.theWorld != null) {
-				this.mc.mcProfiler.startSection("level");
-
 				if (this.mc.gameSettings.limitFramerate == 0) {
 					this.renderWorld(par1, 0L);
 				} else {
@@ -930,7 +921,6 @@ public class EntityRenderer {
 				}
 
 				this.renderEndNanoTime = System.nanoTime();
-				this.mc.mcProfiler.endStartSection("gui");
 
 				if (!this.mc.gameSettings.hideGUI || this.mc.currentScreen != null) {
 					EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.1F);
@@ -973,7 +963,6 @@ public class EntityRenderer {
 					EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
 					EaglerAdapter.glDisable(EaglerAdapter.EAG_SWAP_RB);
 				}
-				this.mc.mcProfiler.endSection();
 			} else {
 				EaglerAdapter.glViewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
 				EaglerAdapter.glMatrixMode(EaglerAdapter.GL_PROJECTION);
@@ -1002,8 +991,6 @@ public class EntityRenderer {
 	public static final TextureLocation terrain = new TextureLocation("/terrain.png");
 
 	public void renderWorld(float par1, long par2) {
-		this.mc.mcProfiler.startSection("lightTex");
-
 		if (this.lightmapUpdateNeeded) {
 			this.updateLightmap(par1);
 		}
@@ -1015,7 +1002,6 @@ public class EntityRenderer {
 			this.mc.renderViewEntity = this.mc.thePlayer;
 		}
 
-		this.mc.mcProfiler.endStartSection("pick");
 		this.getMouseOver(par1);
 		EntityLiving var4 = this.mc.renderViewEntity;
 		RenderGlobal var5 = this.mc.renderGlobal;
@@ -1023,7 +1009,6 @@ public class EntityRenderer {
 		double var7 = var4.lastTickPosX + (var4.posX - var4.lastTickPosX) * (double) par1;
 		double var9 = var4.lastTickPosY + (var4.posY - var4.lastTickPosY) * (double) par1;
 		double var11 = var4.lastTickPosZ + (var4.posZ - var4.lastTickPosZ) * (double) par1;
-		this.mc.mcProfiler.endStartSection("center");
 		
 		EffectPipelineFXAA.displayWidth = this.mc.displayWidth;
 		EffectPipelineFXAA.displayHeight = this.mc.displayHeight;
@@ -1043,21 +1028,17 @@ public class EntityRenderer {
 			}
 
 			EaglerAdapter.glViewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
-			this.mc.mcProfiler.endStartSection("clear");
 			EaglerAdapter.glClear(EaglerAdapter.GL_COLOR_BUFFER_BIT | EaglerAdapter.GL_DEPTH_BUFFER_BIT);
 			this.updateFogColor(par1);
 			EaglerAdapter.glEnable(EaglerAdapter.GL_CULL_FACE);
-			this.mc.mcProfiler.endStartSection("camera");
 			this.setupCameraTransform(par1, var13);
 			ActiveRenderInfo.updateRenderInfo(this.mc.thePlayer, this.mc.gameSettings.thirdPersonView == 2);
-			this.mc.mcProfiler.endStartSection("frustrum");
 			ClippingHelperImpl.getInstance();
 			
 			EaglerAdapter.glEnable(EaglerAdapter.GL_FOG);
 
 			if (this.mc.gameSettings.renderDistance < 2) {
 				this.setupFog(-1, par1);
-				this.mc.mcProfiler.endStartSection("sky");
 				var5.renderSky(par1);
 			}
 			
@@ -1067,14 +1048,11 @@ public class EntityRenderer {
 				EaglerAdapter.glShadeModel(EaglerAdapter.GL_SMOOTH);
 			}
 
-			this.mc.mcProfiler.endStartSection("culling");
 			Frustrum var14 = new Frustrum();
 			var14.setPosition(var7, var9, var11);
 			this.mc.renderGlobal.clipRenderersByFrustum(var14, par1);
 
 			if (var13 == 0) {
-				this.mc.mcProfiler.endStartSection("updatechunks");
-
 				while (!this.mc.renderGlobal.updateRenderers(var4, false) && par2 != 0L) {
 					long var15 = par2 - System.nanoTime();
 
@@ -1088,7 +1066,6 @@ public class EntityRenderer {
 				this.renderCloudsCheck(var5, par1);
 			}
 
-			this.mc.mcProfiler.endStartSection("prepareterrain");
 			EaglerAdapter.glEnable(EaglerAdapter.GL_FOG);
 			this.setupFog(0, par1);
 			EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
@@ -1102,28 +1079,23 @@ public class EntityRenderer {
 				EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MIN_FILTER, EaglerAdapter.GL_NEAREST_MIPMAP_LINEAR);
 			}
 			EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.6f);
-			this.mc.mcProfiler.endStartSection("terrain");
 			var5.sortAndRender(var4, 0, (double) par1);
 			EaglerAdapter.glShadeModel(EaglerAdapter.GL_FLAT);
 			EntityPlayer var17;
 
 			if (this.debugViewDirection == 0) {
 				RenderHelper.enableStandardItemLighting();
-				this.mc.mcProfiler.endStartSection("entities");
 				var5.renderEntities(var4.getPosition(par1), var14, par1);
 				this.enableLightmap((double) par1);
-				this.mc.mcProfiler.endStartSection("litParticles");
 				var6.renderLitParticles(var4, par1);
 				RenderHelper.disableStandardItemLighting();
 				this.setupFog(0, par1);
-				this.mc.mcProfiler.endStartSection("particles");
 				var6.renderParticles(var4, par1);
 				this.disableLightmap((double) par1);
 
 				if (this.mc.objectMouseOver != null && var4.isInsideOfMaterial(Material.water) && var4 instanceof EntityPlayer && !this.mc.gameSettings.hideGUI) {
 					var17 = (EntityPlayer) var4;
 					EaglerAdapter.glDisable(EaglerAdapter.GL_ALPHA_TEST);
-					this.mc.mcProfiler.endStartSection("outline");
 					var5.drawBlockBreaking(var17, this.mc.objectMouseOver, 0, var17.inventory.getCurrentItem(), par1);
 					var5.drawSelectionBox(var17, this.mc.objectMouseOver, 0, var17.inventory.getCurrentItem(), par1);
 					EaglerAdapter.glEnable(EaglerAdapter.GL_ALPHA_TEST);
@@ -1141,8 +1113,6 @@ public class EntityRenderer {
 			terrain.bindTexture();
 			
 			//if (this.mc.gameSettings.fancyGraphics) {
-				this.mc.mcProfiler.endStartSection("water");
-
 				EaglerAdapter.glColorMask(false, false, false, false);
 				int var18 = var5.sortAndRender(var4, 1, (double) par1);
 
@@ -1179,18 +1149,15 @@ public class EntityRenderer {
 			if (this.cameraZoom == 1.0D && var4 instanceof EntityPlayer && !this.mc.gameSettings.hideGUI && this.mc.objectMouseOver != null && !var4.isInsideOfMaterial(Material.water)) {
 				var17 = (EntityPlayer) var4;
 				EaglerAdapter.glDisable(EaglerAdapter.GL_ALPHA_TEST);
-				this.mc.mcProfiler.endStartSection("outline");
 				var5.drawBlockBreaking(var17, this.mc.objectMouseOver, 0, var17.inventory.getCurrentItem(), par1);
 				var5.drawSelectionBox(var17, this.mc.objectMouseOver, 0, var17.inventory.getCurrentItem(), par1);
 				EaglerAdapter.glEnable(EaglerAdapter.GL_ALPHA_TEST);
 			}
 
-			this.mc.mcProfiler.endStartSection("destroyProgress");
 			EaglerAdapter.glEnable(EaglerAdapter.GL_BLEND);
 			EaglerAdapter.glBlendFunc(EaglerAdapter.GL_SRC_ALPHA, EaglerAdapter.GL_ONE);
 			var5.drawBlockDamageTexture(Tessellator.instance, (EntityPlayer) var4, par1);
 			EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
-			this.mc.mcProfiler.endStartSection("weather");
 			EaglerAdapter.glDisable(EaglerAdapter.GL_FOG);
 
 			if (var4.posY >= 128.0D) {
@@ -1198,8 +1165,6 @@ public class EntityRenderer {
 			}
 			
 			this.renderRainSnow(par1);
-
-			this.mc.mcProfiler.endStartSection("hand");
 			
 			//EaglerAdapter.glClear(EaglerAdapter.GL_DEPTH_BUFFER_BIT);
 			
@@ -1213,10 +1178,8 @@ public class EntityRenderer {
 			}
 		}
 
-		this.mc.mcProfiler.endStartSection("postprocess");
 		EaglerAdapter.glColorMask(true, true, true, false);
 		EffectPipelineFXAA.endPipelineRender();
-		this.mc.mcProfiler.endSection();
 	}
 
 	/**
@@ -1224,7 +1187,6 @@ public class EntityRenderer {
 	 */
 	private void renderCloudsCheck(RenderGlobal par1RenderGlobal, float par2) {
 		if (this.mc.gameSettings.shouldRenderClouds()) {
-			this.mc.mcProfiler.endStartSection("clouds");
 			EaglerAdapter.glPushMatrix();
 			this.setupFog(0, par2);
 			EaglerAdapter.glEnable(EaglerAdapter.GL_FOG);

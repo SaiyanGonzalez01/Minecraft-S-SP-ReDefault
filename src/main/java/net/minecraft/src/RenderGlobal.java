@@ -351,7 +351,6 @@ public class RenderGlobal implements IWorldAccess {
 		if (this.renderEntitiesStartupCounter > 0) {
 			--this.renderEntitiesStartupCounter;
 		} else {
-			this.theWorld.theProfiler.startSection("prepare");
 			TileEntityRenderer.instance.cacheActiveRenderInfo(this.theWorld, this.renderEngine, this.mc.fontRenderer, this.mc.renderViewEntity, par3);
 			RenderManager.instance.cacheActiveRenderInfo(this.theWorld, this.renderEngine, this.mc.fontRenderer, this.mc.renderViewEntity, this.mc.pointedEntityLiving, this.mc.gameSettings, par3);
 			this.countEntitiesTotal = 0;
@@ -365,7 +364,6 @@ public class RenderGlobal implements IWorldAccess {
 			TileEntityRenderer.staticPlayerY = var4.lastTickPosY + (var4.posY - var4.lastTickPosY) * (double) par3;
 			TileEntityRenderer.staticPlayerZ = var4.lastTickPosZ + (var4.posZ - var4.lastTickPosZ) * (double) par3;
 			this.mc.entityRenderer.enableLightmap((double) par3);
-			this.theWorld.theProfiler.endStartSection("global");
 			List var5 = this.theWorld.getLoadedEntityList();
 			this.countEntitiesTotal = var5.size();
 			int var6;
@@ -380,8 +378,6 @@ public class RenderGlobal implements IWorldAccess {
 				}
 			}
 
-			this.theWorld.theProfiler.endStartSection("entities");
-
 			for (var6 = 0; var6 < var5.size(); ++var6) {
 				var7 = (Entity) var5.get(var6);
 
@@ -393,7 +389,6 @@ public class RenderGlobal implements IWorldAccess {
 				}
 			}
 
-			this.theWorld.theProfiler.endStartSection("tileentities");
 			RenderHelper.enableStandardItemLighting();
 
 			for (var6 = 0; var6 < this.tileEntities.size(); ++var6) {
@@ -401,7 +396,6 @@ public class RenderGlobal implements IWorldAccess {
 			}
 
 			this.mc.entityRenderer.disableLightmap((double) par3);
-			this.theWorld.theProfiler.endSection();
 		}
 	}
 
@@ -509,8 +503,6 @@ public class RenderGlobal implements IWorldAccess {
 	 * renderPass, partialTickTime
 	 */
 	public int sortAndRender(EntityLiving par1EntityLiving, int par2, double par3) {
-		this.theWorld.theProfiler.startSection("sortchunks");
-
 		for (int var5 = 0; var5 < 10; ++var5) {
 			this.worldRenderersCheckIndex = (this.worldRenderersCheckIndex + 1) % this.worldRenderers.length;
 			WorldRenderer var6 = this.worldRenderers[this.worldRenderersCheckIndex];
@@ -564,7 +556,6 @@ public class RenderGlobal implements IWorldAccess {
 
 		long ct = EaglerAdapter.steadyTimeMillis();
 		if(par2 == 0) {
-			this.theWorld.theProfiler.endStartSection("getoccl");
 			for (int i = 0; i < this.sortedWorldRenderers.length; ++i) {
 				WorldRenderer c = this.sortedWorldRenderers[i];
 				int ccx = c.chunkX - fx;
@@ -583,7 +574,6 @@ public class RenderGlobal implements IWorldAccess {
 			}
 		}
 		
-		this.theWorld.theProfiler.endStartSection("render");
 		var34 = var17 + this.renderSortedRenderers(0, this.sortedWorldRenderers.length, par2, par3);
 		
 		var7 -= par1EntityLiving.getEyeHeight();
@@ -612,7 +602,6 @@ public class RenderGlobal implements IWorldAccess {
 			
 			inFrustumCount = 0;
 			lastOcclusionQuery = ct;
-			this.theWorld.theProfiler.endStartSection("occl");
 			EaglerAdapter.glEnable(EaglerAdapter.GL_CULL_FACE);
 			EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
 			EaglerAdapter.glColorMask(false, false, false, false);
@@ -649,7 +638,6 @@ public class RenderGlobal implements IWorldAccess {
 			EaglerAdapter.glEnable(EaglerAdapter.GL_CULL_FACE);
 		}
 
-		this.theWorld.theProfiler.endSection();
 		return var34;
 	}
 
@@ -1218,7 +1206,6 @@ public class RenderGlobal implements IWorldAccess {
 		ArrayList var6 = null;
 		int var7 = this.worldRenderersToUpdate.size();
 		int var8 = 0;
-		this.theWorld.theProfiler.startSection("nearChunksSearch");
 		int var9;
 		WorldRenderer var10;
 		int var11;
@@ -1242,9 +1229,6 @@ public class RenderGlobal implements IWorldAccess {
 		}
 		
 		this.worldRenderersToUpdate = laterUpdateList;
-
-		this.theWorld.theProfiler.endSection();
-		this.theWorld.theProfiler.startSection("sortAndUpdate");
 
 		int updates = 0;
 		int dropped = 0;
@@ -1270,8 +1254,6 @@ public class RenderGlobal implements IWorldAccess {
 			}
 		}
 
-		this.theWorld.theProfiler.endSection();
-		
 		return true;
 	}
 	

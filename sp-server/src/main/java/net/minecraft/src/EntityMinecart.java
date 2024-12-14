@@ -208,7 +208,6 @@ public abstract class EntityMinecart extends Entity {
 		int var2;
 
 		if (!this.worldObj.isRemote && this.worldObj instanceof WorldServer) {
-			this.worldObj.theProfiler.startSection("portal");
 			MinecraftServer var1 = ((WorldServer) this.worldObj).getMinecraftServer();
 			var2 = this.getMaxInPortalTime();
 
@@ -243,8 +242,6 @@ public abstract class EntityMinecart extends Entity {
 			if (this.timeUntilPortal > 0) {
 				--this.timeUntilPortal;
 			}
-
-			this.worldObj.theProfiler.endSection();
 		}
 
 		if (this.worldObj.isRemote) {

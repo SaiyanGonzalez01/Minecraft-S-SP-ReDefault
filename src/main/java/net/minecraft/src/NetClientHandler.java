@@ -155,8 +155,9 @@ public class NetClientHandler extends NetHandler {
 
 	public void handleLogin(Packet1Login par1Packet1Login) {
 		this.mc.playerController = new PlayerControllerMP(this.mc, this);
-		this.worldClient = new WorldClient(this, new WorldSettings(0L, par1Packet1Login.gameType, false, par1Packet1Login.hardcoreMode, par1Packet1Login.terrainType), par1Packet1Login.dimension, par1Packet1Login.difficultySetting,
-				this.mc.mcProfiler);
+		this.worldClient = new WorldClient(this, new WorldSettings(0L, par1Packet1Login.gameType, false,
+				par1Packet1Login.hardcoreMode, par1Packet1Login.terrainType), par1Packet1Login.dimension,
+				par1Packet1Login.difficultySetting);
 		this.worldClient.isRemote = true;
 		this.mc.loadWorld(this.worldClient);
 		this.mc.thePlayer.dimension = par1Packet1Login.dimension;
@@ -720,8 +721,10 @@ public class NetClientHandler extends NetHandler {
 		if (par1Packet9Respawn.respawnDimension != this.mc.thePlayer.dimension) {
 			this.doneLoadingTerrain = false;
 			Scoreboard var2 = this.worldClient.getScoreboard();
-			this.worldClient = new WorldClient(this, new WorldSettings(0L, par1Packet9Respawn.gameType, false, this.mc.theWorld.getWorldInfo().isHardcoreModeEnabled(), par1Packet9Respawn.terrainType), par1Packet9Respawn.respawnDimension,
-					par1Packet9Respawn.difficulty, this.mc.mcProfiler);
+			this.worldClient = new WorldClient(this,
+					new WorldSettings(0L, par1Packet9Respawn.gameType, false,
+							this.mc.theWorld.getWorldInfo().isHardcoreModeEnabled(), par1Packet9Respawn.terrainType),
+					par1Packet9Respawn.respawnDimension, par1Packet9Respawn.difficulty);
 			this.worldClient.func_96443_a(var2);
 			this.worldClient.isRemote = true;
 			this.mc.loadWorld(this.worldClient);

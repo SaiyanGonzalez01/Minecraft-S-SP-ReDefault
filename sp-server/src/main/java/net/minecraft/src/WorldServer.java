@@ -71,9 +71,8 @@ public class WorldServer extends World {
 	private IntHashMap entityIdMap;
 
 	public WorldServer(MinecraftServer par1MinecraftServer, ISaveHandler par2ISaveHandler, String par3Str, int par4,
-			WorldSettings par5WorldSettings, Profiler par6Profiler, ILogAgent par7ILogAgent) {
-		super(par2ISaveHandler, par3Str, par5WorldSettings, WorldProvider.getProviderForDimension(par4), par6Profiler,
-				par7ILogAgent);
+			WorldSettings par5WorldSettings, ILogAgent par7ILogAgent) {
+		super(par2ISaveHandler, par3Str, par5WorldSettings, WorldProvider.getProviderForDimension(par4), par7ILogAgent);
 		this.mcServer = par1MinecraftServer;
 		this.theEntityTracker = new EntityTracker(this);
 		this.thePlayerManager = new PlayerManager(this,
@@ -130,14 +129,11 @@ public class WorldServer extends World {
 			}
 		}
 
-		this.theProfiler.startSection("mobSpawner");
-
 		if (this.getGameRules().getGameRuleBooleanValue("doMobSpawning")) {
 			SpawnerAnimals.findChunksForSpawning(this, this.spawnHostileMobs, this.spawnPeacefulMobs,
 					this.worldInfo.getWorldTotalTime() % 400L == 0L);
 		}
 
-		this.theProfiler.endStartSection("chunkSource");
 		this.chunkProvider.unloadQueuedChunks();
 		int var4 = this.calculateSkylightSubtracted(1.0F);
 
@@ -147,18 +143,12 @@ public class WorldServer extends World {
 
 		this.worldInfo.incrementTotalWorldTime(this.worldInfo.getWorldTotalTime() + 1L);
 		this.worldInfo.setWorldTime(this.worldInfo.getWorldTime() + 1L);
-		this.theProfiler.endStartSection("tickPending");
 		this.tickUpdates(false);
-		this.theProfiler.endStartSection("tickTiles");
 		this.tickBlocksAndAmbiance();
-		this.theProfiler.endStartSection("chunkMap");
 		this.thePlayerManager.updatePlayerInstances();
-		this.theProfiler.endStartSection("village");
 		this.villageCollectionObj.tick();
 		this.villageSiegeObj.tick();
-		this.theProfiler.endStartSection("portalForcer");
 		this.field_85177_Q.removeStalePortalLocations(this.getTotalWorldTime());
-		this.theProfiler.endSection();
 		this.sendAndApplyBlockEvents();
 
 		_r += this.theChunkProviderServer.statR();
@@ -280,14 +270,11 @@ public class WorldServer extends World {
 			ChunkCoordIntPair var4 = (ChunkCoordIntPair) var3.next();
 			int var5 = var4.chunkXPos * 16;
 			int var6 = var4.chunkZPos * 16;
-			this.theProfiler.startSection("getChunk");
 			Chunk var7 = this.getChunkFromChunkCoords(var4.chunkXPos, var4.chunkZPos);
 			this.moodSoundAndLightCheck(var5, var6, var7);
-			this.theProfiler.endStartSection("tickChunk");
 			if(var7.updateSkylight()) {
 				++_lu;
 			}
-			this.theProfiler.endStartSection("thunder");
 			int var8;
 			int var9;
 			int var10;
@@ -305,7 +292,6 @@ public class WorldServer extends World {
 				}
 			}
 
-			this.theProfiler.endStartSection("iceandsnow");
 			int var13;
 
 			if (this.rand.nextInt(16) == 0) {
@@ -336,7 +322,6 @@ public class WorldServer extends World {
 				}
 			}
 			
-			this.theProfiler.endStartSection("tickTiles");
 			ExtendedBlockStorage[] var19 = var7.getBlockStorageArray();
 			var9 = var19.length;
 
@@ -362,8 +347,6 @@ public class WorldServer extends World {
 					}
 				}
 			}
-
-			this.theProfiler.endSection();
 		}
 	}
 
@@ -471,7 +454,6 @@ public class WorldServer extends World {
 				var2 = 1000;
 			}
 
-			this.theProfiler.startSection("cleaning");
 			NextTickListEntry var4;
 
 			for (int var3 = 0; var3 < var2; ++var3) {
@@ -486,8 +468,6 @@ public class WorldServer extends World {
 				this.field_94579_S.add(var4);
 			}
 
-			this.theProfiler.endSection();
-			this.theProfiler.startSection("ticking");
 			Iterator var14 = this.field_94579_S.iterator();
 
 			while (var14.hasNext()) {
@@ -508,7 +488,6 @@ public class WorldServer extends World {
 				}
 			}
 
-			this.theProfiler.endSection();
 			this.field_94579_S.clear();
 			return !this.pendingTickListEntries.isEmpty();
 		}
